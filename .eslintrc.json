@@ -95,13 +95,14 @@
         "node": false
       },
 
-      "plugins": ["@typescript-eslint"],
+      "plugins": ["react", "@typescript-eslint"],
 
       "extends": [
         "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended",
         "prettier",
-        "plugin:prettier/recommended"
+        "plugin:prettier/recommended",
+        "plugin:react-hooks/recommended"
       ],
 
       "rules": {
@@ -158,7 +159,18 @@
         ],
 
         "ava/no-only-test": "off",
-        "ava/no-skip-test": "off"
+        "ava/no-skip-test": "off",
+
+        // React Eslint
+        "react/button-has-type": ["warn", { "reset": false }],
+        "react/prop-types": "off",
+        "react/no-unescaped-entities": "off",
+        "react/jsx-curly-brace-presence": "error",
+        "react/display-name": "off",
+
+        // React-Hooks Eslint
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "warn"
       }
     }
   ]

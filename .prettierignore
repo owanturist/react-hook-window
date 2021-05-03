@@ -2,6 +2,7 @@ es
 lib
 dist
 types
+demo
 
 node_modules
 yarn.lock
