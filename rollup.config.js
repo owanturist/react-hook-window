@@ -26,6 +26,7 @@ export default [
   // CommonJS
   {
     input: 'src/index.ts',
+    external: ['react'],
     output: {
       dir: 'lib/',
       format: 'cjs',
@@ -51,6 +52,7 @@ export default [
   // ES
   {
     input: inputES,
+    external: ['react'],
     output: {
       dir: 'es/',
       format: 'es',
@@ -64,29 +66,30 @@ export default [
   },
 
   // ES for Browsers
-  {
-    input: inputES,
-    output: {
-      dir: 'es/',
-      format: 'es',
-      indent: false,
-      entryFileNames: '[name].mjs',
-      sourcemap: true
-    },
-    plugins: [
-      nodeResolve({ extensions }),
+  // {
+  //   input: inputES,
+  //   external: ['react'],
+  //   output: {
+  //     dir: 'es/',
+  //     format: 'es',
+  //     indent: false,
+  //     entryFileNames: '[name].mjs',
+  //     sourcemap: true
+  //   },
+  //   plugins: [
+  //     nodeResolve({ extensions }),
 
-      typescript({
-        tsconfig: './tsconfig.prod.json',
-        transformers: [renamePrivates]
-      }),
+  //     typescript({
+  //       tsconfig: './tsconfig.prod.json',
+  //       transformers: [renamePrivates]
+  //     }),
 
-      terser({
-        module: true,
-        ...terserOptions
-      })
-    ]
-  },
+  //     terser({
+  //       module: true,
+  //       ...terserOptions
+  //     })
+  //   ]
+  // },
 
   // UMD Development
   ...[].map(entry => ({
