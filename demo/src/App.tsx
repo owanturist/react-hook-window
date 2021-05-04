@@ -19,8 +19,8 @@ const App = React.memo(() => {
 
   const {
     ref,
-    startOffset,
-    endOffset,
+    topOffset,
+    bottomOffset,
     indexes,
     scrollToItem,
     isScrolling
@@ -73,7 +73,7 @@ const App = React.memo(() => {
         scroll
       </button>
       <div ref={ref} style={{ height, overflow: 'auto' }}>
-        <div style={{ height: startOffset }} />
+        <div style={{ height: topOffset }} />
         {indexes.map(index => {
           const item = items[index]
 
@@ -90,7 +90,7 @@ const App = React.memo(() => {
             </div>
           )
         })}
-        <div style={{ height: endOffset }} />
+        <div style={{ height: bottomOffset }} />
       </div>
     </div>
   )

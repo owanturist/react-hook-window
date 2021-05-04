@@ -50,8 +50,8 @@ export interface UseFixedSizeListOptions {
 
 export interface UseFixedSizeListResult<E extends HTMLElement> {
   ref: RefObject<E>
-  startOffset: number
-  endOffset: number
+  topOffset: number
+  bottomOffset: number
   indexes: Array<number>
   isScrolling: boolean
   scrollToItem(index: number): void
@@ -196,8 +196,8 @@ export const useFixedSizeList = <E extends HTMLElement>({
   return useMemo(
     () => ({
       ref: containerRef,
-      startOffset: start * itemHeight,
-      endOffset: (itemCount - end) * itemHeight,
+      topOffset: start * itemHeight,
+      bottomOffset: (itemCount - end) * itemHeight,
       indexes,
       isScrolling,
       scrollToItem
