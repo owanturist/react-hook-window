@@ -9,6 +9,7 @@ import {
 import throttle from 'lodash.throttle'
 import debounce from 'lodash.debounce'
 
+const DEFAULT_OVERSCAN_COUNT = 1
 const DEFAULT_THROTTLE_MS = 16 // ~ 60fps
 const IS_SCROLLING_DEBOUNCE_MS = 150
 
@@ -29,13 +30,14 @@ abstract class Boundaries {
     return { start, end }
   }
 
-  public static limit(
+  public static overscan(
+    overscanCount: number,
     itemCount: number,
     { start, end }: Boundaries
   ): Boundaries {
     return {
-      start: Math.max(0, start - 1),
-      end: Math.min(itemCount, end + 1)
+      start: Math.max(0, start - overscanCount),
+      end: Math.min(itemCount, end + overscanCount)
     }
   }
 }
@@ -43,6 +45,7 @@ abstract class Boundaries {
 export interface UseFixedSizeListOptions {
   itemHeight: number
   itemCount: number
+  overscanCount?: number
   scrollTo?: number
   scrollThrottling?: number
   resizeThrottling?: number
@@ -60,6 +63,7 @@ export interface UseFixedSizeListResult<E extends HTMLElement> {
 export const useFixedSizeList = <E extends HTMLElement>({
   itemHeight,
   itemCount,
+  overscanCount = DEFAULT_OVERSCAN_COUNT,
   scrollTo,
   scrollThrottling = DEFAULT_THROTTLE_MS,
   resizeThrottling = DEFAULT_THROTTLE_MS
@@ -70,8 +74,8 @@ export const useFixedSizeList = <E extends HTMLElement>({
   const containerRef = useRef<E>(null)
 
   const { start, end } = useMemo(
-    () => Boundaries.limit(itemCount, boundaries),
-    [itemCount, boundaries]
+    () => Boundaries.overscan(overscanCount, itemCount, boundaries),
+    [overscanCount, itemCount, boundaries]
   )
 
   const scrollToPx = useCallback((px: number) => {
