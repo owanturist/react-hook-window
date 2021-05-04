@@ -54,8 +54,12 @@ export const useFixedSizeList = <E extends HTMLElement>({
 }: UseFixedSizeListOptions): UseFixedSizeListResult<E> => {
   const [boundaries, setBoundaries] = useState(Boundaries.initial)
 
-  const scrollTopRef = useRef(0)
   const containerRef = useRef<E>(null)
+
+  const { start, end } = useMemo(
+    () => Boundaries.limit(itemCount, boundaries),
+    [itemCount, boundaries]
+  )
 
   const scrollToItem = useCallback(
     (index: number): void => {
@@ -75,17 +79,19 @@ export const useFixedSizeList = <E extends HTMLElement>({
       return
     }
 
+    let scrollTop = 0
+
     setBoundaries(Boundaries.calc(itemHeight, node))
 
     const onScroll = (): void => {
-      const prevStart = Boundaries.calcStart(itemHeight, scrollTopRef.current)
+      const prevStart = Boundaries.calcStart(itemHeight, scrollTop)
       const nextBoundaries = Boundaries.calc(itemHeight, node)
 
       if (prevStart !== nextBoundaries.start) {
         setBoundaries(nextBoundaries)
       }
 
-      scrollTopRef.current = node.scrollTop
+      scrollTop = node.scrollTop
     }
 
     node.addEventListener('scroll', onScroll)
@@ -107,18 +113,30 @@ export const useFixedSizeList = <E extends HTMLElement>({
     }
   }, [itemHeight])
 
-  const { start, end } = useMemo(
-    () => Boundaries.limit(itemCount, boundaries),
-    [itemCount, boundaries]
-  )
+  // keep eye on overscroll when itemCount drops
+  useEffect(() => {
+    const node = containerRef.current
 
-  return useMemo(() => {
-    return {
+    if (node == null) {
+      return
+    }
+
+    const maxItemsInWindow = Math.ceil(node.clientHeight / itemHeight)
+    const maxStart = itemCount - maxItemsInWindow
+
+    if (start > maxStart) {
+      setBoundaries(Boundaries.calc(itemHeight, node))
+    }
+  }, [start, itemCount, itemHeight])
+
+  return useMemo(
+    () => ({
       ref: containerRef,
       startOffset: start * itemHeight,
       endOffset: (itemCount - end) * itemHeight,
       indexes: Array.from({ length: end - start }).map((_, i) => i + start),
       scrollToItem
-    }
-  }, [start, end, itemHeight, itemCount, scrollToItem])
+    }),
+    [start, end, itemHeight, itemCount, scrollToItem]
+  )
 }
