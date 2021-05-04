@@ -164,6 +164,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
     if (start > maxStart) {
       setBoundaries(Boundaries.calc(itemHeight, node))
+      node.scrollTo(node.scrollLeft, itemCount * itemHeight - node.clientHeight)
     }
   }, [start, itemCount, itemHeight])
 
