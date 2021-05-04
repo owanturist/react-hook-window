@@ -2,11 +2,12 @@ import React from 'react'
 import './App.css'
 import { useFixedSizeList } from 'react-hook-window'
 
-const makeItems = (n: number): Array<{ id: number; title: string }> =>
-  Array.from({ length: n }).map((_, i) => ({
+const makeItems = (n: number): Array<{ id: number; title: string }> => {
+  return Array.from({ length: n }).map((_, i) => ({
     id: i,
     title: `Hello world #${i}`
   }))
+}
 
 const App = React.memo(() => {
   const [height, setHeight] = React.useState(500)

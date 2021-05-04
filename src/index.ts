@@ -42,6 +42,17 @@ abstract class Boundaries {
   }
 }
 
+const range = (start: number, end: number): Array<number> => {
+  const N = end - start
+  const acc = new Array(N)
+
+  for (let index = 0; index < N; index++) {
+    acc[index] = index + start
+  }
+
+  return acc
+}
+
 export interface UseFixedSizeListOptions {
   itemHeight: number
   itemCount: number
@@ -57,6 +68,7 @@ export interface UseFixedSizeListResult<E extends HTMLElement> {
   bottomOffset: number
   indexes: Array<number>
   isScrolling: boolean
+  scrollTo(px: number): void
   scrollToItem(index: number): void
 }
 
@@ -64,7 +76,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
   itemHeight,
   itemCount,
   overscanCount = DEFAULT_OVERSCAN_COUNT,
-  scrollTo,
+  scrollTo: scrollTop,
   scrollThrottling = DEFAULT_THROTTLE_MS,
   resizeThrottling = DEFAULT_THROTTLE_MS
 }: UseFixedSizeListOptions): UseFixedSizeListResult<E> => {
@@ -78,7 +90,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
     [overscanCount, itemCount, boundaries]
   )
 
-  const scrollToPx = useCallback((px: number) => {
+  const scrollTo = useCallback((px: number) => {
     const node = containerRef.current
 
     if (node != null && node.scrollTop !== px) {
@@ -87,45 +99,17 @@ export const useFixedSizeList = <E extends HTMLElement>({
   }, [])
 
   const scrollToItem = useCallback(
-    (index: number): void => scrollToPx(itemHeight * index),
-    [scrollToPx, itemHeight]
+    (index: number): void => scrollTo(itemHeight * index),
+    [scrollTo, itemHeight]
   )
 
-  useEffect(() => {
-    if (scrollTo != null) {
-      scrollToPx(scrollTo)
-    }
-  }, [scrollToPx, scrollTo])
-
+  // isScrolling monotor
   useEffect(() => {
     const node = containerRef.current
 
     if (node == null) {
       return
     }
-
-    setBoundaries(Boundaries.calc(itemHeight, node))
-  }, [itemHeight])
-
-  useEffect(() => {
-    const node = containerRef.current
-
-    if (node == null) {
-      return
-    }
-
-    let scrollTop = 0
-
-    const onScroll = throttle((): void => {
-      const prevStart = Boundaries.calcStart(itemHeight, scrollTop)
-      const nextBoundaries = Boundaries.calc(itemHeight, node)
-
-      if (prevStart !== nextBoundaries.start) {
-        setBoundaries(nextBoundaries)
-      }
-
-      scrollTop = node.scrollTop
-    }, scrollThrottling)
 
     const onScrollStart = debounce(
       () => setIsScrolling(true),
@@ -139,20 +123,65 @@ export const useFixedSizeList = <E extends HTMLElement>({
       { leading: false, trailing: true }
     )
 
-    node.addEventListener('scroll', onScroll)
     node.addEventListener('scroll', onScrollStart)
     node.addEventListener('scroll', onScrollEnd)
 
     return () => {
-      onScroll.cancel()
       onScrollStart.cancel()
       onScrollEnd.cancel()
-      node.removeEventListener('scroll', onScroll)
       node.removeEventListener('scroll', onScrollStart)
       node.removeEventListener('scroll', onScrollEnd)
     }
+  }, [])
+
+  // props.scrollTo monitor
+  useEffect(() => {
+    if (scrollTop != null) {
+      scrollTo(scrollTop)
+    }
+  }, [scrollTo, scrollTop])
+
+  // props.itemHeight monitor
+  useEffect(() => {
+    const node = containerRef.current
+
+    if (node == null) {
+      return
+    }
+
+    setBoundaries(Boundaries.calc(itemHeight, node))
+  }, [itemHeight])
+
+  // container scroll monitor
+  useEffect(() => {
+    const node = containerRef.current
+
+    if (node == null) {
+      return
+    }
+
+    let prevScrollTop = 0
+
+    const onScroll = throttle((): void => {
+      const prevStart = Boundaries.calcStart(itemHeight, prevScrollTop)
+      const nextBoundaries = Boundaries.calc(itemHeight, node)
+
+      if (prevStart !== nextBoundaries.start) {
+        setBoundaries(nextBoundaries)
+      }
+
+      prevScrollTop = node.scrollTop
+    }, scrollThrottling)
+
+    node.addEventListener('scroll', onScroll)
+
+    return () => {
+      onScroll.cancel()
+      node.removeEventListener('scroll', onScroll)
+    }
   }, [itemHeight, scrollThrottling])
 
+  // container size monitor
   useEffect(() => {
     const node = containerRef.current
 
@@ -188,24 +217,17 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
     if (start > maxStart) {
       setBoundaries(Boundaries.calc(itemHeight, node))
-      scrollToPx(itemCount * itemHeight - node.clientHeight)
+      scrollTo(itemCount * itemHeight - node.clientHeight)
     }
-  }, [scrollToPx, start, itemCount, itemHeight])
+  }, [scrollTo, start, itemCount, itemHeight])
 
-  const indexes = useMemo(
-    () => Array.from({ length: end - start }).map((_, i) => i + start),
-    [start, end]
-  )
-
-  return useMemo(
-    () => ({
-      ref: containerRef,
-      topOffset: start * itemHeight,
-      bottomOffset: (itemCount - end) * itemHeight,
-      indexes,
-      isScrolling,
-      scrollToItem
-    }),
-    [start, end, itemHeight, itemCount, indexes, isScrolling, scrollToItem]
-  )
+  return {
+    ref: containerRef,
+    topOffset: start * itemHeight,
+    bottomOffset: (itemCount - end) * itemHeight,
+    indexes: useMemo(() => range(start, end), [start, end]),
+    isScrolling,
+    scrollTo,
+    scrollToItem
+  }
 }
