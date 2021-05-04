@@ -123,19 +123,29 @@ export const useFixedSizeList = <E extends HTMLElement>({
       scrollTop = node.scrollTop
     }, scrollThrottling)
 
-    const onScrollStartEnd = debounce(
-      () => setIsScrolling(x => !x),
+    const onScrollStart = debounce(
+      () => setIsScrolling(true),
       IS_SCROLLING_DEBOUNCE_MS,
-      { leading: true, trailing: true }
+      { leading: true, trailing: false }
+    )
+
+    const onScrollEnd = debounce(
+      () => setIsScrolling(false),
+      IS_SCROLLING_DEBOUNCE_MS,
+      { leading: false, trailing: true }
     )
 
     node.addEventListener('scroll', onScroll)
-    node.addEventListener('scroll', onScrollStartEnd)
+    node.addEventListener('scroll', onScrollStart)
+    node.addEventListener('scroll', onScrollEnd)
 
     return () => {
       onScroll.cancel()
-      onScrollStartEnd.cancel()
+      onScrollStart.cancel()
+      onScrollEnd.cancel()
       node.removeEventListener('scroll', onScroll)
+      node.removeEventListener('scroll', onScrollStart)
+      node.removeEventListener('scroll', onScrollEnd)
     }
   }, [itemHeight, scrollThrottling])
 
