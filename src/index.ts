@@ -43,6 +43,7 @@ abstract class Boundaries {
 export interface UseFixedSizeListOptions {
   itemHeight: number
   itemCount: number
+  scrollTo?: number
   scrollThrottling?: number
   resizeThrottling?: number
 }
@@ -59,6 +60,7 @@ export interface UseFixedSizeListResult<E extends HTMLElement> {
 export const useFixedSizeList = <E extends HTMLElement>({
   itemHeight,
   itemCount,
+  scrollTo,
   scrollThrottling = DEFAULT_THROTTLE_MS,
   resizeThrottling = DEFAULT_THROTTLE_MS
 }: UseFixedSizeListOptions): UseFixedSizeListResult<E> => {
@@ -72,16 +74,24 @@ export const useFixedSizeList = <E extends HTMLElement>({
     [itemCount, boundaries]
   )
 
-  const scrollToItem = useCallback(
-    (index: number): void => {
-      const node = containerRef.current
+  const scrollToPx = useCallback((px: number) => {
+    const node = containerRef.current
 
-      if (node) {
-        node.scrollTo(node.scrollLeft, itemHeight * index)
-      }
-    },
-    [itemHeight]
+    if (node != null && node.scrollTop !== px) {
+      node.scrollTo(node.scrollLeft, px)
+    }
+  }, [])
+
+  const scrollToItem = useCallback(
+    (index: number): void => scrollToPx(itemHeight * index),
+    [scrollToPx, itemHeight]
   )
+
+  useEffect(() => {
+    if (scrollTo != null) {
+      scrollToPx(scrollTo)
+    }
+  }, [scrollToPx, scrollTo])
 
   useEffect(() => {
     const node = containerRef.current
@@ -164,9 +174,9 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
     if (start > maxStart) {
       setBoundaries(Boundaries.calc(itemHeight, node))
-      node.scrollTo(node.scrollLeft, itemCount * itemHeight - node.clientHeight)
+      scrollToPx(itemCount * itemHeight - node.clientHeight)
     }
-  }, [start, itemCount, itemHeight])
+  }, [scrollToPx, start, itemCount, itemHeight])
 
   const indexes = useMemo(
     () => Array.from({ length: end - start }).map((_, i) => i + start),

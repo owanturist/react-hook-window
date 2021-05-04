@@ -13,6 +13,7 @@ const App = React.memo(() => {
   const [itemHeight, setItemHeight] = React.useState(40)
   const [itemCount, setItemCount] = React.useState(1000)
   const [scrollToItemIndex, setScrollToItemIndex] = React.useState(30)
+  const [scrollTo, setScrollTo] = React.useState(100)
 
   const items = React.useMemo(() => makeItems(itemCount), [itemCount])
 
@@ -26,6 +27,7 @@ const App = React.memo(() => {
   } = useFixedSizeList<HTMLDivElement>({
     itemHeight,
     itemCount,
+    scrollTo,
     scrollThrottling: 100
   })
 
@@ -54,7 +56,14 @@ const App = React.memo(() => {
         onChange={event => setItemCount(Number(event.target.value))}
       />
       <br />
-      Scroll to
+      Scroll to px
+      <input
+        type="number"
+        value={scrollTo}
+        onChange={event => setScrollTo(Number(event.target.value))}
+      />
+      <br />
+      Scroll to Item
       <input
         type="number"
         value={scrollToItemIndex}
