@@ -102,7 +102,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
     let scrollTop = 0
 
-    const onScrolling = throttle((): void => {
+    const onScroll = throttle((): void => {
       const prevStart = Boundaries.calcStart(itemHeight, scrollTop)
       const nextBoundaries = Boundaries.calc(itemHeight, node)
 
@@ -113,26 +113,19 @@ export const useFixedSizeList = <E extends HTMLElement>({
       scrollTop = node.scrollTop
     }, scrollThrottling)
 
-    const onScrollStart = debounce(
-      () => setIsScrolling(true),
+    const onScrollStartEnd = debounce(
+      () => setIsScrolling(x => !x),
       IS_SCROLLING_DEBOUNCE_MS,
-      { leading: true, trailing: false }
+      { leading: true, trailing: true }
     )
 
-    const onScrollEnd = debounce(
-      () => setIsScrolling(false),
-      IS_SCROLLING_DEBOUNCE_MS
-    )
-
-    node.addEventListener('scroll', onScrolling)
-    node.addEventListener('scroll', onScrollStart)
-    node.addEventListener('scroll', onScrollEnd)
+    node.addEventListener('scroll', onScroll)
+    node.addEventListener('scroll', onScrollStartEnd)
 
     return () => {
-      onScrolling.cancel()
-      onScrollStart.cancel()
-      onScrollEnd.cancel()
-      node.removeEventListener('scroll', onScrolling)
+      onScroll.cancel()
+      onScrollStartEnd.cancel()
+      node.removeEventListener('scroll', onScroll)
     }
   }, [itemHeight, scrollThrottling])
 
