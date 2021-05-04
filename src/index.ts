@@ -7,6 +7,10 @@ import {
   useCallback
 } from 'react'
 import throttle from 'lodash.throttle'
+import debounce from 'lodash.debounce'
+
+const DEFAULT_THROTTLE_MS = 16 // ~ 60fps
+const IS_SCROLLING_DEBOUNCE_MS = 150
 
 abstract class Boundaries {
   public abstract readonly start: number
@@ -48,15 +52,17 @@ export interface UseFixedSizeListResult<E extends HTMLElement> {
   startOffset: number
   endOffset: number
   indexes: Array<number>
+  isScrolling: boolean
   scrollToItem(index: number): void
 }
 
 export const useFixedSizeList = <E extends HTMLElement>({
   itemHeight,
   itemCount,
-  scrollThrottling = 16,
-  resizeThrottling = 16
+  scrollThrottling = DEFAULT_THROTTLE_MS,
+  resizeThrottling = DEFAULT_THROTTLE_MS
 }: UseFixedSizeListOptions): UseFixedSizeListResult<E> => {
+  const [isScrolling, setIsScrolling] = useState(false)
   const [boundaries, setBoundaries] = useState(Boundaries.initial)
 
   const containerRef = useRef<E>(null)
@@ -96,7 +102,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
     let scrollTop = 0
 
-    const onScroll = throttle((): void => {
+    const onScrolling = throttle((): void => {
       const prevStart = Boundaries.calcStart(itemHeight, scrollTop)
       const nextBoundaries = Boundaries.calc(itemHeight, node)
 
@@ -107,11 +113,26 @@ export const useFixedSizeList = <E extends HTMLElement>({
       scrollTop = node.scrollTop
     }, scrollThrottling)
 
-    node.addEventListener('scroll', onScroll)
+    const onScrollStart = debounce(
+      () => setIsScrolling(true),
+      IS_SCROLLING_DEBOUNCE_MS,
+      { leading: true, trailing: false }
+    )
+
+    const onScrollEnd = debounce(
+      () => setIsScrolling(false),
+      IS_SCROLLING_DEBOUNCE_MS
+    )
+
+    node.addEventListener('scroll', onScrolling)
+    node.addEventListener('scroll', onScrollStart)
+    node.addEventListener('scroll', onScrollEnd)
 
     return () => {
-      onScroll.cancel()
-      node.removeEventListener('scroll', onScroll)
+      onScrolling.cancel()
+      onScrollStart.cancel()
+      onScrollEnd.cancel()
+      node.removeEventListener('scroll', onScrolling)
     }
   }, [itemHeight, scrollThrottling])
 
@@ -153,14 +174,20 @@ export const useFixedSizeList = <E extends HTMLElement>({
     }
   }, [start, itemCount, itemHeight])
 
+  const indexes = useMemo(
+    () => Array.from({ length: end - start }).map((_, i) => i + start),
+    [start, end]
+  )
+
   return useMemo(
     () => ({
       ref: containerRef,
       startOffset: start * itemHeight,
       endOffset: (itemCount - end) * itemHeight,
-      indexes: Array.from({ length: end - start }).map((_, i) => i + start),
+      indexes,
+      isScrolling,
       scrollToItem
     }),
-    [start, end, itemHeight, itemCount, scrollToItem]
+    [start, end, itemHeight, itemCount, indexes, isScrolling, scrollToItem]
   )
 }

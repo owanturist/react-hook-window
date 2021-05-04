@@ -21,7 +21,8 @@ const App = React.memo(() => {
     startOffset,
     endOffset,
     indexes,
-    scrollToItem
+    scrollToItem,
+    isScrolling
   } = useFixedSizeList<HTMLDivElement>({
     itemHeight,
     itemCount,
@@ -30,6 +31,8 @@ const App = React.memo(() => {
 
   return (
     <div>
+      Scrolling: {String(isScrolling)}
+      <br />
       Height:
       <input
         type="number"
