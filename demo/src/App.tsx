@@ -24,7 +24,8 @@ const App = React.memo(() => {
     scrollToItem
   } = useFixedSizeList<HTMLDivElement>({
     itemHeight,
-    itemCount
+    itemCount,
+    scrollThrottling: 100
   })
 
   return (

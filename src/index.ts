@@ -6,6 +6,7 @@ import {
   useMemo,
   useCallback
 } from 'react'
+import throttle from 'lodash.throttle'
 
 abstract class Boundaries {
   public abstract readonly start: number
@@ -38,6 +39,8 @@ abstract class Boundaries {
 export interface UseFixedSizeListOptions {
   itemHeight: number
   itemCount: number
+  scrollThrottling?: number
+  resizeThrottling?: number
 }
 
 export interface UseFixedSizeListResult<E extends HTMLElement> {
@@ -50,7 +53,9 @@ export interface UseFixedSizeListResult<E extends HTMLElement> {
 
 export const useFixedSizeList = <E extends HTMLElement>({
   itemHeight,
-  itemCount
+  itemCount,
+  scrollThrottling = 16,
+  resizeThrottling = 16
 }: UseFixedSizeListOptions): UseFixedSizeListResult<E> => {
   const [boundaries, setBoundaries] = useState(Boundaries.initial)
 
@@ -79,11 +84,19 @@ export const useFixedSizeList = <E extends HTMLElement>({
       return
     }
 
+    setBoundaries(Boundaries.calc(itemHeight, node))
+  }, [itemHeight])
+
+  useEffect(() => {
+    const node = containerRef.current
+
+    if (node == null) {
+      return
+    }
+
     let scrollTop = 0
 
-    setBoundaries(Boundaries.calc(itemHeight, node))
-
-    const onScroll = (): void => {
+    const onScroll = throttle((): void => {
       const prevStart = Boundaries.calcStart(itemHeight, scrollTop)
       const nextBoundaries = Boundaries.calc(itemHeight, node)
 
@@ -92,26 +105,37 @@ export const useFixedSizeList = <E extends HTMLElement>({
       }
 
       scrollTop = node.scrollTop
-    }
+    }, scrollThrottling)
 
     node.addEventListener('scroll', onScroll)
 
-    if (node.scrollTop > node.scrollHeight) {
-      node.scrollTo(node.scrollLeft, node.scrollHeight)
+    return () => {
+      onScroll.cancel()
+      node.removeEventListener('scroll', onScroll)
+    }
+  }, [itemHeight, scrollThrottling])
+
+  useEffect(() => {
+    const node = containerRef.current
+
+    if (node == null) {
+      return
     }
 
-    const observer = new ResizeObserver(() => {
+    const resizeListener = throttle((): void => {
       setBoundaries(Boundaries.calc(itemHeight, node))
-    })
+    }, resizeThrottling)
+
+    const observer = new ResizeObserver(resizeListener)
 
     observer.observe(node)
 
     return () => {
-      node.removeEventListener('scroll', onScroll)
+      resizeListener.cancel()
       observer.unobserve(node)
       observer.disconnect()
     }
-  }, [itemHeight])
+  }, [itemHeight, resizeThrottling])
 
   // keep eye on overscroll when itemCount drops
   useEffect(() => {
