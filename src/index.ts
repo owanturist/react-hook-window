@@ -1,4 +1,11 @@
-import { RefObject, useRef, useState, useEffect, useMemo } from 'react'
+import {
+  RefObject,
+  useRef,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback
+} from 'react'
 
 abstract class Boundaries {
   public abstract readonly start: number
@@ -38,6 +45,7 @@ export interface UseFixedSizeListResult<E extends HTMLElement> {
   startOffset: number
   endOffset: number
   indexes: Array<number>
+  scrollToItem(index: number): void
 }
 
 export const useFixedSizeList = <E extends HTMLElement>({
@@ -49,13 +57,16 @@ export const useFixedSizeList = <E extends HTMLElement>({
   const scrollTopRef = useRef(0)
   const containerRef = useRef<E>(null)
 
-  useEffect(() => {
-    const node = containerRef.current
+  const scrollToItem = useCallback(
+    (index: number): void => {
+      const node = containerRef.current
 
-    if (node != null) {
-      setBoundaries(Boundaries.calc(itemHeight, node))
-    }
-  }, [itemHeight])
+      if (node) {
+        node.scrollTo(node.scrollLeft, itemHeight * index)
+      }
+    },
+    [itemHeight]
+  )
 
   useEffect(() => {
     const node = containerRef.current
@@ -63,6 +74,8 @@ export const useFixedSizeList = <E extends HTMLElement>({
     if (node == null) {
       return
     }
+
+    setBoundaries(Boundaries.calc(itemHeight, node))
 
     const onScroll = (): void => {
       const prevStart = Boundaries.calcStart(itemHeight, scrollTopRef.current)
@@ -82,14 +95,41 @@ export const useFixedSizeList = <E extends HTMLElement>({
     }
   }, [itemHeight])
 
-  return useMemo(() => {
-    const { start, end } = Boundaries.limit(itemCount, boundaries)
+  useEffect(() => {
+    const node = containerRef.current
 
+    if (node == null) {
+      return
+    }
+
+    if (node.scrollTop > node.scrollHeight) {
+      node.scrollTo(node.scrollLeft, node.scrollHeight)
+    }
+
+    const observer = new ResizeObserver(() => {
+      setBoundaries(Boundaries.calc(itemHeight, node))
+    })
+
+    observer.observe(node)
+
+    return () => {
+      observer.unobserve(node)
+      observer.disconnect()
+    }
+  }, [itemHeight])
+
+  const { start, end } = useMemo(
+    () => Boundaries.limit(itemCount, boundaries),
+    [itemCount, boundaries]
+  )
+
+  return useMemo(() => {
     return {
       ref: containerRef,
       startOffset: start * itemHeight,
       endOffset: (itemCount - end) * itemHeight,
-      indexes: Array.from({ length: end - start }).map((_, i) => i + start)
+      indexes: Array.from({ length: end - start }).map((_, i) => i + start),
+      scrollToItem
     }
-  }, [itemCount, itemHeight, boundaries])
+  }, [start, end, itemHeight, itemCount, scrollToItem])
 }
