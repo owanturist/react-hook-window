@@ -13,11 +13,15 @@ const DEFAULT_OVERSCAN_COUNT = 1
 const DEFAULT_THROTTLE_MS = 16 // ~ 60fps
 const IS_SCROLLING_DEBOUNCE_MS = 150
 
+const clamp = (min: number, max: number, value: number): number => {
+  return Math.max(min, Math.min(value, max))
+}
+
 abstract class Boundaries {
   public abstract readonly start: number
-  public abstract readonly end: number
+  public abstract readonly stop: number
 
-  public static initial: Boundaries = { start: 0, end: 0 }
+  public static initial: Boundaries = { start: 0, stop: 0 }
 
   public static calcStart(itemHeight: number, scrollTop: number): number {
     return Math.floor(scrollTop / itemHeight)
@@ -25,32 +29,34 @@ abstract class Boundaries {
 
   public static calc(itemHeight: number, node: HTMLElement): Boundaries {
     const start = Boundaries.calcStart(itemHeight, node.scrollTop)
-    const end = start + Math.ceil(node.clientHeight / itemHeight)
+    const stop = start + Math.ceil(node.clientHeight / itemHeight)
 
-    return { start, end }
+    return { start, stop }
   }
 
   public static overscan(
     overscanCount: number,
     itemCount: number,
-    { start, end }: Boundaries
+    boundaries: Boundaries
   ): Boundaries {
+    const start = clamp(0, boundaries.start - overscanCount, itemCount)
+
     return {
-      start: Math.max(0, start - overscanCount),
-      end: Math.min(itemCount, end + overscanCount)
+      start,
+      stop: clamp(start, boundaries.stop + overscanCount, itemCount)
     }
   }
-}
 
-const range = (start: number, end: number): Array<number> => {
-  const N = end - start
-  const acc = new Array(N)
+  public static indexes({ start, stop }: Boundaries): Array<number> {
+    const N = stop - start
+    const acc = new Array<number>(N)
 
-  for (let index = 0; index < N; index++) {
-    acc[index] = index + start
+    for (let index = 0; index < N; index++) {
+      acc[index] = index + start
+    }
+
+    return acc
   }
-
-  return acc
 }
 
 const useIsScrolling = <E extends HTMLElement>(ref: RefObject<E>): boolean => {
@@ -63,7 +69,7 @@ const useIsScrolling = <E extends HTMLElement>(ref: RefObject<E>): boolean => {
       return
     }
 
-    const onScrollStart = debounce(
+    const onScrollBegin = debounce(
       () => setIsScrolling(true),
       IS_SCROLLING_DEBOUNCE_MS,
       { leading: true, trailing: false }
@@ -75,13 +81,13 @@ const useIsScrolling = <E extends HTMLElement>(ref: RefObject<E>): boolean => {
       { leading: false, trailing: true }
     )
 
-    node.addEventListener('scroll', onScrollStart)
+    node.addEventListener('scroll', onScrollBegin)
     node.addEventListener('scroll', onScrollEnd)
 
     return () => {
-      onScrollStart.cancel()
+      onScrollBegin.cancel()
       onScrollEnd.cancel()
-      node.removeEventListener('scroll', onScrollStart)
+      node.removeEventListener('scroll', onScrollBegin)
       node.removeEventListener('scroll', onScrollEnd)
     }
   }, [ref])
@@ -121,7 +127,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
   const isScrolling = useIsScrolling(containerRef)
   const [boundaries, setBoundaries] = useState(Boundaries.initial)
 
-  const { start, end } = useMemo(
+  const overscanned = useMemo(
     () => Boundaries.overscan(overscanCount, itemCount, boundaries),
     [overscanCount, itemCount, boundaries]
   )
@@ -220,17 +226,17 @@ export const useFixedSizeList = <E extends HTMLElement>({
     const maxItemsInWindow = Math.ceil(node.clientHeight / itemHeight)
     const maxStart = itemCount - maxItemsInWindow
 
-    if (start > maxStart) {
+    if (boundaries.start > maxStart) {
       setBoundaries(Boundaries.calc(itemHeight, node))
       scrollTo(itemCount * itemHeight - node.clientHeight)
     }
-  }, [scrollTo, start, itemCount, itemHeight])
+  }, [scrollTo, boundaries.start, itemCount, itemHeight])
 
   return {
     ref: containerRef,
-    topOffset: start * itemHeight,
-    bottomOffset: (itemCount - end) * itemHeight,
-    indexes: useMemo(() => range(start, end), [start, end]),
+    topOffset: overscanned.start * itemHeight,
+    bottomOffset: (itemCount - overscanned.stop) * itemHeight,
+    indexes: useMemo(() => Boundaries.indexes(overscanned), [overscanned]),
     isScrolling,
     scrollTo,
     scrollToItem
