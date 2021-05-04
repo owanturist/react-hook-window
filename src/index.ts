@@ -90,18 +90,6 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
     node.addEventListener('scroll', onScroll)
 
-    return () => {
-      node.removeEventListener('scroll', onScroll)
-    }
-  }, [itemHeight])
-
-  useEffect(() => {
-    const node = containerRef.current
-
-    if (node == null) {
-      return
-    }
-
     if (node.scrollTop > node.scrollHeight) {
       node.scrollTo(node.scrollLeft, node.scrollHeight)
     }
@@ -113,6 +101,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
     observer.observe(node)
 
     return () => {
+      node.removeEventListener('scroll', onScroll)
       observer.unobserve(node)
       observer.disconnect()
     }
