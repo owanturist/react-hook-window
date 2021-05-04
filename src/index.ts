@@ -53,6 +53,42 @@ const range = (start: number, end: number): Array<number> => {
   return acc
 }
 
+const useIsScrolling = <E extends HTMLElement>(ref: RefObject<E>): boolean => {
+  const [isScrolling, setIsScrolling] = useState(false)
+
+  useEffect(() => {
+    const node = ref.current
+
+    if (node == null) {
+      return
+    }
+
+    const onScrollStart = debounce(
+      () => setIsScrolling(true),
+      IS_SCROLLING_DEBOUNCE_MS,
+      { leading: true, trailing: false }
+    )
+
+    const onScrollEnd = debounce(
+      () => setIsScrolling(false),
+      IS_SCROLLING_DEBOUNCE_MS,
+      { leading: false, trailing: true }
+    )
+
+    node.addEventListener('scroll', onScrollStart)
+    node.addEventListener('scroll', onScrollEnd)
+
+    return () => {
+      onScrollStart.cancel()
+      onScrollEnd.cancel()
+      node.removeEventListener('scroll', onScrollStart)
+      node.removeEventListener('scroll', onScrollEnd)
+    }
+  }, [ref])
+
+  return isScrolling
+}
+
 export interface UseFixedSizeListOptions {
   itemHeight: number
   itemCount: number
@@ -80,10 +116,10 @@ export const useFixedSizeList = <E extends HTMLElement>({
   scrollThrottling = DEFAULT_THROTTLE_MS,
   resizeThrottling = DEFAULT_THROTTLE_MS
 }: UseFixedSizeListOptions): UseFixedSizeListResult<E> => {
-  const [isScrolling, setIsScrolling] = useState(false)
-  const [boundaries, setBoundaries] = useState(Boundaries.initial)
-
   const containerRef = useRef<E>(null)
+
+  const isScrolling = useIsScrolling(containerRef)
+  const [boundaries, setBoundaries] = useState(Boundaries.initial)
 
   const { start, end } = useMemo(
     () => Boundaries.overscan(overscanCount, itemCount, boundaries),
@@ -102,37 +138,6 @@ export const useFixedSizeList = <E extends HTMLElement>({
     (index: number): void => scrollTo(itemHeight * index),
     [scrollTo, itemHeight]
   )
-
-  // isScrolling monotor
-  useEffect(() => {
-    const node = containerRef.current
-
-    if (node == null) {
-      return
-    }
-
-    const onScrollStart = debounce(
-      () => setIsScrolling(true),
-      IS_SCROLLING_DEBOUNCE_MS,
-      { leading: true, trailing: false }
-    )
-
-    const onScrollEnd = debounce(
-      () => setIsScrolling(false),
-      IS_SCROLLING_DEBOUNCE_MS,
-      { leading: false, trailing: true }
-    )
-
-    node.addEventListener('scroll', onScrollStart)
-    node.addEventListener('scroll', onScrollEnd)
-
-    return () => {
-      onScrollStart.cancel()
-      onScrollEnd.cancel()
-      node.removeEventListener('scroll', onScrollStart)
-      node.removeEventListener('scroll', onScrollEnd)
-    }
-  }, [])
 
   // props.scrollTo monitor
   useEffect(() => {
