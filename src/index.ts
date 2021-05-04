@@ -27,23 +27,32 @@ abstract class Boundaries {
     return Math.floor(scrollTop / itemHeight)
   }
 
+  public static calcStop(
+    itemHeight: number,
+    scrollTop: number,
+    height: number
+  ): number {
+    return Math.floor((scrollTop + height) / itemHeight)
+  }
+
   public static calc(itemHeight: number, node: HTMLElement): Boundaries {
     const start = Boundaries.calcStart(itemHeight, node.scrollTop)
-    const stop = start + Math.ceil(node.clientHeight / itemHeight)
+    const stop = Boundaries.calcStop(
+      itemHeight,
+      node.scrollTop,
+      node.clientHeight
+    )
 
     return { start, stop }
   }
 
-  public static overscan(
-    overscanCount: number,
-    itemCount: number,
-    boundaries: Boundaries
-  ): Boundaries {
-    const start = clamp(0, boundaries.start - overscanCount, itemCount)
+  // FIX +1 on visibleStopIndex
+  public static limit(itemCount: number, boundaries: Boundaries): Boundaries {
+    const start = clamp(0, boundaries.start, itemCount)
 
     return {
       start,
-      stop: clamp(start, boundaries.stop + overscanCount, itemCount)
+      stop: clamp(start, boundaries.stop, itemCount)
     }
   }
 
@@ -56,6 +65,14 @@ abstract class Boundaries {
     }
 
     return acc
+  }
+
+  public static isInitial(boundaries: Boundaries): boolean {
+    return boundaries === Boundaries.initial
+  }
+
+  public static isEqual(left: Boundaries, right: Boundaries): boolean {
+    return left.start === right.start && left.stop === right.stop
   }
 }
 
@@ -95,6 +112,13 @@ const useIsScrolling = <E extends HTMLElement>(ref: RefObject<E>): boolean => {
   return isScrolling
 }
 
+export interface OnItemsRenderedParams {
+  overscanStartIndex: number
+  overscanStopIndex: number
+  visibleStartIndex: number
+  visibleStopIndex: number
+}
+
 export interface UseFixedSizeListOptions {
   itemHeight: number
   itemCount: number
@@ -102,6 +126,7 @@ export interface UseFixedSizeListOptions {
   scrollTo?: number
   scrollThrottling?: number
   resizeThrottling?: number
+  onItemsRendered?(params: OnItemsRenderedParams): void
 }
 
 export interface UseFixedSizeListResult<E extends HTMLElement> {
@@ -120,17 +145,33 @@ export const useFixedSizeList = <E extends HTMLElement>({
   overscanCount = DEFAULT_OVERSCAN_COUNT,
   scrollTo: scrollTop,
   scrollThrottling = DEFAULT_THROTTLE_MS,
-  resizeThrottling = DEFAULT_THROTTLE_MS
+  resizeThrottling = DEFAULT_THROTTLE_MS,
+  onItemsRendered
 }: UseFixedSizeListOptions): UseFixedSizeListResult<E> => {
   const containerRef = useRef<E>(null)
 
   const isScrolling = useIsScrolling(containerRef)
-  const [boundaries, setBoundaries] = useState(Boundaries.initial)
+  const [boundariesRaw, setBoundariesRaw] = useState(Boundaries.initial)
 
-  const overscanned = useMemo(
-    () => Boundaries.overscan(overscanCount, itemCount, boundaries),
-    [overscanCount, itemCount, boundaries]
-  )
+  const boundaries = useMemo(() => {
+    return Boundaries.limit(itemCount, {
+      start: boundariesRaw.start,
+      stop: boundariesRaw.stop
+    })
+  }, [itemCount, boundariesRaw.start, boundariesRaw.stop])
+
+  const setBoundaries = useCallback((nextBoundaries: Boundaries) => {
+    setBoundariesRaw(current =>
+      Boundaries.isEqual(nextBoundaries, current) ? current : nextBoundaries
+    )
+  }, [])
+
+  const overscan = useMemo(() => {
+    return Boundaries.limit(itemCount, {
+      start: boundaries.start - overscanCount,
+      stop: boundaries.stop + overscanCount
+    })
+  }, [overscanCount, itemCount, boundaries.start, boundaries.stop])
 
   const scrollTo = useCallback((px: number) => {
     const node = containerRef.current
@@ -161,7 +202,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
     }
 
     setBoundaries(Boundaries.calc(itemHeight, node))
-  }, [itemHeight])
+  }, [setBoundaries, itemHeight])
 
   // container scroll monitor
   useEffect(() => {
@@ -175,9 +216,17 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
     const onScroll = throttle((): void => {
       const prevStart = Boundaries.calcStart(itemHeight, prevScrollTop)
+      const prevStop = Boundaries.calcStop(
+        itemHeight,
+        prevScrollTop,
+        node.clientHeight
+      )
       const nextBoundaries = Boundaries.calc(itemHeight, node)
 
-      if (prevStart !== nextBoundaries.start) {
+      if (
+        prevStart !== nextBoundaries.start ||
+        prevStop !== nextBoundaries.stop
+      ) {
         setBoundaries(nextBoundaries)
       }
 
@@ -190,7 +239,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
       onScroll.cancel()
       node.removeEventListener('scroll', onScroll)
     }
-  }, [itemHeight, scrollThrottling])
+  }, [setBoundaries, itemHeight, scrollThrottling])
 
   // container size monitor
   useEffect(() => {
@@ -213,7 +262,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
       observer.unobserve(node)
       observer.disconnect()
     }
-  }, [itemHeight, resizeThrottling])
+  }, [setBoundaries, itemHeight, resizeThrottling])
 
   // keep eye on overscroll when itemCount drops
   useEffect(() => {
@@ -230,13 +279,27 @@ export const useFixedSizeList = <E extends HTMLElement>({
       setBoundaries(Boundaries.calc(itemHeight, node))
       scrollTo(itemCount * itemHeight - node.clientHeight)
     }
-  }, [scrollTo, boundaries.start, itemCount, itemHeight])
+  }, [setBoundaries, scrollTo, boundaries.start, itemCount, itemHeight])
+
+  // props.onItemsRendered monitor
+  useEffect(() => {
+    if (onItemsRendered == null || Boundaries.isInitial(boundaries)) {
+      return
+    }
+
+    onItemsRendered({
+      overscanStartIndex: overscan.start,
+      overscanStopIndex: overscan.stop,
+      visibleStartIndex: boundaries.start,
+      visibleStopIndex: boundaries.stop
+    })
+  }, [boundaries, overscan.start, overscan.stop, onItemsRendered])
 
   return {
     ref: containerRef,
-    topOffset: overscanned.start * itemHeight,
-    bottomOffset: (itemCount - overscanned.stop) * itemHeight,
-    indexes: useMemo(() => Boundaries.indexes(overscanned), [overscanned]),
+    topOffset: overscan.start * itemHeight,
+    bottomOffset: (itemCount - overscan.stop) * itemHeight,
+    indexes: useMemo(() => Boundaries.indexes(overscan), [overscan]),
     isScrolling,
     scrollTo,
     scrollToItem

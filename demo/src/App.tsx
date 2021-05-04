@@ -1,6 +1,6 @@
 import React from 'react'
 import './App.css'
-import { useFixedSizeList } from 'react-hook-window'
+import { OnItemsRenderedParams, useFixedSizeList } from 'react-hook-window'
 
 const makeItems = (n: number): Array<{ id: number; title: string }> => {
   return Array.from({ length: n }).map((_, i) => ({
@@ -18,6 +18,10 @@ const App = React.memo(() => {
   const [scrollTo, setScrollTo] = React.useState(100)
 
   const items = React.useMemo(() => makeItems(itemCount), [itemCount])
+  const onItemsRendered = React.useCallback((params: OnItemsRenderedParams) => {
+    // eslint-disable-next-line no-console
+    console.log(params)
+  }, [])
 
   const {
     ref,
@@ -31,8 +35,13 @@ const App = React.memo(() => {
     itemCount,
     overscanCount,
     scrollTo,
-    scrollThrottling: 100
+    scrollThrottling: 20,
+    onItemsRendered
   })
+
+  React.useEffect(() => {
+    console.log(indexes)
+  }, [indexes])
 
   return (
     <div>
