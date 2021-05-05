@@ -98,24 +98,24 @@ const Demo = React.memo(() => {
         scroll
       </button>
       <div ref={ref} style={{ height, overflow: 'auto' }}>
-        <div style={{ height: topOffset }} />
-        {indexes.map(index => {
-          const item = items[index]
+        <div style={{ paddingTop: topOffset, paddingBottom: bottomOffset }}>
+          {indexes.map(index => {
+            const item = items[index]
 
-          return (
-            <div
-              key={item.id}
-              style={{
-                height: itemHeight,
-                boxSizing: 'border-box',
-                background: index % 2 === 0 ? '#ccc' : '#cec'
-              }}
-            >
-              {item.title}
-            </div>
-          )
-        })}
-        <div style={{ height: bottomOffset }} />
+            return (
+              <div
+                key={item.id}
+                style={{
+                  height: itemHeight,
+                  boxSizing: 'border-box',
+                  background: index % 2 === 0 ? '#ccc' : '#cec'
+                }}
+              >
+                {item.title}
+              </div>
+            )
+          })}
+        </div>
       </div>
     </div>
   )
