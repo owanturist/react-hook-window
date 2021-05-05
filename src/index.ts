@@ -68,10 +68,10 @@ abstract class Boundaries {
     return Boundaries.of(start, stop)
   }
 
-  // FIX +1 on visibleStopIndex
   public static limit(itemCount: number, boundaries: Boundaries): Boundaries {
-    const start = clamp(0, boundaries.start, itemCount)
-    const stop = clamp(start, boundaries.stop, itemCount)
+    const itemCount_ = Math.max(0, itemCount)
+    const start = clamp(0, boundaries.start, itemCount_)
+    const stop = clamp(start, boundaries.stop, itemCount_)
 
     if (start === boundaries.start && stop === boundaries.stop) {
       return boundaries
@@ -194,6 +194,29 @@ const useBoundaries = ({
   ]
 }
 
+const useOnItemsRendered = ({
+  visible,
+  overscan,
+  onItemsRendered
+}: {
+  visible: Boundaries
+  overscan: Boundaries
+  onItemsRendered?(params: OnItemsRenderedParams): void
+}): void => {
+  useEffect(() => {
+    if (onItemsRendered == null || Boundaries.isInitial(visible)) {
+      return
+    }
+
+    onItemsRendered({
+      overscanStartIndex: overscan.start,
+      overscanStopIndex: overscan.stop,
+      visibleStartIndex: visible.start,
+      visibleStopIndex: visible.stop
+    })
+  }, [visible, overscan.start, overscan.stop, onItemsRendered])
+}
+
 export interface OnItemsRenderedParams {
   overscanStartIndex: number
   overscanStopIndex: number
@@ -250,6 +273,14 @@ export const useFixedSizeList = <E extends HTMLElement>({
     (index: number): void => scrollTo(itemHeight * index),
     [scrollTo, itemHeight]
   )
+
+  useOnItemsRendered({
+    // onItemsRendered should limit boundaries per last item index
+    // that's why itemCount gets -1
+    visible: Boundaries.limit(itemCount - 1, visible),
+    overscan: Boundaries.limit(itemCount - 1, overscan),
+    onItemsRendered
+  })
 
   // props.scrollTo monitor
   useEffect(() => {
@@ -336,19 +367,19 @@ export const useFixedSizeList = <E extends HTMLElement>({
     }
   }, [setBoundaries, itemHeight, resizeThrottling])
 
-  // props.onItemsRendered monitor
-  useEffect(() => {
-    if (onItemsRendered == null || Boundaries.isInitial(visible)) {
-      return
-    }
+  // // props.onItemsRendered monitor
+  // useEffect(() => {
+  //   if (onItemsRendered == null || Boundaries.isInitial(visible)) {
+  //     return
+  //   }
 
-    onItemsRendered({
-      overscanStartIndex: overscan.start,
-      overscanStopIndex: overscan.stop,
-      visibleStartIndex: visible.start,
-      visibleStopIndex: visible.stop
-    })
-  }, [visible, overscan.start, overscan.stop, onItemsRendered])
+  //   onItemsRendered({
+  //     overscanStartIndex: overscan.start,
+  //     overscanStopIndex: overscan.stop,
+  //     visibleStartIndex: visible.start,
+  //     visibleStopIndex: visible.stop
+  //   })
+  // }, [visible, overscan.start, overscan.stop, onItemsRendered])
 
   return {
     ref: containerRef,
