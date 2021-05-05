@@ -80,15 +80,19 @@ abstract class Boundaries {
     return Boundaries.of(start, stop)
   }
 
-  public static indexes({ start, stop }: Boundaries): Array<number> {
-    const N = stop - start
+  public static indexes(boundaries: Boundaries): ReadonlyArray<number> {
+    const N = Boundaries.diff(boundaries)
     const acc = new Array<number>(N)
 
     for (let index = 0; index < N; index++) {
-      acc[index] = index + start
+      acc[index] = index + boundaries.start
     }
 
     return acc
+  }
+
+  public static diff({ start, stop }: Boundaries): number {
+    return stop - start
   }
 
   public static isEqual(left: Boundaries, right: Boundaries): boolean {
@@ -97,6 +101,13 @@ abstract class Boundaries {
 
   public static isInitial(boundaries: Boundaries): boolean {
     return boundaries === Boundaries.initial
+  }
+
+  public static isOverScroll(
+    itemCount: number,
+    { start, stop }: Boundaries
+  ): boolean {
+    return start > itemCount && stop > itemCount
   }
 }
 
@@ -143,10 +154,26 @@ const useBoundaries = ({
   const [boundaries, setBoundaries] = useState(Boundaries.initial)
 
   const visible = useMemo(() => {
+    // checks if scroll position is much further than current boundaries
+    // and if so assume accurate boundaries based on previous diff
+    if (Boundaries.isOverScroll(itemCount, boundaries)) {
+      const start = itemCount - Boundaries.diff(boundaries)
+
+      return Boundaries.of(Math.max(0, start), itemCount)
+    }
+
     return Boundaries.limit(itemCount, boundaries)
   }, [itemCount, boundaries])
 
   const overscan = useMemo(() => {
+    // checks if scroll position is much further than current boundaries
+    // and if so assume accurate boundaries based on previous diff
+    if (Boundaries.isOverScroll(itemCount, boundaries)) {
+      const start = itemCount - Boundaries.diff(boundaries) - overscanCount
+
+      return Boundaries.of(Math.max(0, start), itemCount)
+    }
+
     return Boundaries.limit(
       itemCount,
       Boundaries.of(
@@ -188,7 +215,7 @@ export interface UseFixedSizeListResult<E extends HTMLElement> {
   ref: RefObject<E>
   topOffset: number
   bottomOffset: number
-  indexes: Array<number>
+  indexes: ReadonlyArray<number>
   isScrolling: boolean
   scrollTo(px: number): void
   scrollToItem(index: number): void
@@ -301,23 +328,6 @@ export const useFixedSizeList = <E extends HTMLElement>({
       observer.disconnect()
     }
   }, [setBoundaries, itemHeight, resizeThrottling])
-
-  // keep eye on overscroll when itemCount drops
-  useEffect(() => {
-    const node = containerRef.current
-
-    if (node == null) {
-      return
-    }
-
-    const maxItemsInWindow = Math.ceil(node.clientHeight / itemHeight)
-    const maxStart = itemCount - maxItemsInWindow
-
-    if (visible.start > maxStart) {
-      setBoundaries(Boundaries.calc(itemHeight, node))
-      scrollTo(itemCount * itemHeight - node.clientHeight)
-    }
-  }, [setBoundaries, scrollTo, visible.start, itemCount, itemHeight])
 
   // props.onItemsRendered monitor
   useEffect(() => {
