@@ -90,6 +90,10 @@ abstract class Boundaries {
   public static isEqual(left: Boundaries, right: Boundaries): boolean {
     return left.start === right.start && left.stop === right.stop
   }
+
+  public static isInitial(boundaries: Boundaries): boolean {
+    return boundaries === Boundaries.initial
+  }
 }
 
 const useIsScrolling = <E extends HTMLElement>(ref: RefObject<E>): boolean => {
@@ -123,6 +127,22 @@ const useIsScrolling = <E extends HTMLElement>(ref: RefObject<E>): boolean => {
   }, [ref])
 
   return isScrolling
+}
+
+const useBoundaries = (
+  itemCount: number
+): [Boundaries, (boundaries: Boundaries) => void] => {
+  const [{ start, stop }, setBoundaries] = useState(Boundaries.initial)
+
+  return [
+    useMemo(() => {
+      return Boundaries.limit(itemCount, Boundaries.of(start, stop))
+    }, [itemCount, start, stop]),
+
+    useCallback(next => {
+      setBoundaries(prev => (Boundaries.isEqual(next, prev) ? prev : next))
+    }, [])
+  ]
 }
 
 export interface OnItemsRenderedParams {
@@ -164,20 +184,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
   const containerRef = useRef<E>(null)
 
   const isScrolling = useIsScrolling(containerRef)
-  const [boundariesRaw, setBoundariesRaw] = useState(Boundaries.initial)
-
-  const boundaries = useMemo(() => {
-    return Boundaries.limit(
-      itemCount,
-      Boundaries.of(boundariesRaw.start, boundariesRaw.stop)
-    )
-  }, [itemCount, boundariesRaw.start, boundariesRaw.stop])
-
-  const setBoundaries = useCallback((nextBoundaries: Boundaries) => {
-    setBoundariesRaw(current =>
-      Boundaries.isEqual(nextBoundaries, current) ? current : nextBoundaries
-    )
-  }, [])
+  const [boundaries, setBoundaries] = useBoundaries(itemCount)
 
   const overscan = useMemo(() => {
     return Boundaries.limit(
@@ -264,9 +271,10 @@ export const useFixedSizeList = <E extends HTMLElement>({
       return
     }
 
-    const resizeListener = throttle((): void => {
-      setBoundaries(Boundaries.calc(itemHeight, node))
-    }, resizeThrottling)
+    const resizeListener = throttle(
+      () => setBoundaries(Boundaries.calc(itemHeight, node)),
+      resizeThrottling
+    )
 
     const observer = new ResizeObserver(resizeListener)
 
@@ -298,7 +306,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
   // props.onItemsRendered monitor
   useEffect(() => {
-    if (onItemsRendered == null || Boundaries.initial === boundaries) {
+    if (onItemsRendered == null || Boundaries.isInitial(boundaries)) {
       return
     }
 

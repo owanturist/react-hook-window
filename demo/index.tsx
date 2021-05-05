@@ -15,7 +15,7 @@ const Demo = React.memo(() => {
   const [itemCount, setItemCount] = React.useState(1000)
   const [overscanCount, setOverscanCount] = React.useState(3)
   const [scrollToItemIndex, setScrollToItemIndex] = React.useState(30)
-  const [scrollTo, setScrollTo] = React.useState(100)
+  const [scrollTo, setScrollTo] = React.useState(0)
 
   const items = React.useMemo(() => makeItems(itemCount), [itemCount])
   const onItemsRendered = React.useCallback((params: OnItemsRenderedParams) => {
