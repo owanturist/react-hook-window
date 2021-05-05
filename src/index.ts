@@ -279,24 +279,29 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
     let prevScrollTop = 0
 
-    const onScroll = throttle((): void => {
-      const prevStart = Boundaries.calcStart(itemHeight, prevScrollTop)
-      const prevStop = Boundaries.calcStop(
-        itemHeight,
-        prevScrollTop,
-        node.clientHeight
-      )
-      const nextBoundaries = Boundaries.calc(itemHeight, node)
+    const onScroll = throttle(
+      () => {
+        const prevStart = Boundaries.calcStart(itemHeight, prevScrollTop)
+        const prevStop = Boundaries.calcStop(
+          itemHeight,
+          prevScrollTop,
+          node.clientHeight
+        )
+        const nextBoundaries = Boundaries.calc(itemHeight, node)
 
-      if (
-        prevStart !== nextBoundaries.start ||
-        prevStop !== nextBoundaries.stop
-      ) {
-        setBoundaries(nextBoundaries)
-      }
+        if (
+          prevStart !== nextBoundaries.start ||
+          prevStop !== nextBoundaries.stop
+        ) {
+          setBoundaries(nextBoundaries)
+        }
 
-      prevScrollTop = node.scrollTop
-    }, scrollThrottling)
+        prevScrollTop = node.scrollTop
+      },
+      scrollThrottling,
+      // execute on END of interval so it always applies actual data
+      { leading: false, trailing: true }
+    )
 
     return cleanup([
       onScroll.cancel,
@@ -315,7 +320,9 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
     const resizeListener = throttle(
       () => setBoundaries(Boundaries.calc(itemHeight, node)),
-      resizeThrottling
+      resizeThrottling,
+      // execute on END of interval so it always applies actual data
+      { leading: false, trailing: true }
     )
 
     const observer = new ResizeObserver(resizeListener)
