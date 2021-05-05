@@ -129,15 +129,29 @@ const useIsScrolling = <E extends HTMLElement>(ref: RefObject<E>): boolean => {
   return isScrolling
 }
 
-const useBoundaries = (
+const useBoundaries = ({
+  itemCount,
+  overscanCount
+}: {
   itemCount: number
-): [Boundaries, (boundaries: Boundaries) => void] => {
-  const [{ start, stop }, setBoundaries] = useState(Boundaries.initial)
+  overscanCount: number
+}): [Boundaries, Boundaries, (boundaries: Boundaries) => void] => {
+  const [boundaries, setBoundaries] = useState(Boundaries.initial)
 
   return [
     useMemo(() => {
-      return Boundaries.limit(itemCount, Boundaries.of(start, stop))
-    }, [itemCount, start, stop]),
+      return Boundaries.limit(itemCount, boundaries)
+    }, [itemCount, boundaries]),
+
+    useMemo(() => {
+      return Boundaries.limit(
+        itemCount,
+        Boundaries.of(
+          boundaries.start - overscanCount,
+          boundaries.stop + overscanCount
+        )
+      )
+    }, [overscanCount, itemCount, boundaries]),
 
     useCallback(next => {
       setBoundaries(prev => (Boundaries.isEqual(next, prev) ? prev : next))
@@ -184,17 +198,10 @@ export const useFixedSizeList = <E extends HTMLElement>({
   const containerRef = useRef<E>(null)
 
   const isScrolling = useIsScrolling(containerRef)
-  const [boundaries, setBoundaries] = useBoundaries(itemCount)
-
-  const overscan = useMemo(() => {
-    return Boundaries.limit(
-      itemCount,
-      Boundaries.of(
-        boundaries.start - overscanCount,
-        boundaries.stop + overscanCount
-      )
-    )
-  }, [overscanCount, itemCount, boundaries.start, boundaries.stop])
+  const [boundaries, overscan, setBoundaries] = useBoundaries({
+    itemCount,
+    overscanCount
+  })
 
   const scrollTo = useCallback((px: number) => {
     const node = containerRef.current
