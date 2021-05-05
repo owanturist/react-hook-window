@@ -73,6 +73,10 @@ abstract class Boundaries {
     const start = clamp(0, boundaries.start, itemCount)
     const stop = clamp(start, boundaries.stop, itemCount)
 
+    if (start === boundaries.start && stop === boundaries.stop) {
+      return boundaries
+    }
+
     return Boundaries.of(start, stop)
   }
 
@@ -138,20 +142,24 @@ const useBoundaries = ({
 }): [Boundaries, Boundaries, (boundaries: Boundaries) => void] => {
   const [boundaries, setBoundaries] = useState(Boundaries.initial)
 
-  return [
-    useMemo(() => {
-      return Boundaries.limit(itemCount, boundaries)
-    }, [itemCount, boundaries]),
+  const visible = useMemo(() => {
+    return Boundaries.limit(itemCount, boundaries)
+  }, [itemCount, boundaries])
 
-    useMemo(() => {
-      return Boundaries.limit(
-        itemCount,
-        Boundaries.of(
-          boundaries.start - overscanCount,
-          boundaries.stop + overscanCount
-        )
+  const overscan = useMemo(() => {
+    return Boundaries.limit(
+      itemCount,
+      Boundaries.of(
+        boundaries.start - overscanCount,
+        boundaries.stop + overscanCount
       )
-    }, [overscanCount, itemCount, boundaries]),
+    )
+  }, [overscanCount, itemCount, boundaries])
+
+  return [
+    visible,
+
+    Boundaries.isInitial(boundaries) ? Boundaries.initial : overscan,
 
     useCallback(next => {
       setBoundaries(prev => (Boundaries.isEqual(next, prev) ? prev : next))
@@ -198,7 +206,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
   const containerRef = useRef<E>(null)
 
   const isScrolling = useIsScrolling(containerRef)
-  const [boundaries, overscan, setBoundaries] = useBoundaries({
+  const [visible, overscan, setBoundaries] = useBoundaries({
     itemCount,
     overscanCount
   })
@@ -305,25 +313,25 @@ export const useFixedSizeList = <E extends HTMLElement>({
     const maxItemsInWindow = Math.ceil(node.clientHeight / itemHeight)
     const maxStart = itemCount - maxItemsInWindow
 
-    if (boundaries.start > maxStart) {
+    if (visible.start > maxStart) {
       setBoundaries(Boundaries.calc(itemHeight, node))
       scrollTo(itemCount * itemHeight - node.clientHeight)
     }
-  }, [setBoundaries, scrollTo, boundaries.start, itemCount, itemHeight])
+  }, [setBoundaries, scrollTo, visible.start, itemCount, itemHeight])
 
   // props.onItemsRendered monitor
   useEffect(() => {
-    if (onItemsRendered == null || Boundaries.isInitial(boundaries)) {
+    if (onItemsRendered == null || Boundaries.isInitial(visible)) {
       return
     }
 
     onItemsRendered({
       overscanStartIndex: overscan.start,
       overscanStopIndex: overscan.stop,
-      visibleStartIndex: boundaries.start,
-      visibleStopIndex: boundaries.stop
+      visibleStartIndex: visible.start,
+      visibleStopIndex: visible.stop
     })
-  }, [boundaries, overscan.start, overscan.stop, onItemsRendered])
+  }, [visible, overscan.start, overscan.stop, onItemsRendered])
 
   return {
     ref: containerRef,
