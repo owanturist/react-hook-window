@@ -1,6 +1,6 @@
 import React from 'react'
-import './App.css'
-import { OnItemsRenderedParams, useFixedSizeList } from 'react-hook-window'
+import ReactDOM from 'react-dom'
+import { OnItemsRenderedParams, useFixedSizeList } from '../src'
 
 const makeItems = (n: number): Array<{ id: number; title: string }> => {
   return Array.from({ length: n }).map((_, i) => ({
@@ -115,4 +115,9 @@ const App = React.memo(() => {
   )
 })
 
-export default App
+ReactDOM.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+  document.getElementById('root')
+)
