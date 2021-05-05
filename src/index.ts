@@ -17,11 +17,33 @@ const clamp = (min: number, max: number, value: number): number => {
   return Math.max(min, Math.min(value, max))
 }
 
+const on = <K extends keyof HTMLElementEventMap>(
+  node: HTMLElement,
+  type: K,
+  listener: (this: HTMLElement, event: HTMLElementEventMap[K]) => void
+): VoidFunction => {
+  node.addEventListener(type, listener)
+
+  return () => {
+    node.removeEventListener(type, listener)
+  }
+}
+
+const cleanup = (cleanups: ReadonlyArray<VoidFunction>) => (): void => {
+  for (const clean of cleanups) {
+    clean()
+  }
+}
+
 abstract class Boundaries {
   public abstract readonly start: number
   public abstract readonly stop: number
 
-  public static initial: Boundaries = { start: 0, stop: 0 }
+  public static initial = Boundaries.of(0, 0)
+
+  public static of(start: number, stop: number): Boundaries {
+    return { start, stop }
+  }
 
   public static calcStart(itemHeight: number, scrollTop: number): number {
     return Math.floor(scrollTop / itemHeight)
@@ -43,17 +65,15 @@ abstract class Boundaries {
       node.clientHeight
     )
 
-    return { start, stop }
+    return Boundaries.of(start, stop)
   }
 
   // FIX +1 on visibleStopIndex
   public static limit(itemCount: number, boundaries: Boundaries): Boundaries {
     const start = clamp(0, boundaries.start, itemCount)
+    const stop = clamp(start, boundaries.stop, itemCount)
 
-    return {
-      start,
-      stop: clamp(start, boundaries.stop, itemCount)
-    }
+    return Boundaries.of(start, stop)
   }
 
   public static indexes({ start, stop }: Boundaries): Array<number> {
@@ -65,10 +85,6 @@ abstract class Boundaries {
     }
 
     return acc
-  }
-
-  public static isInitial(boundaries: Boundaries): boolean {
-    return boundaries === Boundaries.initial
   }
 
   public static isEqual(left: Boundaries, right: Boundaries): boolean {
@@ -98,15 +114,12 @@ const useIsScrolling = <E extends HTMLElement>(ref: RefObject<E>): boolean => {
       { leading: false, trailing: true }
     )
 
-    node.addEventListener('scroll', onScrollBegin)
-    node.addEventListener('scroll', onScrollEnd)
-
-    return () => {
-      onScrollBegin.cancel()
-      onScrollEnd.cancel()
-      node.removeEventListener('scroll', onScrollBegin)
-      node.removeEventListener('scroll', onScrollEnd)
-    }
+    return cleanup([
+      onScrollBegin.cancel,
+      onScrollEnd.cancel,
+      on(node, 'scroll', onScrollBegin),
+      on(node, 'scroll', onScrollEnd)
+    ])
   }, [ref])
 
   return isScrolling
@@ -154,10 +167,10 @@ export const useFixedSizeList = <E extends HTMLElement>({
   const [boundariesRaw, setBoundariesRaw] = useState(Boundaries.initial)
 
   const boundaries = useMemo(() => {
-    return Boundaries.limit(itemCount, {
-      start: boundariesRaw.start,
-      stop: boundariesRaw.stop
-    })
+    return Boundaries.limit(
+      itemCount,
+      Boundaries.of(boundariesRaw.start, boundariesRaw.stop)
+    )
   }, [itemCount, boundariesRaw.start, boundariesRaw.stop])
 
   const setBoundaries = useCallback((nextBoundaries: Boundaries) => {
@@ -167,10 +180,13 @@ export const useFixedSizeList = <E extends HTMLElement>({
   }, [])
 
   const overscan = useMemo(() => {
-    return Boundaries.limit(itemCount, {
-      start: boundaries.start - overscanCount,
-      stop: boundaries.stop + overscanCount
-    })
+    return Boundaries.limit(
+      itemCount,
+      Boundaries.of(
+        boundaries.start - overscanCount,
+        boundaries.stop + overscanCount
+      )
+    )
   }, [overscanCount, itemCount, boundaries.start, boundaries.stop])
 
   const scrollTo = useCallback((px: number) => {
@@ -233,12 +249,11 @@ export const useFixedSizeList = <E extends HTMLElement>({
       prevScrollTop = node.scrollTop
     }, scrollThrottling)
 
-    node.addEventListener('scroll', onScroll)
-
-    return () => {
-      onScroll.cancel()
-      node.removeEventListener('scroll', onScroll)
-    }
+    return cleanup([
+      onScroll.cancel,
+      // subscribe on scroll
+      on(node, 'scroll', onScroll)
+    ])
   }, [setBoundaries, itemHeight, scrollThrottling])
 
   // container size monitor
@@ -283,7 +298,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
   // props.onItemsRendered monitor
   useEffect(() => {
-    if (onItemsRendered == null || Boundaries.isInitial(boundaries)) {
+    if (onItemsRendered == null || Boundaries.initial === boundaries) {
       return
     }
 

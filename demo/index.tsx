@@ -9,7 +9,7 @@ const makeItems = (n: number): Array<{ id: number; title: string }> => {
   }))
 }
 
-const App = React.memo(() => {
+const Demo = React.memo(() => {
   const [height, setHeight] = React.useState(500)
   const [itemHeight, setItemHeight] = React.useState(40)
   const [itemCount, setItemCount] = React.useState(1000)
@@ -115,9 +115,27 @@ const App = React.memo(() => {
   )
 })
 
+const App: React.FC = ({ children }) => {
+  const [show, setShow] = React.useState(true)
+
+  return (
+    <>
+      <input
+        type="checkbox"
+        checked={show}
+        onChange={event => setShow(event.target.checked)}
+      />
+
+      {show && children}
+    </>
+  )
+}
+
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <App>
+      <Demo />
+    </App>
   </React.StrictMode>,
   document.getElementById('root')
 )

@@ -6,9 +6,11 @@
   "license": "BSD-3-Clause",
   "sideEffects": false,
   "types": "types/index.d.ts",
-  "main": "lib/index.js",
-  "unpkg": "dist",
-  "module": "es",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "import": "./es/index.js",
@@ -76,7 +78,6 @@
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.30.0",
     "ts-node": "^9.1.1",
-    "ts-transformer-minify-privates": "^0.3.0",
     "typescript": "^4.2.4"
   },
   "dependencies": {

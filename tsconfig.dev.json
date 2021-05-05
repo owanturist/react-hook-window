@@ -15,22 +15,18 @@
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx",
-
     /* Strict Type-Checking Options */
     "strict": true, // noImplicitAny noImplicitThis alwaysStrict strictNullChecks strictFunctionTypes strictPropertyInitialization
-
     /* Additional Checks */
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
-
     /* Source Map Options */
     "sourceMap": false,
     "inlineSourceMap": false,
     "inlineSources": false,
-
     "preserveConstEnums": true
   }
 }
