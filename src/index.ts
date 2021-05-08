@@ -78,7 +78,7 @@ class Boundaries {
   }
 
   public toIndexes(): ReadonlyArray<number> {
-    const N = this.distance()
+    const N = Math.max(0, this.stop - this.start)
     const acc = new Array<number>(N)
 
     for (let index = 0; index < N; index++) {
@@ -86,14 +86,6 @@ class Boundaries {
     }
 
     return acc
-  }
-
-  public distance(): number {
-    return this.stop - this.start
-  }
-
-  public isOverScroll(itemCount: number): boolean {
-    return this.start > itemCount && this.stop > itemCount
   }
 }
 
@@ -127,8 +119,8 @@ const useBoundaries = ({
     useMemo(() => {
       // checks if scroll position is much further than current boundaries
       // and if so assume accurate boundaries based on previous distance
-      if (boundaries.isOverScroll(itemCount)) {
-        const start = itemCount - boundaries.distance()
+      if (boundaries.start > itemCount && boundaries.stop > itemCount) {
+        const start = itemCount - (boundaries.stop - boundaries.start)
 
         return Boundaries.of(Math.max(0, start), itemCount)
       }
@@ -140,16 +132,8 @@ const useBoundaries = ({
   const overscan = useKeepEqual(
     Boundaries.isEqual,
     useMemo(() => {
-      // checks if scroll position is much further than current boundaries
-      // and if so assume accurate boundaries based on previous distance
-      if (boundaries.isOverScroll(itemCount)) {
-        const start = itemCount - boundaries.distance() - overscanCount
-
-        return Boundaries.of(Math.max(0, start), itemCount)
-      }
-
-      return boundaries.limit(itemCount, overscanCount)
-    }, [boundaries, itemCount, overscanCount])
+      return visible.limit(itemCount, overscanCount)
+    }, [visible, itemCount, overscanCount])
   )
 
   const visibleIndex = visible.limit(lastItemIndex)
