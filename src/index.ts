@@ -18,16 +18,14 @@ const clamp = (min: number, max: number, value: number): number => {
   return Math.max(min, Math.min(value, max))
 }
 
-// >todo make onScroll and optimise
-const on = <K extends keyof HTMLElementEventMap>(
+const onPassiveScroll = (
   node: HTMLElement,
-  type: K,
-  listener: (this: HTMLElement, event: HTMLElementEventMap[K]) => void
+  listener: () => void
 ): VoidFunction => {
-  node.addEventListener(type, listener)
+  node.addEventListener('scroll', listener, { passive: true })
 
   return () => {
-    node.removeEventListener(type, listener)
+    node.removeEventListener('scroll', listener)
   }
 }
 
@@ -272,9 +270,9 @@ export const useFixedSizeList = <E extends HTMLElement>({
       onScrollBegin.cancel,
       onScrollEnd.cancel,
       () => onScrollRef.current?.cancel(),
-      on(node, 'scroll', onScrollBegin),
-      on(node, 'scroll', onScrollEnd),
-      on(node, 'scroll', () => onScrollRef.current?.(node.scrollTop))
+      onPassiveScroll(node, onScrollBegin),
+      onPassiveScroll(node, onScrollEnd),
+      onPassiveScroll(node, () => onScrollRef.current?.(node.scrollTop))
     ])
   }, [])
 
