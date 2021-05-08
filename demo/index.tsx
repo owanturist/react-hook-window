@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { OnItemsRenderedParams, useFixedSizeList } from '../src'
+import { ListViewport, useFixedSizeList } from '../src'
 
 const makeItems = (n: number): Array<{ id: number; title: string }> => {
   return Array.from({ length: n }).map((_, i) => ({
@@ -20,7 +20,7 @@ const Demo = React.memo(() => {
   const [scrollTo, setScrollTo] = React.useState(0)
 
   const items = React.useMemo(() => makeItems(itemCount), [itemCount])
-  const onItemsRendered = React.useCallback((params: OnItemsRenderedParams) => {
+  const onItemsRendered = React.useCallback((params: ListViewport) => {
     // eslint-disable-next-line no-console
     console.log(params)
   }, [])
