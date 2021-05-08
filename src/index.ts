@@ -35,9 +35,12 @@ const cleanup = (cleanups: ReadonlyArray<VoidFunction>) => (): void => {
   }
 }
 
-class Boundaries {
+abstract class Boundaries {
+  public abstract readonly start: number
+  public abstract readonly stop: number
+
   public static of(start: number, stop: number): Boundaries {
-    return new Boundaries(start, stop)
+    return { start, stop }
   }
 
   public static calc(
@@ -51,55 +54,46 @@ class Boundaries {
     return Boundaries.of(start, stop)
   }
 
-  public static isEqual(prev: Boundaries, next: Boundaries): boolean {
-    return (
-      prev === next || (prev.start === next.start && prev.stop === next.stop)
-    )
+  public static replace(prev: Boundaries, next: Boundaries): Boundaries {
+    if (
+      prev === next ||
+      (prev.start === next.start && prev.stop === next.stop)
+    ) {
+      return prev
+    }
+
+    return next
   }
 
-  private constructor(
-    public readonly start: number,
-    public readonly stop: number
-  ) {}
+  public static limit(
+    boundaries: Boundaries,
+    itemCount: number,
+    overscanCount = 0
+  ): Boundaries {
+    const start = clamp(0, boundaries.start - overscanCount, itemCount)
+    const stop = clamp(start, boundaries.stop + overscanCount, itemCount)
 
-  public replace(another: Boundaries): Boundaries {
-    return Boundaries.isEqual(this, another) ? this : another
-  }
-
-  public limit(itemCount: number, overscanCount = 0): Boundaries {
-    const start = clamp(0, this.start - overscanCount, itemCount)
-    const stop = clamp(start, this.stop + overscanCount, itemCount)
-
-    if (start === this.start && stop === this.stop) {
-      return this
+    if (start === boundaries.start && stop === boundaries.stop) {
+      return boundaries
     }
 
     return Boundaries.of(start, stop)
   }
 
-  public toIndexes(): ReadonlyArray<number> {
-    const N = Math.max(0, this.stop - this.start)
+  public static toIndexes({ start, stop }: Boundaries): ReadonlyArray<number> {
+    const N = Math.max(0, stop - start)
     const acc = new Array<number>(N)
 
     for (let index = 0; index < N; index++) {
-      acc[index] = index + this.start
+      acc[index] = index + start
     }
 
     return acc
   }
 }
 
-const useKeepEqual = <T>(
-  isEqual: (prev: T, next: T) => boolean,
-  value: T
-): T => {
-  const valueRef = useRef(value)
-
-  if (!isEqual(valueRef.current, value)) {
-    valueRef.current = value
-  }
-
-  return valueRef.current
+const useReplaceBoundaries = ({ start, stop }: Boundaries): Boundaries => {
+  return useMemo(() => Boundaries.of(start, stop), [start, stop])
 }
 
 const useBoundaries = ({
@@ -114,8 +108,7 @@ const useBoundaries = ({
   const lastItemIndex = Math.max(0, itemCount - 1)
   const [boundaries, setBoundaries] = useState(initial)
 
-  const visible = useKeepEqual(
-    Boundaries.isEqual,
+  const visible = useReplaceBoundaries(
     useMemo(() => {
       // checks if scroll position is much further than current boundaries
       // and if so assume accurate boundaries based on previous distance
@@ -125,19 +118,22 @@ const useBoundaries = ({
         return Boundaries.of(Math.max(0, start), itemCount)
       }
 
-      return boundaries.limit(itemCount)
+      return Boundaries.limit(boundaries, itemCount)
     }, [boundaries, itemCount])
   )
 
-  const overscan = useKeepEqual(
-    Boundaries.isEqual,
+  const overscan = useReplaceBoundaries(
     useMemo(() => {
-      return visible.limit(itemCount, overscanCount)
+      return Boundaries.limit(visible, itemCount, overscanCount)
     }, [visible, itemCount, overscanCount])
   )
 
-  const visibleIndex = visible.limit(lastItemIndex)
-  const overscanIndex = overscan.limit(lastItemIndex)
+  const visibleIndex = useReplaceBoundaries(
+    Boundaries.limit(visible, lastItemIndex)
+  )
+  const overscanIndex = useReplaceBoundaries(
+    Boundaries.limit(overscan, lastItemIndex)
+  )
   const viewport = useMemo(
     () => ({
       overscanStartIndex: overscanIndex.start,
@@ -145,18 +141,16 @@ const useBoundaries = ({
       visibleStartIndex: visibleIndex.start,
       visibleStopIndex: visibleIndex.stop
     }),
-    [
-      overscanIndex.start,
-      overscanIndex.stop,
-      visibleIndex.start,
-      visibleIndex.stop
-    ]
+    [overscanIndex, visibleIndex]
   )
 
   return [
     viewport,
     overscan,
-    useCallback(next => setBoundaries(prev => prev.replace(next)), [])
+    useCallback(
+      next => setBoundaries(prev => Boundaries.replace(prev, next)),
+      []
+    )
   ]
 }
 
@@ -287,7 +281,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
     ref: containerRef,
     topOffset: boundaries.start * itemHeight,
     bottomOffset: (itemCount - boundaries.stop) * itemHeight,
-    indexes: useMemo(() => boundaries.toIndexes(), [boundaries]),
+    indexes: useMemo(() => Boundaries.toIndexes(boundaries), [boundaries]),
     isScrolling,
     scrollTo,
     scrollToItem
