@@ -104,33 +104,14 @@ abstract class Boundaries {
   }
 }
 
-const useBoundaries = ({
-  initial,
-  itemCount,
-  overscanCount
-}: {
+const useBoundaries = (
+  itemCount: number,
   initial: Boundaries
-  itemCount: number
-  overscanCount: number
-}): [ListViewport, Boundaries, (boundaries: Boundaries) => void] => {
+): [Boundaries, (boundaries: Boundaries) => void] => {
   const [boundaries, setBoundaries] = useState(initial)
 
-  const visible = Boundaries.limitOverScroll(boundaries, itemCount)
-  const overscan = Boundaries.limit(visible, itemCount, overscanCount)
-
-  const viewport = useMemo<ListViewport>(
-    () => ({
-      overscanStart: overscan.start,
-      overscanStop: overscan.stop,
-      visibleStart: visible.start,
-      visibleStop: visible.stop
-    }),
-    [overscan.start, overscan.stop, visible.start, visible.stop]
-  )
-
   return [
-    viewport,
-    overscan,
+    Boundaries.limitOverScroll(boundaries, itemCount),
     useCallback(
       next => setBoundaries(prev => Boundaries.replace(prev, next)),
       []
@@ -178,11 +159,11 @@ export const useFixedSizeList = <E extends HTMLElement>({
   const onScrollRef = useRef<DebouncedFunc<(scrollTop: number) => void>>()
 
   const [isScrolling, setIsScrolling] = useState(false)
-  const [viewport, { start, stop }, setBoundaries] = useBoundaries({
-    initial: Boundaries.calc(height, itemHeight, scrollToPx ?? 0),
+  const [boundaries, setBoundaries] = useBoundaries(
     itemCount,
-    overscanCount
-  })
+    Boundaries.calc(height, itemHeight, scrollToPx ?? 0)
+  )
+  const overscan = Boundaries.limit(boundaries, itemCount, overscanCount)
 
   const scrollTo = useCallback((px: number) => {
     const node = containerRef.current
@@ -212,8 +193,19 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
   // props.onItemsRendered monitor
   useEffect(() => {
-    onItemsRendered?.(viewport)
-  }, [onItemsRendered, viewport])
+    onItemsRendered?.({
+      overscanStart: overscan.start,
+      overscanStop: overscan.stop,
+      visibleStart: boundaries.start,
+      visibleStop: boundaries.stop
+    })
+  }, [
+    onItemsRendered,
+    overscan.start,
+    overscan.stop,
+    boundaries.start,
+    boundaries.stop
+  ])
 
   // props.scrollTo monitor
   useEffect(() => {
@@ -265,9 +257,12 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
   return {
     ref: containerRef,
-    topOffset: start * itemHeight,
-    bottomOffset: (itemCount - stop) * itemHeight,
-    indexes: useMemo(() => range(start, stop), [start, stop]),
+    topOffset: overscan.start * itemHeight,
+    bottomOffset: (itemCount - overscan.stop) * itemHeight,
+    indexes: useMemo(() => range(overscan.start, overscan.stop), [
+      overscan.start,
+      overscan.stop
+    ]),
     isScrolling,
     scrollTo,
     scrollToItem
