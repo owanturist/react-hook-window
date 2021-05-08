@@ -40,6 +40,7 @@ const onPassiveScroll = (
   }
 }
 
+// >todo don't use it
 const cleanup = (cleanups: ReadonlyArray<VoidFunction>) => (): void => {
   for (const clean of cleanups) {
     clean()
@@ -55,12 +56,12 @@ abstract class Boundaries {
   }
 
   public static calc(
+    height: number,
     itemHeight: number,
-    scrollTop: number,
-    height: number
+    scrollTop: number
   ): Boundaries {
     const start = Math.floor(scrollTop / itemHeight)
-    const stop = Math.floor((scrollTop + height) / itemHeight)
+    const stop = Math.ceil((scrollTop + height) / itemHeight)
 
     return Boundaries.of(start, stop)
   }
@@ -112,27 +113,19 @@ const useBoundaries = ({
   itemCount: number
   overscanCount: number
 }): [ListViewport, Boundaries, (boundaries: Boundaries) => void] => {
-  const lastItemIndex = Math.max(0, itemCount - 1)
   const [boundaries, setBoundaries] = useState(initial)
 
   const visible = Boundaries.limitOverScroll(boundaries, itemCount)
   const overscan = Boundaries.limit(visible, itemCount, overscanCount)
-  const visibleIndex = Boundaries.limit(visible, lastItemIndex)
-  const overscanIndex = Boundaries.limit(overscan, lastItemIndex)
 
-  const viewport = useMemo(
+  const viewport = useMemo<ListViewport>(
     () => ({
-      overscanStartIndex: overscanIndex.start,
-      overscanStopIndex: overscanIndex.stop,
-      visibleStartIndex: visibleIndex.start,
-      visibleStopIndex: visibleIndex.stop
+      overscanStart: overscan.start,
+      overscanStop: overscan.stop,
+      visibleStart: visible.start,
+      visibleStop: visible.stop
     }),
-    [
-      overscanIndex.start,
-      overscanIndex.stop,
-      visibleIndex.start,
-      visibleIndex.stop
-    ]
+    [overscan.start, overscan.stop, visible.start, visible.stop]
   )
 
   return [
@@ -146,10 +139,10 @@ const useBoundaries = ({
 }
 
 export interface ListViewport {
-  overscanStartIndex: number
-  overscanStopIndex: number
-  visibleStartIndex: number
-  visibleStopIndex: number
+  overscanStart: number
+  overscanStop: number
+  visibleStart: number
+  visibleStop: number
 }
 
 export interface UseFixedSizeListOptions {
@@ -186,7 +179,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [viewport, { start, stop }, setBoundaries] = useBoundaries({
-    initial: Boundaries.calc(itemHeight, scrollToPx ?? 0, height),
+    initial: Boundaries.calc(height, itemHeight, scrollToPx ?? 0),
     itemCount,
     overscanCount
   })
@@ -209,7 +202,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
     // the listener to node each time the props changes
     onScrollRef.current = throttle(
       (scrollTop: number) => {
-        setBoundaries(Boundaries.calc(itemHeight, scrollTop, height))
+        setBoundaries(Boundaries.calc(height, itemHeight, scrollTop))
       },
       scrollThrottling,
       // execute on END of interval so it always applies actual data
@@ -218,7 +211,9 @@ export const useFixedSizeList = <E extends HTMLElement>({
   }, [setBoundaries, itemHeight, height, scrollThrottling])
 
   // props.onItemsRendered monitor
-  useEffect(() => onItemsRendered?.(viewport), [onItemsRendered, viewport])
+  useEffect(() => {
+    onItemsRendered?.(viewport)
+  }, [onItemsRendered, viewport])
 
   // props.scrollTo monitor
   useEffect(() => {
@@ -235,7 +230,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
       return
     }
 
-    setBoundaries(Boundaries.calc(itemHeight, node.scrollTop, height))
+    setBoundaries(Boundaries.calc(height, itemHeight, node.scrollTop))
   }, [setBoundaries, itemHeight, height])
 
   // container scroll monitor
