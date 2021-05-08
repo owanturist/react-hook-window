@@ -33,6 +33,7 @@ const Demo = React.memo(() => {
     scrollToItem,
     isScrolling
   } = useFixedSizeList<HTMLDivElement>({
+    height,
     itemHeight,
     itemCount,
     overscanCount,
