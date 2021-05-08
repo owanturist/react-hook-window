@@ -18,6 +18,17 @@ const clamp = (min: number, max: number, value: number): number => {
   return Math.max(min, Math.min(value, max))
 }
 
+const range = (from: number, to: number): ReadonlyArray<number> => {
+  const N = Math.max(0, to - from)
+  const acc = new Array<number>(N)
+
+  for (let index = 0; index < N; index++) {
+    acc[index] = index + from
+  }
+
+  return acc
+}
+
 const onPassiveScroll = (
   node: HTMLElement,
   listener: () => void
@@ -66,34 +77,16 @@ abstract class Boundaries {
   }
 
   public static limit(
-    boundaries: Boundaries,
+    start: number,
+    stop: number,
     itemCount: number,
     overscanCount = 0
   ): Boundaries {
-    const start = clamp(0, boundaries.start - overscanCount, itemCount)
-    const stop = clamp(start, boundaries.stop + overscanCount, itemCount)
-
-    if (start === boundaries.start && stop === boundaries.stop) {
-      return boundaries
-    }
-
-    return Boundaries.of(start, stop)
+    return Boundaries.of(
+      clamp(0, start - overscanCount, itemCount),
+      clamp(start, stop + overscanCount, itemCount)
+    )
   }
-
-  public static toIndexes({ start, stop }: Boundaries): ReadonlyArray<number> {
-    const N = Math.max(0, stop - start)
-    const acc = new Array<number>(N)
-
-    for (let index = 0; index < N; index++) {
-      acc[index] = index + start
-    }
-
-    return acc
-  }
-}
-
-const useReplaceBoundaries = ({ start, stop }: Boundaries): Boundaries => {
-  return useMemo(() => Boundaries.of(start, stop), [start, stop])
 }
 
 const useBoundaries = ({
@@ -108,31 +101,36 @@ const useBoundaries = ({
   const lastItemIndex = Math.max(0, itemCount - 1)
   const [boundaries, setBoundaries] = useState(initial)
 
-  const visible = useReplaceBoundaries(
-    useMemo(() => {
-      // checks if scroll position is much further than current boundaries
-      // and if so assume accurate boundaries based on previous distance
-      if (boundaries.start > itemCount && boundaries.stop > itemCount) {
-        const start = itemCount - (boundaries.stop - boundaries.start)
+  const visible = useMemo(() => {
+    // checks if scroll position is much further than current boundaries
+    // and if so assume accurate boundaries based on previous distance
+    if (boundaries.start > itemCount && boundaries.stop > itemCount) {
+      const start = itemCount - (boundaries.stop - boundaries.start)
 
-        return Boundaries.of(Math.max(0, start), itemCount)
-      }
+      return Boundaries.of(Math.max(0, start), itemCount)
+    }
 
-      return Boundaries.limit(boundaries, itemCount)
-    }, [boundaries, itemCount])
+    return Boundaries.limit(boundaries.start, boundaries.stop, itemCount)
+  }, [boundaries.start, boundaries.stop, itemCount])
+
+  const overscan = useMemo(() => {
+    return Boundaries.limit(
+      visible.start,
+      visible.stop,
+      itemCount,
+      overscanCount
+    )
+  }, [visible.start, visible.stop, itemCount, overscanCount])
+
+  const visibleIndex = Boundaries.limit(
+    visible.start,
+    visible.stop,
+    lastItemIndex
   )
-
-  const overscan = useReplaceBoundaries(
-    useMemo(() => {
-      return Boundaries.limit(visible, itemCount, overscanCount)
-    }, [visible, itemCount, overscanCount])
-  )
-
-  const visibleIndex = useReplaceBoundaries(
-    Boundaries.limit(visible, lastItemIndex)
-  )
-  const overscanIndex = useReplaceBoundaries(
-    Boundaries.limit(overscan, lastItemIndex)
+  const overscanIndex = Boundaries.limit(
+    visible.start,
+    visible.stop,
+    lastItemIndex
   )
   const viewport = useMemo(
     () => ({
@@ -141,7 +139,12 @@ const useBoundaries = ({
       visibleStartIndex: visibleIndex.start,
       visibleStopIndex: visibleIndex.stop
     }),
-    [overscanIndex, visibleIndex]
+    [
+      overscanIndex.start,
+      overscanIndex.stop,
+      visibleIndex.start,
+      visibleIndex.stop
+    ]
   )
 
   return [
@@ -194,7 +197,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
   const onScrollRef = useRef<DebouncedFunc<(scrollTop: number) => void>>()
 
   const [isScrolling, setIsScrolling] = useState(false)
-  const [viewport, boundaries, setBoundaries] = useBoundaries({
+  const [viewport, { start, stop }, setBoundaries] = useBoundaries({
     initial: Boundaries.calc(itemHeight, scrollToPx ?? 0, height),
     itemCount,
     overscanCount
@@ -279,9 +282,9 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
   return {
     ref: containerRef,
-    topOffset: boundaries.start * itemHeight,
-    bottomOffset: (itemCount - boundaries.stop) * itemHeight,
-    indexes: useMemo(() => Boundaries.toIndexes(boundaries), [boundaries]),
+    topOffset: start * itemHeight,
+    bottomOffset: (itemCount - stop) * itemHeight,
+    indexes: useMemo(() => range(start, stop), [start, stop]),
     isScrolling,
     scrollTo,
     scrollToItem
