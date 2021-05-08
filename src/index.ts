@@ -76,9 +76,23 @@ abstract class Boundaries {
     return next
   }
 
+  // checks if scroll position is much further than current boundaries
+  // and if so assume accurate boundaries based on previous distance
+  public static limitOverScroll(
+    boundaries: Boundaries,
+    itemCount: number
+  ): Boundaries {
+    if (boundaries.start > itemCount && boundaries.stop > itemCount) {
+      const start = itemCount - (boundaries.stop - boundaries.start)
+
+      return Boundaries.of(Math.max(0, start), itemCount)
+    }
+
+    return Boundaries.limit(boundaries, itemCount)
+  }
+
   public static limit(
-    start: number,
-    stop: number,
+    { start, stop }: Boundaries,
     itemCount: number,
     overscanCount = 0
   ): Boundaries {
@@ -101,37 +115,11 @@ const useBoundaries = ({
   const lastItemIndex = Math.max(0, itemCount - 1)
   const [boundaries, setBoundaries] = useState(initial)
 
-  const visible = useMemo(() => {
-    // checks if scroll position is much further than current boundaries
-    // and if so assume accurate boundaries based on previous distance
-    if (boundaries.start > itemCount && boundaries.stop > itemCount) {
-      const start = itemCount - (boundaries.stop - boundaries.start)
+  const visible = Boundaries.limitOverScroll(boundaries, itemCount)
+  const overscan = Boundaries.limit(visible, itemCount, overscanCount)
+  const visibleIndex = Boundaries.limit(visible, lastItemIndex)
+  const overscanIndex = Boundaries.limit(overscan, lastItemIndex)
 
-      return Boundaries.of(Math.max(0, start), itemCount)
-    }
-
-    return Boundaries.limit(boundaries.start, boundaries.stop, itemCount)
-  }, [boundaries.start, boundaries.stop, itemCount])
-
-  const overscan = useMemo(() => {
-    return Boundaries.limit(
-      visible.start,
-      visible.stop,
-      itemCount,
-      overscanCount
-    )
-  }, [visible.start, visible.stop, itemCount, overscanCount])
-
-  const visibleIndex = Boundaries.limit(
-    visible.start,
-    visible.stop,
-    lastItemIndex
-  )
-  const overscanIndex = Boundaries.limit(
-    visible.start,
-    visible.stop,
-    lastItemIndex
-  )
   const viewport = useMemo(
     () => ({
       overscanStartIndex: overscanIndex.start,
