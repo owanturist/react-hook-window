@@ -40,7 +40,6 @@ const onPassiveScroll = (
   }
 }
 
-// >todo don't use it
 const cleanup = (cleanups: ReadonlyArray<VoidFunction>) => (): void => {
   for (const clean of cleanups) {
     clean()
@@ -51,10 +50,6 @@ abstract class Boundaries {
   public abstract readonly start: number
   public abstract readonly stop: number
 
-  public static of(start: number, stop: number): Boundaries {
-    return { start, stop }
-  }
-
   public static calc(
     height: number,
     itemHeight: number,
@@ -63,7 +58,7 @@ abstract class Boundaries {
     const start = Math.floor(scrollTop / itemHeight)
     const stop = Math.ceil((scrollTop + height) / itemHeight)
 
-    return Boundaries.of(start, stop)
+    return { start, stop }
   }
 
   public static replace(prev: Boundaries, next: Boundaries): Boundaries {
@@ -86,7 +81,10 @@ abstract class Boundaries {
     if (boundaries.start > itemCount && boundaries.stop > itemCount) {
       const start = itemCount - (boundaries.stop - boundaries.start)
 
-      return Boundaries.of(Math.max(0, start), itemCount)
+      return {
+        start: Math.max(0, start),
+        stop: itemCount
+      }
     }
 
     return Boundaries.limit(boundaries, itemCount)
@@ -97,10 +95,10 @@ abstract class Boundaries {
     itemCount: number,
     overscanCount = 0
   ): Boundaries {
-    return Boundaries.of(
-      clamp(0, start - overscanCount, itemCount),
-      clamp(start, stop + overscanCount, itemCount)
-    )
+    return {
+      start: clamp(0, start - overscanCount, itemCount),
+      stop: clamp(start, stop + overscanCount, itemCount)
+    }
   }
 }
 
@@ -259,10 +257,9 @@ export const useFixedSizeList = <E extends HTMLElement>({
     ref: containerRef,
     topOffset: overscan.start * itemHeight,
     bottomOffset: (itemCount - overscan.stop) * itemHeight,
-    indexes: useMemo(() => range(overscan.start, overscan.stop), [
-      overscan.start,
-      overscan.stop
-    ]),
+    indexes: useMemo(() => {
+      return range(overscan.start, overscan.stop)
+    }, [overscan.start, overscan.stop]),
     isScrolling,
     scrollTo,
     scrollToItem
