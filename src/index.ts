@@ -44,25 +44,13 @@ abstract class Boundaries {
     return { start, stop }
   }
 
-  public static calcStart(itemHeight: number, scrollTop: number): number {
-    return Math.floor(scrollTop / itemHeight)
-  }
-
-  public static calcStop(
-    itemHeight: number,
-    scrollTop: number,
-    height: number
-  ): number {
-    return Math.floor((scrollTop + height) / itemHeight)
-  }
-
   public static calc(
     itemHeight: number,
     scrollTop: number,
     height: number
   ): Boundaries {
-    const start = Boundaries.calcStart(itemHeight, scrollTop)
-    const stop = Boundaries.calcStop(itemHeight, scrollTop, height)
+    const start = Math.floor(scrollTop / itemHeight)
+    const stop = Math.floor((scrollTop + height) / itemHeight)
 
     return Boundaries.of(start, stop)
   }
@@ -103,39 +91,6 @@ abstract class Boundaries {
   ): boolean {
     return start > itemCount && stop > itemCount
   }
-}
-
-const useIsScrolling = <E extends HTMLElement>(ref: RefObject<E>): boolean => {
-  const [isScrolling, setIsScrolling] = useState(false)
-
-  useEffect(() => {
-    const node = ref.current
-
-    if (node == null) {
-      return
-    }
-
-    const onScrollBegin = debounce(
-      () => setIsScrolling(true),
-      IS_SCROLLING_DEBOUNCE_MS,
-      { leading: true, trailing: false }
-    )
-
-    const onScrollEnd = debounce(
-      () => setIsScrolling(false),
-      IS_SCROLLING_DEBOUNCE_MS,
-      { leading: false, trailing: true }
-    )
-
-    return cleanup([
-      onScrollBegin.cancel,
-      onScrollEnd.cancel,
-      on(node, 'scroll', onScrollBegin),
-      on(node, 'scroll', onScrollEnd)
-    ])
-  }, [ref])
-
-  return isScrolling
 }
 
 const useBoundaries = ({
@@ -253,7 +208,8 @@ export const useFixedSizeList = <E extends HTMLElement>({
   const containerRef = useRef<E>(null)
   const onScrollRef = useRef<DebouncedFunc<(scrollTop: number) => void>>()
 
-  const isScrolling = useIsScrolling(containerRef)
+  const [isScrolling, setIsScrolling] = useState(false)
+  // >todo return OnItelemsRenderedParams instead of visibe
   const [visible, overscan, setBoundaries] = useBoundaries({
     initial: Boundaries.calc(itemHeight, scrollToPx ?? 0, height),
     itemCount,
@@ -274,24 +230,9 @@ export const useFixedSizeList = <E extends HTMLElement>({
   )
 
   useEffect(() => {
-    let prevScrollTop = 0
-
     onScrollRef.current = throttle(
       (scrollTop: number) => {
-        // use calc and isEqual
-        // myabe don't compare at all?
-        const prevStart = Boundaries.calcStart(itemHeight, prevScrollTop)
-        const prevStop = Boundaries.calcStop(itemHeight, prevScrollTop, height)
-        const nextBoundaries = Boundaries.calc(itemHeight, scrollTop, height)
-
-        if (
-          prevStart !== nextBoundaries.start ||
-          prevStop !== nextBoundaries.stop
-        ) {
-          setBoundaries(nextBoundaries)
-        }
-
-        prevScrollTop = scrollTop
+        setBoundaries(Boundaries.calc(itemHeight, scrollTop, height))
       },
       scrollThrottling,
       // execute on END of interval so it always applies actual data
@@ -331,9 +272,24 @@ export const useFixedSizeList = <E extends HTMLElement>({
       return
     }
 
+    const onScrollBegin = debounce(
+      () => setIsScrolling(true),
+      IS_SCROLLING_DEBOUNCE_MS,
+      { leading: true, trailing: false }
+    )
+
+    const onScrollEnd = debounce(
+      () => setIsScrolling(false),
+      IS_SCROLLING_DEBOUNCE_MS,
+      { leading: false, trailing: true }
+    )
+
     return cleanup([
+      onScrollBegin.cancel,
+      onScrollEnd.cancel,
       () => onScrollRef.current?.cancel(),
-      // subscribe on scroll
+      on(node, 'scroll', onScrollBegin),
+      on(node, 'scroll', onScrollEnd),
       on(node, 'scroll', () => onScrollRef.current?.(node.scrollTop))
     ])
   }, [])
