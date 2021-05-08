@@ -69,9 +69,8 @@ abstract class Boundaries {
   }
 
   public static limit(itemCount: number, boundaries: Boundaries): Boundaries {
-    const itemCount_ = Math.max(0, itemCount)
-    const start = clamp(0, boundaries.start, itemCount_)
-    const stop = clamp(start, boundaries.stop, itemCount_)
+    const start = clamp(0, boundaries.start, itemCount)
+    const stop = clamp(start, boundaries.stop, itemCount)
 
     if (start === boundaries.start && stop === boundaries.stop) {
       return boundaries
@@ -254,6 +253,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
   onItemsRendered
 }: UseFixedSizeListOptions): UseFixedSizeListResult<E> => {
   const containerRef = useRef<E>(null)
+  const lastItemIndex = Math.max(0, itemCount - 1)
 
   const isScrolling = useIsScrolling(containerRef)
   const [visible, overscan, setBoundaries] = useBoundaries({
@@ -275,10 +275,8 @@ export const useFixedSizeList = <E extends HTMLElement>({
   )
 
   useOnItemsRendered({
-    // onItemsRendered should limit boundaries per last item index
-    // that's why itemCount gets -1
-    visible: Boundaries.limit(itemCount - 1, visible),
-    overscan: Boundaries.limit(itemCount - 1, overscan),
+    visible: Boundaries.limit(lastItemIndex, visible),
+    overscan: Boundaries.limit(lastItemIndex, overscan),
     onItemsRendered
   })
 
