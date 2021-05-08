@@ -40,8 +40,6 @@ abstract class Boundaries {
   public abstract readonly start: number
   public abstract readonly stop: number
 
-  public static initial = Boundaries.of(0, 0)
-
   public static of(start: number, stop: number): Boundaries {
     return { start, stop }
   }
@@ -99,10 +97,6 @@ abstract class Boundaries {
     return left.start === right.start && left.stop === right.stop
   }
 
-  public static isInitial(boundaries: Boundaries): boolean {
-    return boundaries === Boundaries.initial
-  }
-
   public static isOverScroll(
     itemCount: number,
     { start, stop }: Boundaries
@@ -145,13 +139,15 @@ const useIsScrolling = <E extends HTMLElement>(ref: RefObject<E>): boolean => {
 }
 
 const useBoundaries = ({
+  initial,
   itemCount,
   overscanCount
 }: {
+  initial: Boundaries
   itemCount: number
   overscanCount: number
 }): [Boundaries, Boundaries, (boundaries: Boundaries) => void] => {
-  const [boundaries, setBoundaries] = useState(Boundaries.initial)
+  const [boundaries, setBoundaries] = useState(initial)
 
   const visible = useMemo(() => {
     // checks if scroll position is much further than current boundaries
@@ -185,9 +181,7 @@ const useBoundaries = ({
 
   return [
     visible,
-
-    Boundaries.isInitial(boundaries) ? Boundaries.initial : overscan,
-
+    overscan,
     useCallback(next => {
       setBoundaries(prev => (Boundaries.isEqual(next, prev) ? prev : next))
     }, [])
@@ -204,17 +198,19 @@ const useOnItemsRendered = ({
   onItemsRendered?(params: OnItemsRenderedParams): void
 }): void => {
   useEffect(() => {
-    if (onItemsRendered == null || Boundaries.isInitial(visible)) {
-      return
-    }
-
-    onItemsRendered({
+    onItemsRendered?.({
       overscanStartIndex: overscan.start,
       overscanStopIndex: overscan.stop,
       visibleStartIndex: visible.start,
       visibleStopIndex: visible.stop
     })
-  }, [visible, overscan.start, overscan.stop, onItemsRendered])
+  }, [
+    visible.start,
+    visible.stop,
+    overscan.start,
+    overscan.stop,
+    onItemsRendered
+  ])
 }
 
 export interface OnItemsRenderedParams {
@@ -259,6 +255,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
   const isScrolling = useIsScrolling(containerRef)
   const [visible, overscan, setBoundaries] = useBoundaries({
+    initial: Boundaries.calc(itemHeight, scrollToPx ?? 0, height),
     itemCount,
     overscanCount
   })
