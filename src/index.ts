@@ -57,13 +57,13 @@ abstract class Boundaries {
     return Math.floor((scrollTop + height) / itemHeight)
   }
 
-  public static calc(itemHeight: number, node: HTMLElement): Boundaries {
-    const start = Boundaries.calcStart(itemHeight, node.scrollTop)
-    const stop = Boundaries.calcStop(
-      itemHeight,
-      node.scrollTop,
-      node.clientHeight
-    )
+  public static calc(
+    itemHeight: number,
+    scrollTop: number,
+    height: number
+  ): Boundaries {
+    const start = Boundaries.calcStart(itemHeight, scrollTop)
+    const stop = Boundaries.calcStop(itemHeight, scrollTop, height)
 
     return Boundaries.of(start, stop)
   }
@@ -297,7 +297,9 @@ export const useFixedSizeList = <E extends HTMLElement>({
       return
     }
 
-    setBoundaries(Boundaries.calc(itemHeight, node))
+    setBoundaries(
+      Boundaries.calc(itemHeight, node.scrollTop, node.clientHeight)
+    )
   }, [setBoundaries, itemHeight])
 
   // container scroll monitor
@@ -318,7 +320,11 @@ export const useFixedSizeList = <E extends HTMLElement>({
           prevScrollTop,
           node.clientHeight
         )
-        const nextBoundaries = Boundaries.calc(itemHeight, node)
+        const nextBoundaries = Boundaries.calc(
+          itemHeight,
+          node.scrollTop,
+          node.clientHeight
+        )
 
         if (
           prevStart !== nextBoundaries.start ||
@@ -350,7 +356,10 @@ export const useFixedSizeList = <E extends HTMLElement>({
     }
 
     const resizeListener = throttle(
-      () => setBoundaries(Boundaries.calc(itemHeight, node)),
+      () =>
+        setBoundaries(
+          Boundaries.calc(itemHeight, node.scrollTop, node.clientHeight)
+        ),
       resizeThrottling,
       // execute on END of interval so it always applies actual data
       { leading: false, trailing: true }
@@ -366,20 +375,6 @@ export const useFixedSizeList = <E extends HTMLElement>({
       observer.disconnect()
     }
   }, [setBoundaries, itemHeight, resizeThrottling])
-
-  // // props.onItemsRendered monitor
-  // useEffect(() => {
-  //   if (onItemsRendered == null || Boundaries.isInitial(visible)) {
-  //     return
-  //   }
-
-  //   onItemsRendered({
-  //     overscanStartIndex: overscan.start,
-  //     overscanStopIndex: overscan.stop,
-  //     visibleStartIndex: visible.start,
-  //     visibleStopIndex: visible.stop
-  //   })
-  // }, [visible, overscan.start, overscan.stop, onItemsRendered])
 
   return {
     ref: containerRef,
