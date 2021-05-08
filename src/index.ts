@@ -46,6 +46,105 @@ const cleanup = (cleanups: ReadonlyArray<VoidFunction>) => (): void => {
   }
 }
 
+const calcStartPosition = (index: number, itemHeight: number): number => {
+  return itemHeight * index
+}
+
+const calcEndPosition = (
+  index: number,
+  itemHeight: number,
+  height: number
+): number => {
+  return calcStartPosition(index, itemHeight) + itemHeight - height
+}
+
+const calcCenterPosition = (
+  index: number,
+  itemHeight: number,
+  height: number
+): number => {
+  return calcStartPosition(index, itemHeight) + itemHeight / 2 - height / 2
+}
+
+const calcShortestPosition = (
+  startPosition: number,
+  endPosition: number,
+  currentPosition: number
+): number => {
+  if (currentPosition > startPosition) {
+    return startPosition
+  }
+
+  if (currentPosition < endPosition) {
+    return endPosition
+  }
+
+  return currentPosition
+}
+
+const calcSmartPosition = (
+  index: number,
+  itemHeight: number,
+  height: number,
+  currentPosition: number
+): number => {
+  const startPosition = calcStartPosition(index, itemHeight)
+  const endPosition = calcEndPosition(index, itemHeight, height)
+
+  if (
+    currentPosition - startPosition > height ||
+    endPosition - currentPosition > height
+  ) {
+    return calcCenterPosition(index, itemHeight, height)
+  }
+
+  return calcShortestPosition(startPosition, endPosition, currentPosition)
+}
+
+const calcAutoPosition = (
+  index: number,
+  itemHeight: number,
+  height: number,
+  currentPosition: number
+): number => {
+  const startPosition = calcStartPosition(index, itemHeight)
+  const endPosition = calcEndPosition(index, itemHeight, height)
+
+  return calcShortestPosition(startPosition, endPosition, currentPosition)
+}
+
+const calcPosition = ({
+  type,
+  index,
+  itemHeight,
+  height,
+  currentPosition
+}: {
+  type: ScrollPosition
+  index: number
+  itemHeight: number
+  height: number
+  currentPosition: number
+}): number => {
+  if (type === 'start') {
+    return calcStartPosition(index, itemHeight)
+  }
+
+  if (type === 'end') {
+    return calcEndPosition(index, itemHeight, height)
+  }
+
+  if (type === 'center') {
+    return calcCenterPosition(index, itemHeight, height)
+  }
+
+  if (type === 'smart') {
+    return calcSmartPosition(index, itemHeight, height, currentPosition)
+  }
+
+  return calcAutoPosition(index, itemHeight, height, currentPosition)
+}
+
 abstract class Boundaries {
   public abstract readonly start: number
   public abstract readonly stop: number
@@ -62,10 +161,7 @@ abstract class Boundaries {
   }
 
   public static replace(prev: Boundaries, next: Boundaries): Boundaries {
-    if (
-      prev === next ||
-      (prev.start === next.start && prev.stop === next.stop)
-    ) {
+    if (prev.start === next.start && prev.stop === next.stop) {
       return prev
     }
 
@@ -117,6 +213,8 @@ const useBoundaries = (
   ]
 }
 
+export type ScrollPosition = 'auto' | 'smart' | 'center' | 'end' | 'start'
+
 export interface ListViewport {
   overscanStart: number
   overscanStop: number
@@ -141,7 +239,7 @@ export interface UseFixedSizeListResult<E extends HTMLElement> {
   indexes: ReadonlyArray<number>
   isScrolling: boolean
   scrollTo(px: number): void
-  scrollToItem(index: number): void
+  scrollToItem(index: number, position?: ScrollPosition): void
 }
 
 export const useFixedSizeList = <E extends HTMLElement>({
@@ -172,8 +270,22 @@ export const useFixedSizeList = <E extends HTMLElement>({
   }, [])
 
   const scrollToItem = useCallback(
-    (index: number): void => scrollTo(itemHeight * index),
-    [scrollTo, itemHeight]
+    (index: number, position: ScrollPosition = 'auto'): void => {
+      const node = containerRef.current
+
+      if (node != null) {
+        scrollTo(
+          calcPosition({
+            type: position,
+            index,
+            itemHeight,
+            height,
+            currentPosition: node.scrollTop
+          })
+        )
+      }
+    },
+    [scrollTo, height, itemHeight]
   )
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { ListViewport, useFixedSizeList } from '../src'
+import { ScrollPosition, ListViewport, useFixedSizeList } from '../src'
 
 const makeItems = (n: number): Array<{ id: number; title: string }> => {
   return Array.from({ length: n }).map((_, i) => ({
@@ -11,12 +11,20 @@ const makeItems = (n: number): Array<{ id: number; title: string }> => {
 
 let n = 0
 
+const positions: ReadonlyArray<ScrollPosition> = [
+  'auto',
+  'smart',
+  'start',
+  'center',
+  'end'
+]
+
 const Demo = React.memo(() => {
   const [height, setHeight] = React.useState(500)
   const [itemHeight, setItemHeight] = React.useState(40)
-  const [itemCount, setItemCount] = React.useState(100000)
+  const [itemCount, setItemCount] = React.useState(100)
   const [overscanCount, setOverscanCount] = React.useState(3)
-  const [scrollToItemIndex, setScrollToItemIndex] = React.useState(30000)
+  const [scrollToItemIndex, setScrollToItemIndex] = React.useState(30)
   const [scrollTo, setScrollTo] = React.useState(0)
 
   const items = React.useMemo(() => makeItems(itemCount), [itemCount])
@@ -95,9 +103,15 @@ const Demo = React.memo(() => {
         value={scrollToItemIndex}
         onChange={event => setScrollToItemIndex(Number(event.target.value))}
       />
-      <button type="button" onClick={() => scrollToItem(scrollToItemIndex)}>
-        scroll
-      </button>
+      {positions.map(position => (
+        <button
+          key={position}
+          type="button"
+          onClick={() => scrollToItem(scrollToItemIndex, position)}
+        >
+          scroll {position}
+        </button>
+      ))}
       <div ref={ref} style={{ height, overflow: 'auto' }}>
         <div style={{ paddingTop: topOffset, paddingBottom: bottomOffset }}>
           {indexes.map(index => {
