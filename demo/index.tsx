@@ -14,9 +14,9 @@ let n = 0
 const Demo = React.memo(() => {
   const [height, setHeight] = React.useState(500)
   const [itemHeight, setItemHeight] = React.useState(40)
-  const [itemCount, setItemCount] = React.useState(1000)
+  const [itemCount, setItemCount] = React.useState(100000)
   const [overscanCount, setOverscanCount] = React.useState(3)
-  const [scrollToItemIndex, setScrollToItemIndex] = React.useState(300)
+  const [scrollToItemIndex, setScrollToItemIndex] = React.useState(30000)
   const [scrollTo, setScrollTo] = React.useState(0)
 
   const items = React.useMemo(() => makeItems(itemCount), [itemCount])

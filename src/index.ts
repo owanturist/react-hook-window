@@ -51,20 +51,19 @@ class Boundaries {
     return Boundaries.of(start, stop)
   }
 
+  public static isEqual(prev: Boundaries, next: Boundaries): boolean {
+    return (
+      prev === next || (prev.start === next.start && prev.stop === next.stop)
+    )
+  }
+
   private constructor(
     public readonly start: number,
     public readonly stop: number
   ) {}
 
   public replace(another: Boundaries): Boundaries {
-    if (
-      this === another ||
-      (this.start === another.start && this.stop === another.stop)
-    ) {
-      return this
-    }
-
-    return another
+    return Boundaries.isEqual(this, another) ? this : another
   }
 
   public limit(itemCount: number, overscanCount = 0): Boundaries {
@@ -98,6 +97,19 @@ class Boundaries {
   }
 }
 
+const useKeepEqual = <T>(
+  isEqual: (prev: T, next: T) => boolean,
+  value: T
+): T => {
+  const valueRef = useRef(value)
+
+  if (!isEqual(valueRef.current, value)) {
+    valueRef.current = value
+  }
+
+  return valueRef.current
+}
+
 const useBoundaries = ({
   initial,
   itemCount,
@@ -110,29 +122,35 @@ const useBoundaries = ({
   const lastItemIndex = Math.max(0, itemCount - 1)
   const [boundaries, setBoundaries] = useState(initial)
 
-  const visible = useMemo(() => {
-    // checks if scroll position is much further than current boundaries
-    // and if so assume accurate boundaries based on previous diff
-    if (boundaries.isOverScroll(itemCount)) {
-      const start = itemCount - boundaries.distance()
+  const visible = useKeepEqual(
+    Boundaries.isEqual,
+    useMemo(() => {
+      // checks if scroll position is much further than current boundaries
+      // and if so assume accurate boundaries based on previous distance
+      if (boundaries.isOverScroll(itemCount)) {
+        const start = itemCount - boundaries.distance()
 
-      return Boundaries.of(Math.max(0, start), itemCount)
-    }
+        return Boundaries.of(Math.max(0, start), itemCount)
+      }
 
-    return boundaries.limit(itemCount)
-  }, [itemCount, boundaries])
+      return boundaries.limit(itemCount)
+    }, [boundaries, itemCount])
+  )
 
-  const overscan = useMemo(() => {
-    // checks if scroll position is much further than current boundaries
-    // and if so assume accurate boundaries based on previous diff
-    if (boundaries.isOverScroll(itemCount)) {
-      const start = itemCount - boundaries.distance() - overscanCount
+  const overscan = useKeepEqual(
+    Boundaries.isEqual,
+    useMemo(() => {
+      // checks if scroll position is much further than current boundaries
+      // and if so assume accurate boundaries based on previous distance
+      if (boundaries.isOverScroll(itemCount)) {
+        const start = itemCount - boundaries.distance() - overscanCount
 
-      return Boundaries.of(Math.max(0, start), itemCount)
-    }
+        return Boundaries.of(Math.max(0, start), itemCount)
+      }
 
-    return boundaries.limit(itemCount, overscanCount)
-  }, [overscanCount, itemCount, boundaries])
+      return boundaries.limit(itemCount, overscanCount)
+    }, [boundaries, itemCount, overscanCount])
+  )
 
   const visibleIndex = visible.limit(lastItemIndex)
   const overscanIndex = overscan.limit(lastItemIndex)
@@ -143,7 +161,12 @@ const useBoundaries = ({
       visibleStartIndex: visibleIndex.start,
       visibleStopIndex: visibleIndex.stop
     }),
-    [visibleIndex, overscanIndex]
+    [
+      overscanIndex.start,
+      overscanIndex.stop,
+      visibleIndex.start,
+      visibleIndex.stop
+    ]
   )
 
   return [
