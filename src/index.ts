@@ -8,11 +8,14 @@ import {
 } from 'react'
 import throttle from 'lodash.throttle'
 import debounce from 'lodash.debounce'
-import type { DebouncedFunc } from 'lodash'
 
 const DEFAULT_OVERSCAN_COUNT = 1
 const DEFAULT_SCROLL_THROTTLE_MS = 16 // ~ 60fps
 const IS_SCROLLING_DEBOUNCE_MS = 150
+
+const noop = (): void => {
+  // do nothing
+}
 
 const clamp = (min: number, max: number, value: number): number => {
   return Math.max(min, Math.min(value, max))
@@ -242,7 +245,7 @@ const useIsScrolling = (): [boolean, () => void] => {
       },
       () => {
         onScrollBegin.cancel()
-        onScrollBegin.cancel()
+        onScrollEnd.cancel()
       }
     ]
   }, [])
@@ -291,12 +294,12 @@ export const useFixedSizeList = <E extends HTMLElement>({
   onItemsRendered
 }: UseFixedSizeListOptions): UseFixedSizeListResult<E> => {
   const containerRef = useRef<E>(null)
-  const onScrollRef = useRef<DebouncedFunc<(scrollTop: number) => void>>()
+  const onScrollRef = useRef<(scrollTop: number) => void>(noop)
   const calcInitialScrollRef = useRef(() => {
     return calcInitialScroll(initialScroll, itemHeight, height)
   })
 
-  const [isScrolling, onScrolling] = useIsScrolling()
+  const [isScrolling, tickIsScrolling] = useIsScrolling()
   const [boundaries, setBoundaries] = useBoundaries(itemCount, () => {
     return Boundaries.calc(height, itemHeight, calcInitialScrollRef.current())
   })
@@ -357,7 +360,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
   useEffect(() => {
     // the ref keeps onScroll callback so it don't need to (de)attach
     // the listener to node each time the props changes
-    onScrollRef.current = throttle(
+    const onScroll = throttle(
       (scrollTop: number) => {
         setBoundaries(Boundaries.calc(height, itemHeight, scrollTop))
       },
@@ -365,6 +368,10 @@ export const useFixedSizeList = <E extends HTMLElement>({
       // execute on END of interval so it always applies actual data
       { leading: false, trailing: true }
     )
+
+    onScrollRef.current = onScroll
+
+    return onScroll.cancel
   }, [setBoundaries, itemHeight, height, scrollThrottling])
 
   // container scroll monitor
@@ -375,16 +382,11 @@ export const useFixedSizeList = <E extends HTMLElement>({
       return
     }
 
-    const cleanup = onPassiveScroll(node, () => {
-      onScrolling()
-      onScrollRef.current?.(node.scrollTop)
+    return onPassiveScroll(node, () => {
+      tickIsScrolling()
+      onScrollRef.current(node.scrollTop)
     })
-
-    return () => {
-      onScrollRef.current?.cancel()
-      cleanup()
-    }
-  }, [onScrolling])
+  }, [tickIsScrolling])
 
   return {
     ref: containerRef,
