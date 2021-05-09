@@ -274,23 +274,17 @@ export const useFixedSizeList = <E extends HTMLElement>({
       calcInitialScroll(initialScroll, itemHeight, height)
     )
   })
-  const overscan = Boundaries.limit(boundaries, itemCount, overscanCount)
+  const { start, stop } = Boundaries.limit(boundaries, itemCount, overscanCount)
 
   // props.onItemsRendered monitor
   useEffect(() => {
     onItemsRendered?.({
-      overscanStart: overscan.start,
-      overscanStop: overscan.stop,
+      overscanStart: start,
+      overscanStop: stop,
       visibleStart: boundaries.start,
       visibleStop: boundaries.stop
     })
-  }, [
-    onItemsRendered,
-    overscan.start,
-    overscan.stop,
-    boundaries.start,
-    boundaries.stop
-  ])
+  }, [onItemsRendered, start, stop, boundaries.start, boundaries.stop])
 
   // set initial scroll
   useEffect(() => {
@@ -376,12 +370,10 @@ export const useFixedSizeList = <E extends HTMLElement>({
   return {
     isScrolling,
     ref: containerRef,
-    topOffset: overscan.start * itemHeight,
-    bottomOffset: (itemCount - overscan.stop) * itemHeight,
+    topOffset: start * itemHeight,
+    bottomOffset: (itemCount - stop) * itemHeight,
 
-    indexes: useMemo(() => {
-      return range(overscan.start, overscan.stop)
-    }, [overscan.start, overscan.stop]),
+    indexes: useMemo(() => range(start, stop), [start, stop]),
 
     scrollTo: useCallback((px: number) => {
       const node = containerRef.current
