@@ -222,39 +222,6 @@ const useBoundaries = (
   ]
 }
 
-const useIsScrolling = (): [boolean, () => void] => {
-  const [isScrolling, setIsScrolling] = useState(false)
-
-  const [tick, cancel] = useMemo(() => {
-    const onScrollBegin = debounce(
-      () => setIsScrolling(true),
-      IS_SCROLLING_DEBOUNCE_MS,
-      { leading: true, trailing: false }
-    )
-
-    const onScrollEnd = debounce(
-      () => setIsScrolling(false),
-      IS_SCROLLING_DEBOUNCE_MS,
-      { leading: false, trailing: true }
-    )
-
-    return [
-      () => {
-        onScrollBegin()
-        onScrollEnd()
-      },
-      () => {
-        onScrollBegin.cancel()
-        onScrollEnd.cancel()
-      }
-    ]
-  }, [])
-
-  useEffect(() => cancel, [cancel])
-
-  return [isScrolling, tick]
-}
-
 export type ScrollPosition = 'auto' | 'smart' | 'center' | 'end' | 'start'
 
 export interface ListViewport {
@@ -295,36 +262,17 @@ export const useFixedSizeList = <E extends HTMLElement>({
 }: UseFixedSizeListOptions): UseFixedSizeListResult<E> => {
   const containerRef = useRef<E>(null)
   const onScrollRef = useRef<(scrollTop: number) => void>(noop)
+  const onScrollingRef = useRef<() => void>(noop)
   const calcInitialScrollRef = useRef(() => {
     return calcInitialScroll(initialScroll, itemHeight, height)
   })
 
-  const [isScrolling, tickIsScrolling] = useIsScrolling()
+  const [isScrolling, setIsScrolling] = useState(false)
   const [boundaries, setBoundaries] = useBoundaries(itemCount, () => {
     return Boundaries.calc(height, itemHeight, calcInitialScrollRef.current())
   })
   const overscan = Boundaries.limit(boundaries, itemCount, overscanCount)
 
-  const scrollTo = useCallback((px: number) => {
-    const node = containerRef.current
-
-    if (node != null && node.scrollTop !== px) {
-      node.scrollTo(node.scrollLeft, px)
-    }
-  }, [])
-
-  const scrollToItem = useCallback(
-    (index: number, position: ScrollPosition = 'auto'): void => {
-      const node = containerRef.current
-
-      if (node != null) {
-        scrollTo(
-          calcPosition(position, index, itemHeight, height, node.scrollTop)
-        )
-      }
-    },
-    [scrollTo, height, itemHeight]
-  )
   // props.onItemsRendered monitor
   useEffect(() => {
     onItemsRendered?.({
@@ -343,8 +291,10 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
   // set initial scroll
   useEffect(() => {
-    scrollTo(calcInitialScrollRef.current())
-  }, [scrollTo])
+    const node = containerRef.current
+
+    node?.scrollTo(node.scrollLeft, calcInitialScrollRef.current())
+  }, [])
 
   // props.height and props.itemHeight monitor
   useEffect(() => {
@@ -358,8 +308,31 @@ export const useFixedSizeList = <E extends HTMLElement>({
   }, [setBoundaries, itemHeight, height])
 
   useEffect(() => {
-    // the ref keeps onScroll callback so it don't need to (de)attach
-    // the listener to node each time the props changes
+    const onScrollBegin = debounce(
+      () => setIsScrolling(true),
+      IS_SCROLLING_DEBOUNCE_MS,
+      { leading: true, trailing: false }
+    )
+
+    const onScrollEnd = debounce(
+      () => setIsScrolling(false),
+      IS_SCROLLING_DEBOUNCE_MS,
+      { leading: false, trailing: true }
+    )
+
+    // the ref keeps onScrolling callback so it never needs to deattach the listener
+    onScrollingRef.current = () => {
+      onScrollBegin()
+      onScrollEnd()
+    }
+
+    return () => {
+      onScrollBegin.cancel()
+      onScrollEnd.cancel()
+    }
+  }, [])
+
+  useEffect(() => {
     const onScroll = throttle(
       (scrollTop: number) => {
         setBoundaries(Boundaries.calc(height, itemHeight, scrollTop))
@@ -369,6 +342,8 @@ export const useFixedSizeList = <E extends HTMLElement>({
       { leading: false, trailing: true }
     )
 
+    // the ref keeps onScroll callback so it doesn't need to deattach
+    // the listener to node each time the props changes
     onScrollRef.current = onScroll
 
     return onScroll.cancel
@@ -383,20 +358,37 @@ export const useFixedSizeList = <E extends HTMLElement>({
     }
 
     return onPassiveScroll(node, () => {
-      tickIsScrolling()
+      onScrollingRef.current()
       onScrollRef.current(node.scrollTop)
     })
-  }, [tickIsScrolling])
+  }, [])
 
   return {
+    isScrolling,
     ref: containerRef,
     topOffset: overscan.start * itemHeight,
     bottomOffset: (itemCount - overscan.stop) * itemHeight,
+
     indexes: useMemo(() => {
       return range(overscan.start, overscan.stop)
     }, [overscan.start, overscan.stop]),
-    isScrolling,
-    scrollTo,
-    scrollToItem
+
+    scrollTo: useCallback((px: number) => {
+      const node = containerRef.current
+
+      node?.scrollTo(node.scrollLeft, px)
+    }, []),
+
+    scrollToItem: useCallback(
+      (index: number, position: ScrollPosition = 'auto'): void => {
+        const node = containerRef.current
+
+        node?.scrollTo(
+          node.scrollLeft,
+          calcPosition(position, index, itemHeight, height, node.scrollTop)
+        )
+      },
+      [height, itemHeight]
+    )
   }
 }

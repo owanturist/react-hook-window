@@ -44,6 +44,7 @@ const Demo = React.memo(() => {
     itemHeight,
     itemCount,
     overscanCount,
+    initialScroll: 3000,
     scrollThrottling: 20,
     onItemsRendered
   })
