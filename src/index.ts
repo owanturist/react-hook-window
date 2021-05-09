@@ -212,13 +212,15 @@ const useBoundaries = (
   init: () => Boundaries
 ): [Boundaries, (boundaries: Boundaries) => void] => {
   const [boundaries, setBoundaries] = useState(init)
+  // it's safer to keep setter in ref so React never cleans it up
+  // due to memory optimisation https://reactjs.org/docs/hooks-reference.html#usememo
+  const setBoundariesRef = useRef((next: Boundaries) => {
+    setBoundaries(prev => Boundaries.replace(prev, next))
+  })
 
   return [
     Boundaries.limitOverScroll(boundaries, itemCount),
-    useCallback(
-      next => setBoundaries(prev => Boundaries.replace(prev, next)),
-      []
-    )
+    setBoundariesRef.current
   ]
 }
 
