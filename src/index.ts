@@ -40,12 +40,6 @@ const onPassiveScroll = (
   }
 }
 
-const cleanup = (cleanups: ReadonlyArray<VoidFunction>) => (): void => {
-  for (const clean of cleanups) {
-    clean()
-  }
-}
-
 const calcStartPosition = (index: number, itemHeight: number): number => {
   return itemHeight * index
 }
@@ -360,14 +354,18 @@ export const useFixedSizeList = <E extends HTMLElement>({
       { leading: false, trailing: true }
     )
 
-    return cleanup([
-      onScrollBegin.cancel,
-      onScrollEnd.cancel,
-      () => onScrollRef.current?.cancel(),
-      onPassiveScroll(node, onScrollBegin),
-      onPassiveScroll(node, onScrollEnd),
-      onPassiveScroll(node, () => onScrollRef.current?.(node.scrollTop))
-    ])
+    const cleanup = onPassiveScroll(node, () => {
+      onScrollBegin()
+      onScrollEnd()
+      onScrollRef.current?.(node.scrollTop)
+    })
+
+    return () => {
+      onScrollBegin.cancel()
+      onScrollEnd.cancel()
+      onScrollRef.current?.cancel()
+      cleanup()
+    }
   }, [])
 
   return {
