@@ -302,11 +302,9 @@ export const useFixedSizeList = <E extends HTMLElement>({
   useEffect(() => {
     const node = containerRef.current
 
-    if (node == null) {
-      return
+    if (node != null) {
+      setBoundaries(Boundaries.calc(height, itemHeight, node.scrollTop))
     }
-
-    setBoundaries(Boundaries.calc(height, itemHeight, node.scrollTop))
   }, [setBoundaries, itemHeight, height])
 
   // define onScrolling handler
@@ -323,7 +321,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
       { leading: false, trailing: true }
     )
 
-    // the ref keeps onScrolling callback so it never needs to deattach the listener
+    // the ref keeps onScrolling callback so it never needs to reattach the listener
     onScrollingRef.current = () => {
       onScrollBegin()
       onScrollEnd()
@@ -346,7 +344,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
       { leading: false, trailing: true }
     )
 
-    // the ref keeps onScroll callback so it doesn't need to deattach
+    // the ref keeps onScroll callback so it doesn't need to reattach
     // the listener to node each time the props changes
     onScrollRef.current = onScroll
 
