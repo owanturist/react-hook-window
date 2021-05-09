@@ -265,13 +265,14 @@ export const useFixedSizeList = <E extends HTMLElement>({
   const containerRef = useRef<E>(null)
   const onScrollRef = useRef<(scrollTop: number) => void>(noop)
   const onScrollingRef = useRef<() => void>(noop)
-  const calcInitialScrollRef = useRef(() => {
-    return calcInitialScroll(initialScroll, itemHeight, height)
-  })
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [boundaries, setBoundaries] = useBoundaries(itemCount, () => {
-    return Boundaries.calc(height, itemHeight, calcInitialScrollRef.current())
+    return Boundaries.calc(
+      height,
+      itemHeight,
+      calcInitialScroll(initialScroll, itemHeight, height)
+    )
   })
   const overscan = Boundaries.limit(boundaries, itemCount, overscanCount)
 
@@ -295,7 +296,12 @@ export const useFixedSizeList = <E extends HTMLElement>({
   useEffect(() => {
     const node = containerRef.current
 
-    node?.scrollTo(node.scrollLeft, calcInitialScrollRef.current())
+    node?.scrollTo(
+      node.scrollLeft,
+      calcInitialScroll(initialScroll, itemHeight, height)
+    )
+    // it does not want to watch the values' changes on purpose
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // props.height and props.itemHeight monitor
@@ -309,6 +315,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
     setBoundaries(Boundaries.calc(height, itemHeight, node.scrollTop))
   }, [setBoundaries, itemHeight, height])
 
+  // define onScrolling handler
   useEffect(() => {
     const onScrollBegin = debounce(
       () => setIsScrolling(true),
@@ -334,6 +341,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
     }
   }, [])
 
+  // define onScroll handler
   useEffect(() => {
     const onScroll = throttle(
       (scrollTop: number) => {
