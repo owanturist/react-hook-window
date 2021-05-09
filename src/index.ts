@@ -113,19 +113,13 @@ const calcAutoPosition = (
   return calcShortestPosition(startPosition, endPosition, currentPosition)
 }
 
-const calcPosition = ({
-  type,
-  index,
-  itemHeight,
-  height,
-  currentPosition
-}: {
-  type: ScrollPosition
-  index: number
-  itemHeight: number
-  height: number
+const calcPosition = (
+  type: ScrollPosition,
+  index: number,
+  itemHeight: number,
+  height: number,
   currentPosition: number
-}): number => {
+): number => {
   if (type === 'start') {
     return calcStartPosition(index, itemHeight)
   }
@@ -143,6 +137,24 @@ const calcPosition = ({
   }
 
   return calcAutoPosition(index, itemHeight, height, currentPosition)
+}
+
+const calcInitialScroll = (
+  options: number | { index: number; position?: ScrollPosition },
+  itemHeight: number,
+  height: number
+): number => {
+  if (typeof options === 'number') {
+    return options
+  }
+
+  return calcPosition(
+    options.position ?? 'auto',
+    options.index,
+    itemHeight,
+    height,
+    0
+  )
 }
 
 abstract class Boundaries {
@@ -200,9 +212,9 @@ abstract class Boundaries {
 
 const useBoundaries = (
   itemCount: number,
-  initial: Boundaries
+  init: () => Boundaries
 ): [Boundaries, (boundaries: Boundaries) => void] => {
-  const [boundaries, setBoundaries] = useState(initial)
+  const [boundaries, setBoundaries] = useState(init)
 
   return [
     Boundaries.limitOverScroll(boundaries, itemCount),
@@ -227,7 +239,7 @@ export interface UseFixedSizeListOptions {
   itemHeight: number
   itemCount: number
   overscanCount?: number
-  scrollTo?: number
+  initialScroll?: number | { index: number; position?: ScrollPosition }
   scrollThrottling?: number
   onItemsRendered?(viewport: ListViewport): void
 }
@@ -247,18 +259,20 @@ export const useFixedSizeList = <E extends HTMLElement>({
   itemHeight,
   itemCount,
   overscanCount = DEFAULT_OVERSCAN_COUNT,
-  scrollTo: scrollToPx,
+  initialScroll = 0,
   scrollThrottling = DEFAULT_SCROLL_THROTTLE_MS,
   onItemsRendered
 }: UseFixedSizeListOptions): UseFixedSizeListResult<E> => {
   const containerRef = useRef<E>(null)
   const onScrollRef = useRef<DebouncedFunc<(scrollTop: number) => void>>()
+  const calcInitialScrollRef = useRef(() => {
+    return calcInitialScroll(initialScroll, itemHeight, height)
+  })
 
   const [isScrolling, setIsScrolling] = useState(false)
-  const [boundaries, setBoundaries] = useBoundaries(
-    itemCount,
-    Boundaries.calc(height, itemHeight, scrollToPx ?? 0)
-  )
+  const [boundaries, setBoundaries] = useBoundaries(itemCount, () => {
+    return Boundaries.calc(height, itemHeight, calcInitialScrollRef.current())
+  })
   const overscan = Boundaries.limit(boundaries, itemCount, overscanCount)
 
   const scrollTo = useCallback((px: number) => {
@@ -275,32 +289,12 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
       if (node != null) {
         scrollTo(
-          calcPosition({
-            type: position,
-            index,
-            itemHeight,
-            height,
-            currentPosition: node.scrollTop
-          })
+          calcPosition(position, index, itemHeight, height, node.scrollTop)
         )
       }
     },
     [scrollTo, height, itemHeight]
   )
-
-  useEffect(() => {
-    // the ref keeps onScroll callback so it don't need to (de)attach
-    // the listener to node each time the props changes
-    onScrollRef.current = throttle(
-      (scrollTop: number) => {
-        setBoundaries(Boundaries.calc(height, itemHeight, scrollTop))
-      },
-      scrollThrottling,
-      // execute on END of interval so it always applies actual data
-      { leading: false, trailing: true }
-    )
-  }, [setBoundaries, itemHeight, height, scrollThrottling])
-
   // props.onItemsRendered monitor
   useEffect(() => {
     onItemsRendered?.({
@@ -317,12 +311,10 @@ export const useFixedSizeList = <E extends HTMLElement>({
     boundaries.stop
   ])
 
-  // props.scrollTo monitor
+  // set initial scroll
   useEffect(() => {
-    if (scrollToPx != null) {
-      scrollTo(scrollToPx)
-    }
-  }, [scrollTo, scrollToPx])
+    scrollTo(calcInitialScrollRef.current())
+  }, [scrollTo])
 
   // props.height and props.itemHeight monitor
   useEffect(() => {
@@ -334,6 +326,19 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
     setBoundaries(Boundaries.calc(height, itemHeight, node.scrollTop))
   }, [setBoundaries, itemHeight, height])
+
+  useEffect(() => {
+    // the ref keeps onScroll callback so it don't need to (de)attach
+    // the listener to node each time the props changes
+    onScrollRef.current = throttle(
+      (scrollTop: number) => {
+        setBoundaries(Boundaries.calc(height, itemHeight, scrollTop))
+      },
+      scrollThrottling,
+      // execute on END of interval so it always applies actual data
+      { leading: false, trailing: true }
+    )
+  }, [setBoundaries, itemHeight, height, scrollThrottling])
 
   // container scroll monitor
   useEffect(() => {

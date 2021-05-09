@@ -25,7 +25,6 @@ const Demo = React.memo(() => {
   const [itemCount, setItemCount] = React.useState(100)
   const [overscanCount, setOverscanCount] = React.useState(3)
   const [scrollToItemIndex, setScrollToItemIndex] = React.useState(30)
-  const [scrollTo, setScrollTo] = React.useState(0)
 
   const items = React.useMemo(() => makeItems(itemCount), [itemCount])
   const onItemsRendered = React.useCallback((params: ListViewport) => {
@@ -45,7 +44,7 @@ const Demo = React.memo(() => {
     itemHeight,
     itemCount,
     overscanCount,
-    scrollTo,
+    initialScroll: 3000,
     scrollThrottling: 20,
     onItemsRendered
   })
@@ -88,13 +87,6 @@ const Demo = React.memo(() => {
         type="number"
         value={overscanCount}
         onChange={event => setOverscanCount(Number(event.target.value))}
-      />
-      <br />
-      Scroll to px
-      <input
-        type="number"
-        value={scrollTo}
-        onChange={event => setScrollTo(Number(event.target.value))}
       />
       <br />
       Scroll to Item
