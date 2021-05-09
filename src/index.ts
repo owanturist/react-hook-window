@@ -219,6 +219,39 @@ const useBoundaries = (
   ]
 }
 
+const useIsScrolling = (): [boolean, () => void] => {
+  const [isScrolling, setIsScrolling] = useState(false)
+
+  const [tick, cancel] = useMemo(() => {
+    const onScrollBegin = debounce(
+      () => setIsScrolling(true),
+      IS_SCROLLING_DEBOUNCE_MS,
+      { leading: true, trailing: false }
+    )
+
+    const onScrollEnd = debounce(
+      () => setIsScrolling(false),
+      IS_SCROLLING_DEBOUNCE_MS,
+      { leading: false, trailing: true }
+    )
+
+    return [
+      () => {
+        onScrollBegin()
+        onScrollEnd()
+      },
+      () => {
+        onScrollBegin.cancel()
+        onScrollBegin.cancel()
+      }
+    ]
+  }, [])
+
+  useEffect(() => cancel, [cancel])
+
+  return [isScrolling, tick]
+}
+
 export type ScrollPosition = 'auto' | 'smart' | 'center' | 'end' | 'start'
 
 export interface ListViewport {
@@ -263,7 +296,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
     return calcInitialScroll(initialScroll, itemHeight, height)
   })
 
-  const [isScrolling, setIsScrolling] = useState(false)
+  const [isScrolling, onScrolling] = useIsScrolling()
   const [boundaries, setBoundaries] = useBoundaries(itemCount, () => {
     return Boundaries.calc(height, itemHeight, calcInitialScrollRef.current())
   })
@@ -342,31 +375,16 @@ export const useFixedSizeList = <E extends HTMLElement>({
       return
     }
 
-    const onScrollBegin = debounce(
-      () => setIsScrolling(true),
-      IS_SCROLLING_DEBOUNCE_MS,
-      { leading: true, trailing: false }
-    )
-
-    const onScrollEnd = debounce(
-      () => setIsScrolling(false),
-      IS_SCROLLING_DEBOUNCE_MS,
-      { leading: false, trailing: true }
-    )
-
     const cleanup = onPassiveScroll(node, () => {
-      onScrollBegin()
-      onScrollEnd()
+      onScrolling()
       onScrollRef.current?.(node.scrollTop)
     })
 
     return () => {
-      onScrollBegin.cancel()
-      onScrollEnd.cancel()
       onScrollRef.current?.cancel()
       cleanup()
     }
-  }, [])
+  }, [onScrolling])
 
   return {
     ref: containerRef,
