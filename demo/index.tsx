@@ -1,6 +1,12 @@
-import React from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import ReactDOM from 'react-dom'
-import { ScrollPosition, ListViewport, useFixedSizeList } from '../src'
+import debounce from 'lodash.debounce'
+import {
+  ScrollPosition,
+  ListViewport,
+  useFixedSizeList,
+  useInfiniteLoader
+} from '../src'
 
 interface Data {
   id: number
@@ -180,10 +186,99 @@ const App: React.FC = ({ children }) => {
   )
 }
 
+const loadData = (index: number): Promise<Data> => {
+  return new Promise(done => {
+    const delay = Math.round(Math.random() * 2000 + 500)
+    setTimeout(() => {
+      done({
+        id: index,
+        title: `Item #${index} loaded after ${delay}`
+      })
+    }, delay)
+  })
+}
+
+const DemoInfiniteLoading = React.memo(() => {
+  const [data, setData] = useState<Record<number, null | Data>>({})
+
+  const isItemLoaded = useCallback((index: number) => index in data, [data])
+
+  const loadMoreItems = useMemo(() => {
+    return debounce((start: number, stop: number) => {
+      const range = new Array<number>(0)
+
+      for (let index = start; index < stop; index++) {
+        range.push(index)
+      }
+
+      setData(current => {
+        return range.reduce((acc, id) => ({ ...acc, [id]: null }), current)
+      })
+
+      Promise.all(range.map(loadData)).then(loadedItems => {
+        setData(current => {
+          console.log('loaded [%d, %d)', start, stop)
+
+          return loadedItems.reduce(
+            (acc, item) => ({ ...acc, [item.id]: item }),
+            current
+          )
+        })
+      })
+    }, 150)
+  }, [])
+
+  useEffect(() => loadMoreItems.cancel, [loadMoreItems])
+
+  const { onItemsRendered } = useInfiniteLoader({
+    isItemLoaded,
+    loadMoreItems
+  })
+
+  const height = 500
+  const itemHeight = 50
+  const {
+    setRef,
+    topOffset,
+    bottomOffset,
+    indexes
+  } = useFixedSizeList<HTMLDivElement>({
+    height,
+    itemHeight,
+    itemCount: 300,
+    overscanCount: 4,
+    onItemsRendered
+  })
+
+  return (
+    <div ref={setRef} style={{ height, overflow: 'auto' }}>
+      <div style={{ paddingTop: topOffset, paddingBottom: bottomOffset }}>
+        {indexes.map(index => {
+          const item = data[index]
+
+          return (
+            <div
+              key={item?.id ?? index}
+              style={{
+                height: itemHeight,
+                boxSizing: 'border-box',
+                background: index % 2 === 0 ? '#ccc' : '#cec'
+              }}
+            >
+              {item == null ? 'Loading' : item.title}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+})
+
 ReactDOM.render(
   <React.StrictMode>
     <App>
-      <Demo />
+      {/* <Demo /> */}
+      <DemoInfiniteLoading />
     </App>
   </React.StrictMode>,
   document.getElementById('root')
