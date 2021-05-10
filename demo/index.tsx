@@ -2,7 +2,12 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { ScrollPosition, ListViewport, useFixedSizeList } from '../src'
 
-const makeItems = (n: number): Array<{ id: number; title: string }> => {
+interface Data {
+  id: number
+  title: string
+}
+
+const makeItems = (n: number): Array<Data> => {
   return Array.from({ length: n }).map((_, i) => ({
     id: i,
     title: `Hello world #${i}`
@@ -19,12 +24,48 @@ const positions: ReadonlyArray<ScrollPosition> = [
   'end'
 ]
 
+const ListView = React.memo(
+  React.forwardRef<
+    HTMLDivElement,
+    {
+      items: ReadonlyArray<Data>
+      height: number
+      itemHeight: number
+      topOffset: number
+      bottomOffset: number
+      indexes: ReadonlyArray<number>
+    }
+  >(({ items, height, itemHeight, topOffset, bottomOffset, indexes }, ref) => (
+    <div ref={ref} style={{ height, overflow: 'auto' }}>
+      <div style={{ paddingTop: topOffset, paddingBottom: bottomOffset }}>
+        {indexes.map(index => {
+          const item = items[index]
+
+          return (
+            <div
+              key={item.id}
+              style={{
+                height: itemHeight,
+                boxSizing: 'border-box',
+                background: index % 2 === 0 ? '#ccc' : '#cec'
+              }}
+            >
+              {item.title}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  ))
+)
+
 const Demo = React.memo(() => {
   const [height, setHeight] = React.useState(500)
   const [itemHeight, setItemHeight] = React.useState(40)
   const [itemCount, setItemCount] = React.useState(100)
   const [overscanCount, setOverscanCount] = React.useState(3)
   const [scrollToItemIndex, setScrollToItemIndex] = React.useState(30)
+  const [ref, saveRef] = React.useState<(node: HTMLDivElement) => void>()
 
   const items = React.useMemo(() => makeItems(itemCount), [itemCount])
   const onItemsRendered = React.useCallback((params: ListViewport) => {
@@ -33,7 +74,7 @@ const Demo = React.memo(() => {
   }, [])
 
   const {
-    ref,
+    setRef,
     topOffset,
     bottomOffset,
     indexes,
@@ -56,6 +97,12 @@ const Demo = React.memo(() => {
   React.useEffect(() => {
     console.log(indexes)
   }, [indexes])
+
+  React.useEffect(() => {
+    setTimeout(() => {
+      saveRef(() => setRef)
+    }, 1000)
+  }, [setRef])
 
   return (
     <div>
@@ -104,26 +151,15 @@ const Demo = React.memo(() => {
           scroll {position}
         </button>
       ))}
-      <div ref={ref} style={{ height, overflow: 'auto' }}>
-        <div style={{ paddingTop: topOffset, paddingBottom: bottomOffset }}>
-          {indexes.map(index => {
-            const item = items[index]
-
-            return (
-              <div
-                key={item.id}
-                style={{
-                  height: itemHeight,
-                  boxSizing: 'border-box',
-                  background: index % 2 === 0 ? '#ccc' : '#cec'
-                }}
-              >
-                {item.title}
-              </div>
-            )
-          })}
-        </div>
-      </div>
+      <ListView
+        items={items}
+        height={height}
+        itemHeight={itemHeight}
+        topOffset={topOffset}
+        bottomOffset={bottomOffset}
+        indexes={indexes}
+        ref={ref}
+      />
     </div>
   )
 })

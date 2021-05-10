@@ -1,11 +1,4 @@
-import {
-  RefObject,
-  useRef,
-  useState,
-  useEffect,
-  useMemo,
-  useCallback
-} from 'react'
+import { useRef, useState, useEffect, useMemo, useCallback } from 'react'
 import throttle from 'lodash.throttle'
 import debounce from 'lodash.debounce'
 
@@ -244,11 +237,11 @@ export interface UseFixedSizeListOptions {
 }
 
 export interface UseFixedSizeListResult<E extends HTMLElement> {
-  ref: RefObject<E>
   topOffset: number
   bottomOffset: number
   indexes: ReadonlyArray<number>
   isScrolling: boolean
+  setRef(node: E): void
   scrollTo(px: number): void
   scrollToItem(index: number, position?: ScrollPosition): void
 }
@@ -262,7 +255,8 @@ export const useFixedSizeList = <E extends HTMLElement>({
   scrollThrottling = DEFAULT_SCROLL_THROTTLE_MS,
   onItemsRendered
 }: UseFixedSizeListOptions): UseFixedSizeListResult<E> => {
-  const containerRef = useRef<E>(null)
+  // it wants to keep track when a container gets changed
+  const [container, setContainer] = useState<E>()
   const onScrollRef = useRef<(scrollTop: number) => void>(noop)
   const onScrollingRef = useRef<() => void>(noop)
 
@@ -278,34 +272,39 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
   // props.onItemsRendered monitor
   useEffect(() => {
-    onItemsRendered?.({
-      overscanStart: start,
-      overscanStop: stop,
-      visibleStart: boundaries.start,
-      visibleStop: boundaries.stop
-    })
-  }, [onItemsRendered, start, stop, boundaries.start, boundaries.stop])
+    if (container != null) {
+      onItemsRendered?.({
+        overscanStart: start,
+        overscanStop: stop,
+        visibleStart: boundaries.start,
+        visibleStop: boundaries.stop
+      })
+    }
+  }, [
+    container,
+    onItemsRendered,
+    start,
+    stop,
+    boundaries.start,
+    boundaries.stop
+  ])
 
   // set initial scroll
   useEffect(() => {
-    const node = containerRef.current
-
-    node?.scrollTo(
-      node.scrollLeft,
+    container?.scrollTo(
+      container.scrollLeft,
       calcInitialScroll(initialScroll, itemHeight, height)
     )
     // it does not want to watch the values' changes on purpose
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [container])
 
   // props.height and props.itemHeight monitor
   useEffect(() => {
-    const node = containerRef.current
-
-    if (node != null) {
-      setBoundaries(Boundaries.calc(height, itemHeight, node.scrollTop))
+    if (container != null) {
+      setBoundaries(Boundaries.calc(height, itemHeight, container.scrollTop))
     }
-  }, [setBoundaries, itemHeight, height])
+  }, [setBoundaries, container, itemHeight, height])
 
   // define onScrolling handler
   useEffect(() => {
@@ -353,42 +352,37 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
   // container scroll monitor
   useEffect(() => {
-    const node = containerRef.current
-
-    if (node == null) {
+    if (container == null) {
       return
     }
 
-    return onPassiveScroll(node, () => {
+    return onPassiveScroll(container, () => {
       onScrollingRef.current()
-      onScrollRef.current(node.scrollTop)
+      onScrollRef.current(container.scrollTop)
     })
-  }, [])
+  }, [container])
 
   return {
     isScrolling,
-    ref: containerRef,
+    setRef: setContainer,
     topOffset: start * itemHeight,
     bottomOffset: (itemCount - stop) * itemHeight,
 
     indexes: useMemo(() => range(start, stop), [start, stop]),
 
-    scrollTo: useCallback((px: number) => {
-      const node = containerRef.current
-
-      node?.scrollTo(node.scrollLeft, px)
-    }, []),
+    scrollTo: useCallback(
+      (px: number) => container?.scrollTo(container.scrollLeft, px),
+      [container]
+    ),
 
     scrollToItem: useCallback(
       (index: number, position: ScrollPosition = 'auto'): void => {
-        const node = containerRef.current
-
-        node?.scrollTo(
-          node.scrollLeft,
-          calcPosition(position, index, itemHeight, height, node.scrollTop)
+        container?.scrollTo(
+          container.scrollLeft,
+          calcPosition(position, index, itemHeight, height, container.scrollTop)
         )
       },
-      [height, itemHeight]
+      [container, height, itemHeight]
     )
   }
 }
