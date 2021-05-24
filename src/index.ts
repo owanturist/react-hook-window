@@ -38,24 +38,28 @@ const onPassiveScroll = (
   }
 }
 
-const calcStartPosition = (index: number, itemHeight: number): number => {
-  return itemHeight * index
-}
+// P O S I T I O N
 
 const calcEndPosition = (
+  viewport: ListViewport,
   index: number,
-  itemHeight: number,
-  height: number
+  containerSize: number
 ): number => {
-  return calcStartPosition(index, itemHeight) + itemHeight - height
+  return (
+    viewport.getSpaceBefore(index) + viewport.getItemSize(index) - containerSize
+  )
 }
 
 const calcCenterPosition = (
+  viewport: ListViewport,
   index: number,
-  itemHeight: number,
-  height: number
+  containerSize: number
 ): number => {
-  return calcStartPosition(index, itemHeight) + itemHeight / 2 - height / 2
+  return (
+    viewport.getSpaceBefore(index) +
+    viewport.getItemSize(index) / 2 -
+    containerSize / 2
+  )
 }
 
 const calcShortestPosition = (
@@ -75,66 +79,66 @@ const calcShortestPosition = (
 }
 
 const calcSmartPosition = (
+  viewport: ListViewport,
   index: number,
-  itemHeight: number,
-  height: number,
+  containerSize: number,
   currentPosition: number
 ): number => {
-  const startPosition = calcStartPosition(index, itemHeight)
-  const endPosition = calcEndPosition(index, itemHeight, height)
+  const startPosition = viewport.getSpaceBefore(index)
+  const endPosition = calcEndPosition(viewport, index, containerSize)
 
   if (
-    currentPosition - startPosition > height ||
-    endPosition - currentPosition > height
+    currentPosition - startPosition > containerSize ||
+    endPosition - currentPosition > containerSize
   ) {
-    return calcCenterPosition(index, itemHeight, height)
+    return calcCenterPosition(viewport, index, containerSize)
   }
 
   return calcShortestPosition(startPosition, endPosition, currentPosition)
 }
 
 const calcAutoPosition = (
+  viewport: ListViewport,
   index: number,
-  itemHeight: number,
-  height: number,
+  containerSize: number,
   currentPosition: number
 ): number => {
-  const startPosition = calcStartPosition(index, itemHeight)
-  const endPosition = calcEndPosition(index, itemHeight, height)
+  const startPosition = viewport.getSpaceBefore(index)
+  const endPosition = calcEndPosition(viewport, index, containerSize)
 
   return calcShortestPosition(startPosition, endPosition, currentPosition)
 }
 
 const calcPosition = (
   type: ScrollPosition,
+  viewport: ListViewport,
   index: number,
-  itemHeight: number,
-  height: number,
+  containerSize: number,
   currentPosition: number
 ): number => {
   if (type === 'start') {
-    return calcStartPosition(index, itemHeight)
+    return viewport.getSpaceBefore(index)
   }
 
   if (type === 'end') {
-    return calcEndPosition(index, itemHeight, height)
+    return calcEndPosition(viewport, index, containerSize)
   }
 
   if (type === 'center') {
-    return calcCenterPosition(index, itemHeight, height)
+    return calcCenterPosition(viewport, index, containerSize)
   }
 
   if (type === 'smart') {
-    return calcSmartPosition(index, itemHeight, height, currentPosition)
+    return calcSmartPosition(viewport, index, containerSize, currentPosition)
   }
 
-  return calcAutoPosition(index, itemHeight, height, currentPosition)
+  return calcAutoPosition(viewport, index, containerSize, currentPosition)
 }
 
 const calcInitialScroll = (
   options: number | { index: number; position?: ScrollPosition },
-  itemHeight: number,
-  height: number
+  viewport: ListViewport,
+  containerSize: number
 ): number => {
   if (typeof options === 'number') {
     return options
@@ -142,27 +146,18 @@ const calcInitialScroll = (
 
   return calcPosition(
     options.position ?? 'auto',
+    viewport,
     options.index,
-    itemHeight,
-    height,
+    containerSize,
     0
   )
 }
 
+// B O U N D A R I E S
+
 abstract class Boundaries {
   public abstract readonly start: number
   public abstract readonly stop: number
-
-  public static calc(
-    height: number,
-    itemHeight: number,
-    scrollTop: number
-  ): Boundaries {
-    const start = Math.floor(scrollTop / itemHeight)
-    const stop = Math.ceil((scrollTop + height) / itemHeight)
-
-    return { start, stop }
-  }
 
   public static replace(prev: Boundaries, next: Boundaries): Boundaries {
     if (prev.start === next.start && prev.stop === next.stop) {
@@ -216,9 +211,49 @@ const useBoundaries = (
   ]
 }
 
+// V I R T U A L   W I N D O W
+
+interface ListViewport {
+  getSpaceBefore(index: number): number
+  getSpaceAfter(index: number): number
+  getItemSize(index: number): number
+  calcBoundaries(containerSize: number, scrollStart: number): Boundaries
+}
+
+class FixedSizeListViewport implements ListViewport {
+  public constructor(
+    private readonly itemSize: number,
+    private readonly itemCount: number
+  ) {}
+
+  public getSpaceBefore(index: number): number {
+    return this.itemSize * index
+  }
+
+  public getSpaceAfter(index: number): number {
+    return this.itemSize * Math.max(0, this.itemCount - index)
+  }
+
+  public getItemSize(): number {
+    return this.itemSize
+  }
+
+  public calcBoundaries(
+    containerSize: number,
+    scrollStart: number
+  ): Boundaries {
+    const start = Math.floor(scrollStart / this.itemSize)
+    const stop = Math.ceil((scrollStart + containerSize) / this.itemSize)
+
+    return { start, stop }
+  }
+}
+
+// M A I N
+
 export type ScrollPosition = 'auto' | 'smart' | 'center' | 'end' | 'start'
 
-export interface ListViewport {
+export interface ListRenderedRange {
   overscanStart: number
   overscanStop: number
   visibleStart: number
@@ -232,7 +267,7 @@ export interface UseFixedSizeListOptions {
   overscanCount?: number
   initialScroll?: number | { index: number; position?: ScrollPosition }
   scrollThrottling?: number
-  onItemsRendered?(viewport: ListViewport): void
+  onItemsRendered?(renderedRange: ListRenderedRange): void
 }
 
 export interface UseFixedSizeListResult<E extends HTMLElement> {
@@ -259,12 +294,16 @@ export const useFixedSizeList = <E extends HTMLElement>({
   const onScrollRef = useRef<(scrollTop: number) => void>(noop)
   const onScrollingRef = useRef<() => void>(noop)
 
+  const viewport = useMemo(
+    () => new FixedSizeListViewport(itemHeight, itemCount),
+    [itemHeight, itemCount]
+  )
+
   const [isScrolling, setIsScrolling] = useState(false)
   const [boundaries, setBoundaries] = useBoundaries(itemCount, () => {
-    return Boundaries.calc(
+    return viewport.calcBoundaries(
       height,
-      itemHeight,
-      calcInitialScroll(initialScroll, itemHeight, height)
+      calcInitialScroll(initialScroll, viewport, height)
     )
   })
   const { start, stop } = Boundaries.limit(boundaries, itemCount, overscanCount)
@@ -292,7 +331,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
   useEffect(() => {
     container?.scrollTo(
       container.scrollLeft,
-      calcInitialScroll(initialScroll, itemHeight, height)
+      calcInitialScroll(initialScroll, viewport, height)
     )
     // it does not want to watch the values' changes on purpose
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -301,9 +340,9 @@ export const useFixedSizeList = <E extends HTMLElement>({
   // props.height and props.itemHeight monitor
   useEffect(() => {
     if (container != null) {
-      setBoundaries(Boundaries.calc(height, itemHeight, container.scrollTop))
+      setBoundaries(viewport.calcBoundaries(height, container.scrollTop))
     }
-  }, [setBoundaries, container, itemHeight, height])
+  }, [setBoundaries, container, viewport, height])
 
   // define onScrolling handler
   useEffect(() => {
@@ -335,10 +374,10 @@ export const useFixedSizeList = <E extends HTMLElement>({
   useEffect(() => {
     const onScroll = throttle(
       (scrollTop: number) => {
-        setBoundaries(Boundaries.calc(height, itemHeight, scrollTop))
+        setBoundaries(viewport.calcBoundaries(height, scrollTop))
       },
       scrollThrottling,
-      // execute on END of interval so it always applies actual data
+      // execute on END of interval so it always applies actual boundaries
       { leading: false, trailing: true }
     )
 
@@ -347,7 +386,7 @@ export const useFixedSizeList = <E extends HTMLElement>({
     onScrollRef.current = onScroll
 
     return onScroll.cancel
-  }, [setBoundaries, itemHeight, height, scrollThrottling])
+  }, [setBoundaries, viewport, height, scrollThrottling])
 
   // container scroll monitor
   useEffect(() => {
@@ -364,8 +403,8 @@ export const useFixedSizeList = <E extends HTMLElement>({
   return {
     isScrolling,
     setRef: setContainer,
-    topOffset: start * itemHeight,
-    bottomOffset: (itemCount - stop) * itemHeight,
+    topOffset: viewport.getSpaceBefore(start),
+    bottomOffset: viewport.getSpaceAfter(stop),
 
     indexes: useMemo(() => range(start, stop), [start, stop]),
 
@@ -378,10 +417,10 @@ export const useFixedSizeList = <E extends HTMLElement>({
       (index: number, position: ScrollPosition = 'auto'): void => {
         container?.scrollTo(
           container.scrollLeft,
-          calcPosition(position, index, itemHeight, height, container.scrollTop)
+          calcPosition(position, viewport, index, height, container.scrollTop)
         )
       },
-      [container, height, itemHeight]
+      [container, height, viewport]
     )
   }
 }
@@ -420,7 +459,7 @@ const calcUnloadedRanges = (
   return ranges
 }
 
-export interface InfiniteLoaderViewport {
+export interface InfiniteLoaderRenderedRange {
   overscanStart: number
   overscanStop: number
 }
@@ -431,7 +470,7 @@ export interface UseInfiniteLoaderOptions {
 }
 
 export interface UseInfiniteLoaderResult {
-  onItemsRendered(viewport: InfiniteLoaderViewport): void
+  onItemsRendered(renderedRange: InfiniteLoaderRenderedRange): void
 }
 
 export const useInfiniteLoader = ({
@@ -439,7 +478,7 @@ export const useInfiniteLoader = ({
   loadMoreItems
 }: UseInfiniteLoaderOptions): UseInfiniteLoaderResult => {
   const onItemsRendered = useCallback(
-    ({ overscanStart, overscanStop }: InfiniteLoaderViewport) => {
+    ({ overscanStart, overscanStop }: InfiniteLoaderRenderedRange) => {
       const ranges = calcUnloadedRanges(
         isItemLoaded,
         overscanStart,
