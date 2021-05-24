@@ -36,10 +36,10 @@ const ListView = React.memo(
     {
       items: ReadonlyArray<Data>
       height: number
-      itemHeight: number
       topOffset: number
       bottomOffset: number
       indexes: ReadonlyArray<number>
+      itemHeight(index: number): number
     }
   >(({ items, height, itemHeight, topOffset, bottomOffset, indexes }, ref) => (
     <div ref={ref} style={{ height, overflow: 'auto' }}>
@@ -51,7 +51,7 @@ const ListView = React.memo(
             <div
               key={item.id}
               style={{
-                height: itemHeight,
+                height: itemHeight(index),
                 boxSizing: 'border-box',
                 background: index % 2 === 0 ? '#ccc' : '#cec'
               }}
@@ -74,6 +74,14 @@ const Demo = React.memo(() => {
   const [ref, saveRef] = React.useState<(node: HTMLDivElement) => void>()
 
   const items = React.useMemo(() => makeItems(itemCount), [itemCount])
+  const itemsSize = React.useMemo(() => {
+    const sizes = Array.from({ length: itemCount }).map(
+      () => itemHeight + Math.round(Math.random() * itemHeight)
+    )
+
+    return (index: number) => sizes[index]
+  }, [itemCount, itemHeight])
+
   const onItemsRendered = React.useCallback((params: ListRenderedRange) => {
     // eslint-disable-next-line no-console
     console.log(params)
@@ -89,10 +97,10 @@ const Demo = React.memo(() => {
     isScrolling
   } = useFixedSizeList<HTMLDivElement>({
     height,
-    itemHeight,
+    itemHeight: itemsSize,
     itemCount,
     overscanCount,
-    initialScroll: 3000,
+    initialScroll: 0,
     scrollThrottling: 20,
     onItemsRendered
   })
@@ -165,7 +173,7 @@ const Demo = React.memo(() => {
       <ListView
         items={items}
         height={height}
-        itemHeight={itemHeight}
+        itemHeight={itemsSize}
         topOffset={topOffset}
         bottomOffset={bottomOffset}
         indexes={indexes}

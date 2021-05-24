@@ -221,6 +221,7 @@ interface ListViewport {
   calcBoundaries(containerSize: number, scrollStart: number): Boundaries
 }
 
+// #TODO change to hook
 class FixedSizeListViewport implements ListViewport {
   public constructor(
     private readonly itemSize: number,
@@ -250,6 +251,84 @@ class FixedSizeListViewport implements ListViewport {
   }
 }
 
+class VariableSizeListViewport implements ListViewport {
+  public static init(
+    getItemSize: (index: number) => number,
+    itemCount: number
+  ): ListViewport {
+    if (itemCount <= 0) {
+      return new FixedSizeListViewport(0, 0)
+    }
+
+    const itemsStartPositions = new Array<number>(itemCount)
+
+    itemsStartPositions[0] = 0
+
+    for (let index = 1; index < itemCount; index++) {
+      const prev = itemsStartPositions[index - 1]
+
+      itemsStartPositions[index] = prev + getItemSize(index - 1)
+    }
+
+    return new VariableSizeListViewport(getItemSize, itemsStartPositions)
+  }
+
+  private constructor(
+    private readonly itemSizeByIndex: (index: number) => number,
+    private readonly itemsStartPositions: ReadonlyArray<number>
+  ) {}
+
+  public getSpaceBefore(index: number): number {
+    return this.itemsStartPositions[index]
+  }
+
+  public getSpaceAfter(index: number): number {
+    const lastIndex = this.itemsStartPositions.length - 1
+
+    if (index >= lastIndex) {
+      return 0
+    }
+
+    return this.itemsStartPositions[lastIndex] - this.itemsStartPositions[index]
+  }
+
+  public getItemSize(index: number): number {
+    return this.itemSizeByIndex(index)
+  }
+
+  public calcBoundaries(
+    containerSize: number,
+    scrollStart: number
+  ): Boundaries {
+    const start = this.findBoundariesStart(scrollStart)
+    const stop = this.findBoundariesStop(scrollStart + containerSize)
+
+    return { start, stop }
+  }
+
+  // #TODO use bindary search
+  private findBoundariesStart(scrollStart: number): number {
+    for (let index = 0; index < this.itemsStartPositions.length; index++) {
+      if (this.itemsStartPositions[index] >= scrollStart) {
+        return Math.max(0, index - 1)
+      }
+    }
+
+    return this.itemsStartPositions.length
+  }
+
+  // #TODO use bindary search
+  private findBoundariesStop(scrollStart: number): number {
+    for (let index = 0; index < this.itemsStartPositions.length; index++) {
+      if (this.itemsStartPositions[index] >= scrollStart) {
+        return index
+      }
+    }
+
+    return this.itemsStartPositions.length
+  }
+}
+
 // M A I N
 
 export type ScrollPosition = 'auto' | 'smart' | 'center' | 'end' | 'start'
@@ -263,7 +342,7 @@ export interface ListRenderedRange {
 
 export interface UseFixedSizeListOptions {
   height: number
-  itemHeight: number
+  itemHeight: number | ((index: number) => number)
   itemCount: number
   overscanCount?: number
   initialScroll?: number | { index: number; position?: ScrollPosition }
@@ -295,10 +374,13 @@ export const useFixedSizeList = <E extends HTMLElement>({
   const onScrollRef = useRef<(scrollTop: number) => void>(noop)
   const onScrollingRef = useRef<() => void>(noop)
 
-  const viewport = useMemo(
-    () => new FixedSizeListViewport(itemHeight, itemCount),
-    [itemHeight, itemCount]
-  )
+  const viewport = useMemo(() => {
+    if (typeof itemHeight === 'function') {
+      return VariableSizeListViewport.init(itemHeight, itemCount)
+    }
+
+    return new FixedSizeListViewport(itemHeight, itemCount)
+  }, [itemHeight, itemCount])
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [boundaries, setBoundaries] = useBoundaries(itemCount, () => {
@@ -404,9 +486,8 @@ export const useFixedSizeList = <E extends HTMLElement>({
   return {
     isScrolling,
     setRef: setContainer,
-    topOffset: viewport.getSpaceBefore(start),
-    bottomOffset: viewport.getSpaceAfter(stop),
-
+    topOffset: useMemo(() => viewport.getSpaceBefore(start), [viewport, start]),
+    bottomOffset: useMemo(() => viewport.getSpaceAfter(stop), [viewport, stop]),
     indexes: useMemo(() => range(start, stop), [start, stop]),
 
     scrollTo: useRefCallback(
