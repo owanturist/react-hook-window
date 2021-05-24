@@ -277,8 +277,8 @@ const DemoInfiniteLoading = React.memo(() => {
 ReactDOM.render(
   <React.StrictMode>
     <App>
-      {/* <Demo /> */}
-      <DemoInfiniteLoading />
+      <Demo />
+      {/* <DemoInfiniteLoading /> */}
     </App>
   </React.StrictMode>,
   document.getElementById('root')

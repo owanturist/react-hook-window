@@ -2,6 +2,8 @@ import { useRef, useState, useEffect, useMemo, useCallback } from 'react'
 import throttle from 'lodash.throttle'
 import debounce from 'lodash.debounce'
 
+import { usePermanent } from './use-permanent'
+
 const DEFAULT_OVERSCAN_COUNT = 1
 const DEFAULT_SCROLL_THROTTLE_MS = 16 // ~ 60fps
 const IS_SCROLLING_DEBOUNCE_MS = 150
@@ -205,15 +207,12 @@ const useBoundaries = (
   init: () => Boundaries
 ): [Boundaries, (boundaries: Boundaries) => void] => {
   const [boundaries, setBoundaries] = useState(init)
-  // it's safer to keep setter in ref so React never cleans it up
-  // due to memory optimisation https://reactjs.org/docs/hooks-reference.html#usememo
-  const setBoundariesRef = useRef((next: Boundaries) => {
-    setBoundaries(prev => Boundaries.replace(prev, next))
-  })
 
   return [
     Boundaries.limitOverScroll(boundaries, itemCount),
-    setBoundariesRef.current
+    usePermanent(() => (next: Boundaries) => {
+      setBoundaries(prev => Boundaries.replace(prev, next))
+    })
   ]
 }
 

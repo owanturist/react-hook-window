@@ -30,7 +30,8 @@
     "lint": "eslint . --config=.eslintrc.prod.json --ext=js,ts",
     "prettify": "prettier . --write",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "demo": "parcel ./demo/index.html"
+    "demo": "parcel ./demo/index.html",
+    "demo:build": "parcel build ./demo/index.html"
   },
   "husky": {
     "hooks": {
