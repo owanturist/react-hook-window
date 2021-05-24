@@ -3,6 +3,7 @@ import throttle from 'lodash.throttle'
 import debounce from 'lodash.debounce'
 
 import { usePermanent } from './use-permanent'
+import { useRefCallback } from './use-ref-callback'
 
 const DEFAULT_OVERSCAN_COUNT = 1
 const DEFAULT_SCROLL_THROTTLE_MS = 16 // ~ 60fps
@@ -408,12 +409,12 @@ export const useFixedSizeList = <E extends HTMLElement>({
 
     indexes: useMemo(() => range(start, stop), [start, stop]),
 
-    scrollTo: useCallback(
+    scrollTo: useRefCallback(
       (px: number) => container?.scrollTo(container.scrollLeft, px),
       [container]
     ),
 
-    scrollToItem: useCallback(
+    scrollToItem: useRefCallback(
       (index: number, position: ScrollPosition = 'auto'): void => {
         container?.scrollTo(
           container.scrollLeft,

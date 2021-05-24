@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import ReactDOM from 'react-dom'
 import debounce from 'lodash.debounce'
 import {
+  ListRenderedRange,
   ScrollPosition,
-  ListViewport,
   useFixedSizeList,
   useInfiniteLoader
 } from '../src'
@@ -74,7 +74,7 @@ const Demo = React.memo(() => {
   const [ref, saveRef] = React.useState<(node: HTMLDivElement) => void>()
 
   const items = React.useMemo(() => makeItems(itemCount), [itemCount])
-  const onItemsRendered = React.useCallback((params: ListViewport) => {
+  const onItemsRendered = React.useCallback((params: ListRenderedRange) => {
     // eslint-disable-next-line no-console
     console.log(params)
   }, [])
@@ -84,6 +84,7 @@ const Demo = React.memo(() => {
     topOffset,
     bottomOffset,
     indexes,
+    scrollTo,
     scrollToItem,
     isScrolling
   } = useFixedSizeList<HTMLDivElement>({
@@ -95,6 +96,10 @@ const Demo = React.memo(() => {
     scrollThrottling: 20,
     onItemsRendered
   })
+
+  React.useEffect(() => {
+    console.log('CHANGE SCROLL TO')
+  }, [scrollToItem])
 
   React.useEffect(() => {
     console.log('render %d', n++)
