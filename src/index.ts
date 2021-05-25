@@ -490,20 +490,16 @@ export const useFixedSizeList = <E extends HTMLElement>({
     bottomOffset: useMemo(() => viewport.getSpaceAfter(stop), [viewport, stop]),
     indexes: useMemo(() => range(start, stop), [start, stop]),
 
-    scrollTo: useRefCallback(
-      (px: number) => container?.scrollTo(container.scrollLeft, px),
-      [container]
-    ),
+    scrollTo: useRefCallback(px => {
+      container?.scrollTo(container.scrollLeft, px)
+    }),
 
-    scrollToItem: useRefCallback(
-      (index: number, position: ScrollPosition = 'auto'): void => {
-        container?.scrollTo(
-          container.scrollLeft,
-          calcPosition(position, viewport, index, height, container.scrollTop)
-        )
-      },
-      [container, height, viewport]
-    )
+    scrollToItem: useRefCallback((index, position = 'auto') => {
+      container?.scrollTo(
+        container.scrollLeft,
+        calcPosition(position, viewport, index, height, container.scrollTop)
+      )
+    })
   }
 }
 

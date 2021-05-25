@@ -71,7 +71,6 @@ const Demo = React.memo(() => {
   const [itemCount, setItemCount] = React.useState(100)
   const [overscanCount, setOverscanCount] = React.useState(3)
   const [scrollToItemIndex, setScrollToItemIndex] = React.useState(30)
-  const [ref, saveRef] = React.useState<(node: HTMLDivElement) => void>()
 
   const items = React.useMemo(() => makeItems(itemCount), [itemCount])
   const itemsSize = React.useMemo(() => {
@@ -116,12 +115,6 @@ const Demo = React.memo(() => {
   React.useEffect(() => {
     console.log(indexes)
   }, [indexes])
-
-  React.useEffect(() => {
-    setTimeout(() => {
-      saveRef(() => setRef)
-    }, 1000)
-  }, [setRef])
 
   return (
     <div>
@@ -177,7 +170,7 @@ const Demo = React.memo(() => {
         topOffset={topOffset}
         bottomOffset={bottomOffset}
         indexes={indexes}
-        ref={ref}
+        ref={setRef}
       />
     </div>
   )
@@ -250,18 +243,14 @@ const DemoInfiniteLoading = React.memo(() => {
 
   const height = 500
   const itemHeight = 50
-  const {
-    setRef,
-    topOffset,
-    bottomOffset,
-    indexes
-  } = useFixedSizeList<HTMLDivElement>({
-    height,
-    itemHeight,
-    itemCount: 300,
-    overscanCount: 4,
-    onItemsRendered
-  })
+  const { setRef, topOffset, bottomOffset, indexes } =
+    useFixedSizeList<HTMLDivElement>({
+      height,
+      itemHeight,
+      itemCount: 300,
+      overscanCount: 4,
+      onItemsRendered
+    })
 
   return (
     <div ref={setRef} style={{ height, overflow: 'auto' }}>

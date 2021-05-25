@@ -184,12 +184,7 @@
         "react/display-name": "off",
         // React-Hooks Eslint
         "react-hooks/rules-of-hooks": "error",
-        "react-hooks/exhaustive-deps": [
-          "warn",
-          {
-            "additionalHooks": "(useRefCallback)"
-          }
-        ]
+        "react-hooks/exhaustive-deps": "warn"
       }
     }
   ]

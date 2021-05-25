@@ -1,17 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useRef, useEffect } from 'react'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const useRefCallback = <T extends (...args: Array<any>) => any>(
-  callback: T,
-  deps: ReadonlyArray<any>
+  callback: T
 ): T => {
   const callbackRef = useRef(callback)
 
   useEffect(() => {
     callbackRef.current = callback
-    // custom hook with deps
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps)
+  })
 
   return useRef(((...args) => callbackRef.current(...args)) as T).current
 }
