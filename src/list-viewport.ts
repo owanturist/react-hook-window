@@ -1,4 +1,5 @@
 import { ListBoundaries } from './list-boundaries'
+import { clamp } from './helpers'
 
 export interface ListViewport {
   getSpaceBefore(index: number): number
@@ -35,8 +36,19 @@ class FixedSizeListViewport implements ListViewport {
     containerSize: number,
     scrollStart: number
   ): ListBoundaries {
-    const start = Math.floor(scrollStart / this.itemSize)
-    const stop = Math.ceil((scrollStart + containerSize) / this.itemSize)
+    if (this.itemSize <= 0) {
+      return { start: 0, stop: 0 }
+    }
+    const start = clamp(
+      0,
+      this.itemCount,
+      Math.floor(scrollStart / this.itemSize)
+    )
+    const stop = clamp(
+      start,
+      this.itemCount,
+      Math.ceil((scrollStart + containerSize) / this.itemSize)
+    )
 
     return { start, stop }
   }
@@ -49,17 +61,22 @@ class VariableSizeListViewport implements ListViewport {
   ) {}
 
   public getSpaceBefore(index: number): number {
-    return this.itemsStartPositions[index]
+    return this.itemsStartPositions[Math.min(this.itemCount - 1, index)]
   }
 
   public getSpaceAfter(index: number): number {
-    const lastIndex = this.itemsStartPositions.length - 1
+    const lastIndex = this.itemCount - 1
 
     if (index >= lastIndex) {
       return 0
     }
 
-    return this.getSpaceBefore(lastIndex) - this.getSpaceBefore(index)
+    return (
+      this.getSpaceBefore(lastIndex) +
+      this.getItemSize(lastIndex) -
+      this.getSpaceBefore(index) -
+      this.getItemSize(index)
+    )
   }
 
   public getItemSize(index: number): number {
@@ -76,26 +93,30 @@ class VariableSizeListViewport implements ListViewport {
     return { start, stop }
   }
 
-  // #TODO use bindary search
-  private findBoundariesStart(scrollStart: number): number {
-    for (let index = 0; index < this.itemsStartPositions.length; index++) {
-      if (this.itemsStartPositions[index] >= scrollStart) {
-        return Math.max(0, index - 1)
-      }
-    }
-
+  private get itemCount(): number {
     return this.itemsStartPositions.length
   }
 
   // #TODO use bindary search
+  private findBoundariesStart(scrollStart: number): number {
+    for (let index = 0; index < this.itemCount; index++) {
+      if (this.itemsStartPositions[index] > scrollStart) {
+        return Math.max(0, index - 1)
+      }
+    }
+
+    return this.itemCount
+  }
+
+  // #TODO use bindary search
   private findBoundariesStop(scrollStart: number): number {
-    for (let index = 0; index < this.itemsStartPositions.length; index++) {
+    for (let index = 0; index < this.itemCount; index++) {
       if (this.itemsStartPositions[index] >= scrollStart) {
         return index
       }
     }
 
-    return this.itemsStartPositions.length
+    return this.itemCount
   }
 }
 
