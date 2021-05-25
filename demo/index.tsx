@@ -4,7 +4,7 @@ import debounce from 'lodash.debounce'
 import {
   ListRenderedRange,
   ScrollPosition,
-  useFixedSizeList,
+  useWindowedList,
   useInfiniteLoader
 } from '../src'
 
@@ -94,7 +94,7 @@ const Demo = React.memo(() => {
     scrollTo,
     scrollToItem,
     isScrolling
-  } = useFixedSizeList<HTMLDivElement>({
+  } = useWindowedList<HTMLDivElement>({
     height,
     itemHeight: itemsSize,
     itemCount,
@@ -244,7 +244,7 @@ const DemoInfiniteLoading = React.memo(() => {
   const height = 500
   const itemHeight = 50
   const { setRef, topOffset, bottomOffset, indexes } =
-    useFixedSizeList<HTMLDivElement>({
+    useWindowedList<HTMLDivElement>({
       height,
       itemHeight,
       itemCount: 300,
