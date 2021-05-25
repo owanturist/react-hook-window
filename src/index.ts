@@ -221,7 +221,6 @@ interface ListViewport {
   calcBoundaries(containerSize: number, scrollStart: number): Boundaries
 }
 
-// #TODO change to hook
 class FixedSizeListViewport implements ListViewport {
   public constructor(
     private readonly itemSize: number,
@@ -233,7 +232,13 @@ class FixedSizeListViewport implements ListViewport {
   }
 
   public getSpaceAfter(index: number): number {
-    return this.itemSize * Math.max(0, this.itemCount - index)
+    const lastIndex = this.itemCount - 1
+
+    if (index >= lastIndex) {
+      return 0
+    }
+
+    return this.getSpaceBefore(lastIndex) - this.getSpaceBefore(index)
   }
 
   public getItemSize(): number {
@@ -289,7 +294,7 @@ class VariableSizeListViewport implements ListViewport {
       return 0
     }
 
-    return this.itemsStartPositions[lastIndex] - this.itemsStartPositions[index]
+    return this.getSpaceBefore(lastIndex) - this.getSpaceBefore(index)
   }
 
   public getItemSize(index: number): number {
