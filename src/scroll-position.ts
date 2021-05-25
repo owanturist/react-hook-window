@@ -1,27 +1,40 @@
-import { ListViewport } from './list-viewport'
+import { positive } from './helpers'
 
+/**
+ * Defines scroll position:
+ *
+ * - `auto` scroll as little as possible to ensure the item is visible.
+ *   If the item is already visible, it won't scroll at all.
+ *
+ * - `smart` If the item is already visible, don't scroll at all.
+ *   If it is less than one viewport away, scroll as little as possible
+ *   so that it becomes visible. If it is more than one viewport away,
+ *   scroll so that it is centered within the list.
+ *
+ * - `center` center align the item within the list.
+ *
+ * - `end` align the item to the end of the list
+ *   (the bottom for vertical lists or the right for horizontal lists).
+ *
+ * - `start` align the item to the beginning of the list
+ *   (the top for vertical lists or the left for horizontal lists).
+ */
 export type ScrollPosition = 'auto' | 'smart' | 'center' | 'end' | 'start'
 
-const calcEndPosition = (
-  viewport: ListViewport,
-  index: number,
+export const calcEndPosition = (
+  startPosition: number,
+  itemSize: number,
   containerSize: number
 ): number => {
-  return (
-    viewport.getSpaceBefore(index) + viewport.getItemSize(index) - containerSize
-  )
+  return positive(startPosition + itemSize - containerSize)
 }
 
-const calcCenterPosition = (
-  viewport: ListViewport,
-  index: number,
+export const calcCenterPosition = (
+  startPosition: number,
+  itemSize: number,
   containerSize: number
 ): number => {
-  return (
-    viewport.getSpaceBefore(index) +
-    viewport.getItemSize(index) / 2 -
-    containerSize / 2
-  )
+  return positive(startPosition + itemSize / 2 - containerSize / 2)
 }
 
 const calcShortestPosition = (
@@ -40,59 +53,67 @@ const calcShortestPosition = (
   return currentPosition
 }
 
-const calcSmartPosition = (
-  viewport: ListViewport,
-  index: number,
+export const calcSmartPosition = (
+  startPosition: number,
+  itemSize: number,
   containerSize: number,
   currentPosition: number
 ): number => {
-  const startPosition = viewport.getSpaceBefore(index)
-  const endPosition = calcEndPosition(viewport, index, containerSize)
+  const endPosition = calcEndPosition(startPosition, itemSize, containerSize)
 
   if (
     currentPosition - startPosition > containerSize ||
     endPosition - currentPosition > containerSize
   ) {
-    return calcCenterPosition(viewport, index, containerSize)
+    return calcCenterPosition(startPosition, itemSize, containerSize)
   }
 
   return calcShortestPosition(startPosition, endPosition, currentPosition)
 }
 
-const calcAutoPosition = (
-  viewport: ListViewport,
-  index: number,
+export const calcAutoPosition = (
+  startPosition: number,
+  itemSize: number,
   containerSize: number,
   currentPosition: number
 ): number => {
-  const startPosition = viewport.getSpaceBefore(index)
-  const endPosition = calcEndPosition(viewport, index, containerSize)
+  const endPosition = calcEndPosition(startPosition, itemSize, containerSize)
 
   return calcShortestPosition(startPosition, endPosition, currentPosition)
 }
 
 export const calcScrollPosition = (
   type: ScrollPosition,
-  viewport: ListViewport,
-  index: number,
+  startPosition: number,
+  itemSize: number,
   containerSize: number,
   currentPosition: number
 ): number => {
   if (type === 'start') {
-    return viewport.getSpaceBefore(index)
+    return startPosition
   }
 
   if (type === 'end') {
-    return calcEndPosition(viewport, index, containerSize)
+    return calcEndPosition(startPosition, itemSize, containerSize)
   }
 
   if (type === 'center') {
-    return calcCenterPosition(viewport, index, containerSize)
+    return calcCenterPosition(startPosition, itemSize, containerSize)
   }
 
   if (type === 'smart') {
-    return calcSmartPosition(viewport, index, containerSize, currentPosition)
+    return calcSmartPosition(
+      startPosition,
+      itemSize,
+      containerSize,
+      currentPosition
+    )
   }
 
-  return calcAutoPosition(viewport, index, containerSize, currentPosition)
+  return calcAutoPosition(
+    startPosition,
+    itemSize,
+    containerSize,
+    currentPosition
+  )
 }

@@ -23,7 +23,7 @@
     "prebuild": "npm run clean",
     "build": "rollup --config",
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag v$PACKAGE_VERSION && git push --tags",
-    "test": "ava",
+    "test": "ava ./tests/*.test.ts",
     "test:watch": "npm test -- --watch",
     "test:coverage": "nyc ava",
     "test:report": "nyc report --reporter=text-lcov | coveralls",
@@ -56,7 +56,7 @@
     "@rollup/plugin-node-resolve": "^13.0.0",
     "@types/lodash.debounce": "^4.0.6",
     "@types/lodash.throttle": "^4.1.6",
-    "@types/react": "^17.0.6",
+    "@types/react": "^17.0.7",
     "@types/react-dom": "^17.0.5",
     "@typescript-eslint/eslint-plugin": "^4.25.0",
     "@typescript-eslint/parser": "^4.25.0",
@@ -75,7 +75,7 @@
     "prettier": "^2.3.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "rollup": "^2.49.0",
+    "rollup": "^2.50.0",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.30.0",
     "ts-node": "^10.0.0",
@@ -84,5 +84,13 @@
   "dependencies": {
     "lodash.debounce": "^4.0.8",
     "lodash.throttle": "^4.1.1"
+  },
+  "ava": {
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
   }
 }

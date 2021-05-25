@@ -1,9 +1,11 @@
-export const clamp = (min: number, max: number, value: number): number => {
-  return Math.max(min, Math.min(value, max))
-}
-
 export const noop = (): void => {
   // do nothing
+}
+
+export const positive = (x: number): number => Math.max(0, x)
+
+export const clamp = (min: number, max: number, value: number): number => {
+  return Math.max(min, Math.min(value, max))
 }
 
 export const range = (from: number, to: number): ReadonlyArray<number> => {

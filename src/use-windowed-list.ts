@@ -24,8 +24,8 @@ const calcInitialScroll = (
 
   return calcScrollPosition(
     options.position ?? 'auto',
-    viewport,
-    options.index,
+    viewport.getSpaceBefore(options.index),
+    viewport.getItemSize(options.index),
     containerSize,
     0
   )
@@ -213,8 +213,8 @@ export const useWindowedList = <E extends HTMLElement>({
         container.scrollLeft,
         calcScrollPosition(
           position,
-          viewport,
-          index,
+          viewport.getSpaceBefore(index),
+          viewport.getItemSize(index),
           height,
           container.scrollTop
         )
