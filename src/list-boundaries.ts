@@ -1,4 +1,4 @@
-import { clamp } from './helpers'
+import { clamp, positive } from './helpers'
 
 export abstract class ListBoundaries {
   public abstract readonly start: number
@@ -25,7 +25,7 @@ export abstract class ListBoundaries {
       const start = itemCount - (boundaries.stop - boundaries.start)
 
       return {
-        start: Math.max(0, start),
+        start: positive(start),
         stop: itemCount
       }
     }
