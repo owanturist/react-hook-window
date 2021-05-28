@@ -114,7 +114,6 @@ test('VariableSizeListViewport#calcBoundaries', t => {
   t.deepEqual(_0.calcBoundaries(0, 0), { start: 0, stop: 0 })
 
   const _1 = initListViewport(i => sizes[i], sizes.length)
-
   t.deepEqual(_1.calcBoundaries(0, 0), { start: 0, stop: 0 })
   t.deepEqual(_1.calcBoundaries(60, 0), { start: 0, stop: 3 })
   t.deepEqual(_1.calcBoundaries(60, 1), { start: 0, stop: 4 })
@@ -125,9 +124,8 @@ test('VariableSizeListViewport#calcBoundaries', t => {
   t.deepEqual(_1.calcBoundaries(900, 30), { start: 1, stop: 9 })
   t.deepEqual(_1.calcBoundaries(900, 151), { start: 5, stop: 9 })
 
-  // const _2 = initListViewport(() => 30, 1)
-  // t.deepEqual(_2.calcBoundaries(0, 0), { start: 0, stop: 0 })
-  // t.deepEqual(_2.calcBoundaries(0, 20), { start: 0, stop: 1 })
-  // t.deepEqual(_2.calcBoundaries(20, 40), { start: 0, stop: 1 })
-  // t.deepEqual(_2.calcBoundaries(30, 40), { start: 1, stop: 1 })
+  const _2 = initListViewport(() => 30, 1)
+  t.deepEqual(_2.calcBoundaries(0, 0), { start: 0, stop: 0 })
+  t.deepEqual(_2.calcBoundaries(0, 20), { start: 0, stop: 1 })
+  t.deepEqual(_2.calcBoundaries(20, 40), { start: 0, stop: 1 })
 })

@@ -103,31 +103,42 @@ class VariableSizeListViewport implements ListViewport {
     return this.itemsEndPositions.length
   }
 
-  // #TODO use bindary search
   private findBoundariesStart(viewportStart: number): number {
-    for (let index = 0; index < this.itemCount; index++) {
-      if (this.itemsEndPositions[index] > viewportStart) {
-        return index
+    let left = 0
+    let right = this.itemCount - 1
+
+    while (left < right) {
+      const mid = left + Math.floor((right - left) / 2)
+
+      if (this.itemsEndPositions[mid] > viewportStart) {
+        right = mid
+      } else {
+        left = mid + 1
       }
     }
 
-    return this.itemCount
+    return left
   }
 
-  // #TODO use bindary search
   private findBoundariesStop(viewportEnd: number): number {
-    for (let index = 0; index < this.itemCount; index++) {
-      if (this.getSpaceBefore(index) >= viewportEnd) {
-        return index
+    if (viewportEnd <= 0) {
+      return 0
+    }
+
+    let left = 0
+    let right = this.itemCount - 1
+
+    while (left < right) {
+      const mid = left + Math.floor((right - left) / 2)
+
+      if (this.itemsEndPositions[mid] >= viewportEnd) {
+        right = mid
+      } else {
+        left = mid + 1
       }
     }
 
-    return this.itemCount
-  }
-
-  // #TODO remove
-  toString(): string {
-    return this.itemsEndPositions.join(' ')
+    return clamp(0, left + 1, this.itemCount)
   }
 }
 
