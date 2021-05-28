@@ -88,15 +88,15 @@ const Demo = React.memo(() => {
 
   const {
     setRef,
-    topOffset,
-    bottomOffset,
+    startOffset: topOffset,
+    endOffset: bottomOffset,
     indexes,
     scrollTo,
     scrollToItem,
     isScrolling
   } = useWindowedList<HTMLDivElement>({
-    height,
-    itemHeight: itemsSize,
+    containerSize: height,
+    itemSize: itemsSize,
     itemCount,
     overscanCount,
     initialScroll: 0,
@@ -243,14 +243,18 @@ const DemoInfiniteLoading = React.memo(() => {
 
   const height = 500
   const itemHeight = 50
-  const { setRef, topOffset, bottomOffset, indexes } =
-    useWindowedList<HTMLDivElement>({
-      height,
-      itemHeight,
-      itemCount: 300,
-      overscanCount: 4,
-      onItemsRendered
-    })
+  const {
+    setRef,
+    startOffset: topOffset,
+    endOffset: bottomOffset,
+    indexes
+  } = useWindowedList<HTMLDivElement>({
+    containerSize: height,
+    itemSize: itemHeight,
+    itemCount: 300,
+    overscanCount: 4,
+    onItemsRendered
+  })
 
   return (
     <div ref={setRef} style={{ height, overflow: 'auto' }}>

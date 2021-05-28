@@ -53,8 +53,8 @@ export interface ListRenderedRange {
 }
 
 export interface UseWindowedListOptions {
-  height: number
-  itemHeight: number | ((index: number) => number)
+  containerSize: number
+  itemSize: number | ((index: number) => number)
   itemCount: number
   overscanCount?: number
   initialScroll?: number | { index: number; position?: ScrollPosition }
@@ -64,8 +64,8 @@ export interface UseWindowedListOptions {
 
 // #TODO extends by ListRenderedRange
 export interface UseWindowedListResult<E extends HTMLElement> {
-  topOffset: number
-  bottomOffset: number
+  startOffset: number
+  endOffset: number
   indexes: ReadonlyArray<number>
   isScrolling: boolean
   setRef(node: E): void
@@ -74,8 +74,8 @@ export interface UseWindowedListResult<E extends HTMLElement> {
 }
 
 export const useWindowedList = <E extends HTMLElement>({
-  height,
-  itemHeight,
+  containerSize,
+  itemSize,
   itemCount,
   overscanCount = DEFAULT_OVERSCAN_COUNT,
   initialScroll = 0,
@@ -88,15 +88,15 @@ export const useWindowedList = <E extends HTMLElement>({
   const onScrollingRef = useRef<() => void>(noop)
 
   const viewport = useMemo(
-    () => initListViewport(itemHeight, itemCount),
-    [itemHeight, itemCount]
+    () => initListViewport(itemSize, itemCount),
+    [itemSize, itemCount]
   )
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [boundaries, setBoundaries] = useBoundaries(itemCount, () => {
     return viewport.calcBoundaries(
-      height,
-      calcInitialScroll(initialScroll, viewport, height)
+      containerSize,
+      calcInitialScroll(initialScroll, viewport, containerSize)
     )
   })
   const { start, stop } = ListBoundaries.limit(
@@ -128,7 +128,7 @@ export const useWindowedList = <E extends HTMLElement>({
   useEffect(() => {
     container?.scrollTo(
       container.scrollLeft,
-      calcInitialScroll(initialScroll, viewport, height)
+      calcInitialScroll(initialScroll, viewport, containerSize)
     )
     // it does not want to watch the values' changes on purpose
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -137,9 +137,9 @@ export const useWindowedList = <E extends HTMLElement>({
   // props.height and props.itemHeight monitor
   useEffect(() => {
     if (container != null) {
-      setBoundaries(viewport.calcBoundaries(height, container.scrollTop))
+      setBoundaries(viewport.calcBoundaries(containerSize, container.scrollTop))
     }
-  }, [setBoundaries, container, viewport, height])
+  }, [setBoundaries, container, viewport, containerSize])
 
   // define onScrolling handler
   useEffect(() => {
@@ -171,7 +171,7 @@ export const useWindowedList = <E extends HTMLElement>({
   useEffect(() => {
     const onScroll = throttle(
       (scrollTop: number) => {
-        setBoundaries(viewport.calcBoundaries(height, scrollTop))
+        setBoundaries(viewport.calcBoundaries(containerSize, scrollTop))
       },
       scrollThrottling,
       // execute on END of interval so it always applies actual boundaries
@@ -183,7 +183,7 @@ export const useWindowedList = <E extends HTMLElement>({
     onScrollRef.current = onScroll
 
     return onScroll.cancel
-  }, [setBoundaries, viewport, height, scrollThrottling])
+  }, [setBoundaries, viewport, containerSize, scrollThrottling])
 
   // container scroll monitor
   useEffect(() => {
@@ -200,8 +200,11 @@ export const useWindowedList = <E extends HTMLElement>({
   return {
     isScrolling,
     setRef: setContainer,
-    topOffset: useMemo(() => viewport.getSpaceBefore(start), [viewport, start]),
-    bottomOffset: useMemo(
+    startOffset: useMemo(
+      () => viewport.getSpaceBefore(start),
+      [viewport, start]
+    ),
+    endOffset: useMemo(
       () => viewport.getSpaceAfter(positive(stop - 1)),
       [viewport, stop]
     ),
@@ -218,7 +221,7 @@ export const useWindowedList = <E extends HTMLElement>({
           position,
           viewport.getSpaceBefore(index),
           viewport.getItemSize(index),
-          height,
+          containerSize,
           container.scrollTop
         )
       )
