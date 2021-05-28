@@ -56,12 +56,15 @@ class FixedSizeListViewport implements ListViewport {
 
 class VariableSizeListViewport implements ListViewport {
   public constructor(
-    private readonly itemSizeByIndex: (index: number) => number,
-    private readonly itemsStartPositions: ReadonlyArray<number>
+    private readonly itemsEndPositions: ReadonlyArray<number>
   ) {}
 
   public getSpaceBefore(index: number): number {
-    return this.itemsStartPositions[Math.min(this.itemCount - 1, index)]
+    if (index <= 0) {
+      return 0
+    }
+
+    return this.itemsEndPositions[Math.min(this.itemCount - 1, index) - 1]
   }
 
   public getSpaceAfter(index: number): number {
@@ -71,16 +74,19 @@ class VariableSizeListViewport implements ListViewport {
       return 0
     }
 
-    return (
-      this.getSpaceBefore(lastIndex) +
-      this.getItemSize(lastIndex) -
-      this.getSpaceBefore(index) -
-      this.getItemSize(index)
-    )
+    return this.itemsEndPositions[lastIndex] - this.itemsEndPositions[index]
   }
 
   public getItemSize(index: number): number {
-    return this.itemSizeByIndex(index)
+    if (index <= 0) {
+      return this.itemsEndPositions[0]
+    }
+
+    if (index >= this.itemCount) {
+      return 0
+    }
+
+    return this.itemsEndPositions[index] - this.itemsEndPositions[index - 1]
   }
 
   public calcBoundaries(
@@ -94,29 +100,34 @@ class VariableSizeListViewport implements ListViewport {
   }
 
   private get itemCount(): number {
-    return this.itemsStartPositions.length
+    return this.itemsEndPositions.length
   }
 
   // #TODO use bindary search
-  private findBoundariesStart(scrollStart: number): number {
+  private findBoundariesStart(viewportStart: number): number {
     for (let index = 0; index < this.itemCount; index++) {
-      if (this.itemsStartPositions[index] > scrollStart) {
-        return Math.max(0, index - 1)
-      }
-    }
-
-    return this.itemCount
-  }
-
-  // #TODO use bindary search
-  private findBoundariesStop(scrollStart: number): number {
-    for (let index = 0; index < this.itemCount; index++) {
-      if (this.itemsStartPositions[index] >= scrollStart) {
+      if (this.itemsEndPositions[index] > viewportStart) {
         return index
       }
     }
 
     return this.itemCount
+  }
+
+  // #TODO use bindary search
+  private findBoundariesStop(viewportEnd: number): number {
+    for (let index = 0; index < this.itemCount; index++) {
+      if (this.getSpaceBefore(index) >= viewportEnd) {
+        return index
+      }
+    }
+
+    return this.itemCount
+  }
+
+  // #TODO remove
+  toString(): string {
+    return this.itemsEndPositions.join(' ')
   }
 }
 
@@ -132,15 +143,15 @@ export const initListViewport = (
     return new FixedSizeListViewport(0, 0)
   }
 
-  const itemsStartPositions = new Array<number>(itemCount)
+  const itemsEndPositions = new Array<number>(itemCount)
 
-  itemsStartPositions[0] = 0
+  itemsEndPositions[0] = itemSize(0)
 
   for (let index = 1; index < itemCount; index++) {
-    const prev = itemsStartPositions[index - 1]
+    const prev = itemsEndPositions[index - 1]
 
-    itemsStartPositions[index] = prev + itemSize(index - 1)
+    itemsEndPositions[index] = prev + itemSize(index)
   }
 
-  return new VariableSizeListViewport(itemSize, itemsStartPositions)
+  return new VariableSizeListViewport(itemsEndPositions)
 }
