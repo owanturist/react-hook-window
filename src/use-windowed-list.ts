@@ -7,7 +7,7 @@ import { useRefCallback } from './use-ref-callback'
 import { ListBoundaries } from './list-boundaries'
 import { ListViewport, initListViewport } from './list-viewport'
 import { ScrollPosition, calcScrollPosition } from './scroll-position'
-import { noop, range, onPassiveScroll } from './helpers'
+import { noop, range, onPassiveScroll, positive } from './helpers'
 
 const DEFAULT_OVERSCAN_COUNT = 1
 const DEFAULT_SCROLL_THROTTLE_MS = 16 // ~ 60fps
@@ -201,7 +201,10 @@ export const useWindowedList = <E extends HTMLElement>({
     isScrolling,
     setRef: setContainer,
     topOffset: useMemo(() => viewport.getSpaceBefore(start), [viewport, start]),
-    bottomOffset: useMemo(() => viewport.getSpaceAfter(stop), [viewport, stop]),
+    bottomOffset: useMemo(
+      () => viewport.getSpaceAfter(positive(stop - 1)),
+      [viewport, stop]
+    ),
     indexes: useMemo(() => range(start, stop), [start, stop]),
 
     scrollTo: useRefCallback(px => {
