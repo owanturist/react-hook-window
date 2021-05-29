@@ -62,8 +62,8 @@ export interface UseWindowedListOptions {
   onItemsRendered?(renderedRange: ListRenderedRange): void
 }
 
-// #TODO extends by ListRenderedRange
-export interface UseWindowedListResult<E extends HTMLElement> {
+export interface UseWindowedListResult<E extends HTMLElement>
+  extends ListRenderedRange {
   startOffset: number
   endOffset: number
   indexes: ReadonlyArray<number>
@@ -200,6 +200,12 @@ export const useWindowedList = <E extends HTMLElement>({
   return {
     isScrolling,
     setRef: setContainer,
+
+    overscanStart: start,
+    overscanStop: stop,
+    visibleStart: boundaries.start,
+    visibleStop: boundaries.stop,
+
     startOffset: useMemo(
       () => viewport.getSpaceBefore(start),
       [viewport, start]

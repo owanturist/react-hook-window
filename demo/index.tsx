@@ -88,8 +88,8 @@ const Demo = React.memo(() => {
 
   const {
     setRef,
-    startOffset: topOffset,
-    endOffset: bottomOffset,
+    startOffset,
+    endOffset,
     indexes,
     scrollTo,
     scrollToItem,
@@ -167,8 +167,8 @@ const Demo = React.memo(() => {
         items={items}
         height={height}
         itemHeight={itemsSize}
-        topOffset={topOffset}
-        bottomOffset={bottomOffset}
+        topOffset={startOffset}
+        bottomOffset={endOffset}
         indexes={indexes}
         ref={setRef}
       />
@@ -242,23 +242,25 @@ const DemoInfiniteLoading = React.memo(() => {
   })
 
   const height = 500
-  const itemHeight = 50
-  const {
-    setRef,
-    startOffset: topOffset,
-    endOffset: bottomOffset,
-    indexes
-  } = useWindowedList<HTMLDivElement>({
-    containerSize: height,
-    itemSize: itemHeight,
-    itemCount: 300,
-    overscanCount: 4,
-    onItemsRendered
-  })
+  const itemSize = React.useMemo(() => {
+    const sizes = Array.from({ length: 100 }).map(
+      () => 60 + Math.round(Math.random() * 60)
+    )
+
+    return (index: number) => sizes[index]
+  }, [])
+  const { setRef, startOffset, endOffset, indexes } =
+    useWindowedList<HTMLDivElement>({
+      containerSize: height,
+      itemSize,
+      itemCount: 100,
+      overscanCount: 4,
+      onItemsRendered
+    })
 
   return (
     <div ref={setRef} style={{ height, overflow: 'auto' }}>
-      <div style={{ paddingTop: topOffset, paddingBottom: bottomOffset }}>
+      <div style={{ paddingTop: startOffset, paddingBottom: endOffset }}>
         {indexes.map(index => {
           const item = data[index]
 
@@ -266,7 +268,7 @@ const DemoInfiniteLoading = React.memo(() => {
             <div
               key={item?.id ?? index}
               style={{
-                height: itemHeight,
+                height: itemSize(index),
                 boxSizing: 'border-box',
                 background: index % 2 === 0 ? '#ccc' : '#cec'
               }}
