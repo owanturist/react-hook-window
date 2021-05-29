@@ -52,7 +52,6 @@
     "react-dom": "^16.8.0 | ^17.0.0"
   },
   "devDependencies": {
-    "@ava/typescript": "^1.1.1",
     "@rollup/plugin-node-resolve": "^13.0.0",
     "@types/lodash.debounce": "^4.0.6",
     "@types/lodash.throttle": "^4.1.6",
@@ -60,11 +59,9 @@
     "@types/react-dom": "^17.0.5",
     "@typescript-eslint/eslint-plugin": "^4.25.0",
     "@typescript-eslint/parser": "^4.25.0",
-    "ava": "^3.15.0",
     "coveralls": "^3.1.0",
     "eslint": "^7.27.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-ava": "^12.0.0",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.23.2",
     "eslint-plugin-react-hooks": "^4.2.0",
@@ -78,19 +75,10 @@
     "rollup": "^2.50.0",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.30.0",
-    "ts-node": "^10.0.0",
     "typescript": "^4.2.4"
   },
   "dependencies": {
     "lodash.debounce": "^4.0.8",
     "lodash.throttle": "^4.1.1"
-  },
-  "ava": {
-    "extensions": [
-      "ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ]
   }
 }
