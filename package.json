@@ -23,7 +23,7 @@
     "prebuild": "npm run clean",
     "build": "rollup --config",
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag v$PACKAGE_VERSION && git push --tags",
-    "test": "ava ./tests/*.test.ts",
+    "test": "jest ./tests",
     "test:watch": "npm test -- --watch",
     "test:coverage": "nyc ava",
     "test:report": "nyc report --reporter=text-lcov | coveralls",
@@ -52,22 +52,28 @@
     "react-dom": "^16.8.0 | ^17.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.14.3",
+    "@babel/preset-env": "^7.14.4",
+    "@babel/preset-typescript": "^7.13.0",
     "@rollup/plugin-node-resolve": "^13.0.0",
+    "@testing-library/react-hooks": "^7.0.0",
+    "@types/jest": "^26.0.23",
     "@types/lodash.debounce": "^4.0.6",
     "@types/lodash.throttle": "^4.1.6",
     "@types/react": "^17.0.7",
     "@types/react-dom": "^17.0.5",
     "@typescript-eslint/eslint-plugin": "^4.25.0",
     "@typescript-eslint/parser": "^4.25.0",
-    "coveralls": "^3.1.0",
+    "babel-jest": "^27.0.2",
     "eslint": "^7.27.0",
     "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-jest": "^24.3.6",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.23.2",
     "eslint-plugin-react-hooks": "^4.2.0",
     "husky": "^4.3.7",
+    "jest": "^27.0.3",
     "lint-staged": "^11.0.0",
-    "nyc": "^15.1.0",
     "parcel": "^2.0.0-beta.2",
     "prettier": "^2.3.0",
     "react": "^17.0.2",
@@ -80,5 +86,8 @@
   "dependencies": {
     "lodash.debounce": "^4.0.8",
     "lodash.throttle": "^4.1.1"
+  },
+  "jest": {
+    "testEnvironment": "jsdom"
   }
 }

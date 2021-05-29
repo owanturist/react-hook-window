@@ -11,7 +11,7 @@
     "sourceType": "module",
     "project": ["./tsconfig.json"]
   },
-  "extends": ["eslint:recommended", "plugin:ava/recommended"],
+  "extends": ["eslint:recommended"],
   "globals": {},
   "rules": {
     // Possible Errors
@@ -101,7 +101,7 @@
         "browser": true,
         "node": false
       },
-      "plugins": ["react", "@typescript-eslint"],
+      "plugins": ["react", "@typescript-eslint", "jest"],
       "extends": [
         "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended",
@@ -161,16 +161,6 @@
           }
         ],
         "@typescript-eslint/switch-exhaustiveness-check": "error",
-        // AVA
-        "ava/no-ignored-test-files": [
-          "error",
-          {
-            "extensions": ["ts"],
-            "files": ["tests/**/*.test.ts"]
-          }
-        ],
-        "ava/no-only-test": "off",
-        "ava/no-skip-test": "off",
         // React Eslint
         "react/button-has-type": [
           "warn",
@@ -185,6 +175,19 @@
         // React-Hooks Eslint
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": "warn"
+      }
+    },
+    {
+      "files": ["tests/**/*.ts", "tests/**/*.tsx"],
+      "env": {
+        "jest": true
+      },
+      "plugins": ["jest"],
+      "extends": ["plugin:jest/recommended", "plugin:jest/style"],
+      "rules": {
+        // Jest
+        "jest/no-disabled-tests": "off",
+        "jest/no-focused-tests": "warn"
       }
     }
   ]
