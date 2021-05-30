@@ -154,12 +154,6 @@
         "@typescript-eslint/prefer-ts-expect-error": "error",
         "@typescript-eslint/require-array-sort-compare": "error",
         "@typescript-eslint/restrict-plus-operands": "error",
-        "@typescript-eslint/restrict-template-expressions": [
-          "error",
-          {
-            "allowNumber": true
-          }
-        ],
         "@typescript-eslint/switch-exhaustiveness-check": "error",
         // React Eslint
         "react/button-has-type": [
@@ -178,7 +172,7 @@
       }
     },
     {
-      "files": ["tests/**/*.ts", "tests/**/*.tsx"],
+      "files": ["tests/**/*.ts"],
       "env": {
         "jest": true
       },
@@ -189,6 +183,14 @@
         "jest/no-disabled-tests": "off",
         "jest/no-focused-tests": "warn"
       }
+    },
+    {
+      "files": ["cypress/**/*.ts"],
+      "env": {
+        "cypress/globals": true
+      },
+      "plugins": ["cypress"],
+      "extends": ["plugin:cypress/recommended"]
     }
   ]
 }

@@ -64,11 +64,11 @@ export interface UseWindowedListOptions {
 
 export interface UseWindowedListResult<E extends HTMLElement>
   extends ListRenderedRange {
-  startOffset: number
-  endOffset: number
+  startSpace: number
+  endSpace: number
   indexes: ReadonlyArray<number>
   isScrolling: boolean
-  setRef(node: E): void
+  setRef(node: null | E): void
   scrollTo(px: number): void
   scrollToItem(index: number, position?: ScrollPosition): void
 }
@@ -83,7 +83,7 @@ export const useWindowedList = <E extends HTMLElement>({
   onItemsRendered
 }: UseWindowedListOptions): UseWindowedListResult<E> => {
   // it wants to keep track when a container gets changed
-  const [container, setContainer] = useState<E>()
+  const [container, setContainer] = useState<null | E>(null)
   const onScrollRef = useRef<(scrollTop: number) => void>(noop)
   const onScrollingRef = useRef<() => void>(noop)
 
@@ -206,11 +206,11 @@ export const useWindowedList = <E extends HTMLElement>({
     visibleStart: boundaries.start,
     visibleStop: boundaries.stop,
 
-    startOffset: useMemo(
+    startSpace: useMemo(
       () => viewport.getSpaceBefore(start),
       [viewport, start]
     ),
-    endOffset: useMemo(
+    endSpace: useMemo(
       () => viewport.getSpaceAfter(positive(stop - 1)),
       [viewport, stop]
     ),
