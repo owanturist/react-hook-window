@@ -185,7 +185,7 @@
       }
     },
     {
-      "files": ["cypress/**/*.ts"],
+      "files": ["cypress/**/*.ts", "cypress/**/*.js"],
       "env": {
         "cypress/globals": true
       },

@@ -1,5 +1,3 @@
-import '@testing-library/cypress/add-commands'
-
 // ***********************************************
 // This example commands.js shows you how to
 // create various custom commands and overwrite
@@ -25,3 +23,15 @@ import '@testing-library/cypress/add-commands'
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+Cypress.Commands.add(
+  'getScrollHeight',
+  { prevSubject: 'element' },
+  ($: JQuery<HTMLElement>) => cy.wrap($.get(0).scrollHeight)
+)
+
+Cypress.Commands.add(
+  'getClientHeight',
+  { prevSubject: 'element' },
+  ($: JQuery<HTMLElement>) => cy.wrap($.get(0).clientHeight)
+)

@@ -1,4 +1,6 @@
 {
   "baseUrl": "http://localhost:1234/",
-  "scrollBehavior": false
+  "scrollBehavior": false,
+  "viewportWidth": 1280,
+  "viewportHeight": 1024
 }
