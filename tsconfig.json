@@ -8,5 +8,10 @@
   "compilerOptions": {
     "sourceMap": true
   },
-  "include": ["./src/**/*.ts", "./tests/**/*.test.ts", "./demo/**/*.tsx"]
+  "include": [
+    "./src/**/*.ts",
+    "./tests/**/*.test.ts",
+    "./demo/**/*.tsx",
+    "./cypress/**/*.ts"
+  ]
 }
