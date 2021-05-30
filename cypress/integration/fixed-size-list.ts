@@ -75,6 +75,17 @@ it('handles container resizing', () => {
   cy.findByText('Item #14').should('not.be.visible')
   cy.findByText('Item #13').should('not.exist')
   cy.findAllByTestId('item').should('have.length', 6)
+
+  // double size
+  cy.findByTestId('container-size-input').fill('420')
+  cy.get('@container').getClientHeight().should('eq', 420)
+  cy.get('@container').getScrollHeight().should('eq', 1000) // 50px * 20
+
+  cy.findByText('Item #19').should('be.visible')
+  cy.findByText('Item #11').should('be.visible')
+  cy.findByText('Item #10').should('not.be.visible')
+  cy.findByText('Item #9').should('not.exist')
+  cy.findAllByTestId('item').should('have.length', 10)
 })
 
 it('handles item resizing', () => {
@@ -110,6 +121,18 @@ it('handles item resizing', () => {
   cy.findByText('Item #2').should('be.visible')
   cy.findByText('Item #1').should('not.exist')
   cy.findAllByTestId('item').should('have.length', 18)
+
+  // double size
+  cy.findByTestId('item-size-input').fill('60')
+  cy.get('@container').getClientHeight().should('eq', 510)
+  cy.get('@container').getScrollHeight().should('eq', 1200) // 60px * 20
+
+  cy.findByText('Item #11').should('not.exist')
+  cy.findByText('Item #10').should('be.visible')
+  cy.findByText('Item #9').should('be.visible')
+  cy.findByText('Item #1').should('be.visible')
+  cy.findByText('Item #0').should('not.be.visible')
+  cy.findAllByTestId('item').should('have.length', 11)
 })
 
 it('handle item count change', () => {
