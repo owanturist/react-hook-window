@@ -1,9 +1,90 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { UseWindowedListOptions, useWindowedList } from '../src'
+import {
+  UseWindowedListOptions,
+  InitialListScroll,
+  ScrollPosition,
+  useWindowedList
+} from '../src'
+
+const SCROLL_POSITIONS: ReadonlyArray<ScrollPosition> = [
+  'auto',
+  'start',
+  'center',
+  'end',
+  'smart'
+]
+
+const InitialScrollControl: React.VFC<{
+  initialScroll?: InitialListScroll
+  onChange(initialScroll: InitialListScroll): void
+}> = ({ initialScroll = 0, onChange }) => {
+  const [px, index, position] =
+    typeof initialScroll === 'number'
+      ? [initialScroll, 0, SCROLL_POSITIONS[0]]
+      : [0, initialScroll.index, initialScroll.position ?? SCROLL_POSITIONS[0]]
+
+  return (
+    <div>
+      <div>
+        <input
+          type="checkbox"
+          checked={typeof initialScroll === 'number'}
+          disabled
+        />
+        {' by px '}
+        <input
+          data-testid="initial-scroll-px-input"
+          type="number"
+          value={px}
+          onChange={event => onChange(Number(event.target.value))}
+        />
+      </div>
+
+      <div>
+        <input
+          type="checkbox"
+          checked={typeof initialScroll === 'object'}
+          disabled
+        />
+
+        {' by item index '}
+        <select
+          data-testid="initial-scroll-position-select"
+          value={position}
+          onChange={event => {
+            onChange({
+              index,
+              position: event.target.value as ScrollPosition
+            })
+          }}
+        >
+          {SCROLL_POSITIONS.map(pos => (
+            <option key={pos} value={pos}>
+              {pos}
+            </option>
+          ))}
+        </select>
+
+        <input
+          data-testid="initial-scroll-index-input"
+          type="number"
+          value={index}
+          onChange={event => {
+            onChange({
+              index: Number(event.target.value),
+              position
+            })
+          }}
+        />
+      </div>
+    </div>
+  )
+}
 
 interface FixedSizeOptions extends UseWindowedListOptions {
   itemSize: number
+  visible: boolean
 }
 
 const ControlPanel = React.memo<{
@@ -11,6 +92,21 @@ const ControlPanel = React.memo<{
   setOptions: React.Dispatch<React.SetStateAction<FixedSizeOptions>>
 }>(({ options, setOptions }) => (
   <div>
+    <div>
+      Visible{' '}
+      <input
+        data-testid="visibility-checkbox"
+        type="checkbox"
+        checked={options.visible}
+        onChange={event =>
+          setOptions(current => ({
+            ...current,
+            visible: event.target.checked
+          }))
+        }
+      />
+    </div>
+
     <div>
       Container size{' '}
       <input
@@ -70,22 +166,27 @@ const ControlPanel = React.memo<{
         }
       />
     </div>
+
+    <div>
+      Initial scroll
+      <InitialScrollControl
+        initialScroll={options.initialScroll}
+        onChange={initialScroll =>
+          setOptions(current => ({ ...current, initialScroll }))
+        }
+      />
+    </div>
   </div>
 ))
 
-const FixedSizeListDemo = React.memo(() => {
-  const [options, setOptions] = React.useState<FixedSizeOptions>({
-    containerSize: 510,
-    itemSize: 50,
-    itemCount: 20
-  })
+const FixedSizeList = React.memo<{
+  options: FixedSizeOptions
+}>(({ options }) => {
   const { setRef, isScrolling, startSpace, endSpace, indexes } =
     useWindowedList(options)
 
   return (
-    <div>
-      <ControlPanel options={options} setOptions={setOptions} />
-
+    <>
       <div>
         <input
           data-testid="scrolling"
@@ -125,6 +226,23 @@ const FixedSizeListDemo = React.memo(() => {
           ))}
         </div>
       </div>
+    </>
+  )
+})
+
+const FixedSizeListDemo = React.memo(() => {
+  const [options, setOptions] = React.useState<FixedSizeOptions>({
+    containerSize: 510,
+    itemSize: 50,
+    itemCount: 20,
+    visible: true
+  })
+
+  return (
+    <div>
+      <ControlPanel options={options} setOptions={setOptions} />
+
+      {options.visible && <FixedSizeList options={options} />}
     </div>
   )
 })

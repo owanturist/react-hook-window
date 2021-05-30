@@ -14,7 +14,7 @@ const DEFAULT_SCROLL_THROTTLE_MS = 16 // ~ 60fps
 const IS_SCROLLING_DEBOUNCE_MS = 150
 
 const calcInitialScroll = (
-  options: number | { index: number; position?: ScrollPosition },
+  options: InitialListScroll,
   viewport: ListViewport,
   containerSize: number
 ): number => {
@@ -52,12 +52,16 @@ export interface ListRenderedRange {
   visibleStop: number
 }
 
+export type InitialListScroll =
+  | number
+  | { index: number; position?: ScrollPosition }
+
 export interface UseWindowedListOptions {
   containerSize: number
   itemSize: number | ((index: number) => number)
   itemCount: number
   overscanCount?: number
-  initialScroll?: number | { index: number; position?: ScrollPosition }
+  initialScroll?: InitialListScroll
   scrollThrottling?: number
   onItemsRendered?(renderedRange: ListRenderedRange): void
 }
