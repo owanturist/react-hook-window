@@ -12,6 +12,7 @@ const ControlPanel = React.memo<{
 }>(({ options, setOptions }) => (
   <div>
     <div>
+      Container size{' '}
       <input
         data-testid="container-size-input"
         type="number"
@@ -26,6 +27,7 @@ const ControlPanel = React.memo<{
     </div>
 
     <div>
+      Item size{' '}
       <input
         data-testid="item-size-input"
         type="number"
@@ -40,6 +42,7 @@ const ControlPanel = React.memo<{
     </div>
 
     <div>
+      Item count{' '}
       <input
         data-testid="item-count-input"
         type="number"
@@ -48,6 +51,21 @@ const ControlPanel = React.memo<{
           setOptions(current => ({
             ...current,
             itemCount: Number(event.target.value)
+          }))
+        }
+      />
+    </div>
+
+    <div>
+      Overscan count{' '}
+      <input
+        data-testid="overscan-count-input"
+        type="number"
+        value={options.overscanCount}
+        onChange={event =>
+          setOptions(current => ({
+            ...current,
+            overscanCount: Number(event.target.value)
           }))
         }
       />
