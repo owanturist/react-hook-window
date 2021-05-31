@@ -1,346 +1,412 @@
+const toggleVisibility = (): void => {
+  cy.findByTestId('container').should('be.visible')
+  cy.findByTestId('visibility-checkbox').click().click()
+  cy.findByTestId('container').should('be.visible')
+}
+
+const setContainerSize = (height: number): void => {
+  cy.findByTestId('container-size-input').fill(height.toString())
+}
+
+const setItemSize = (height: number): void => {
+  cy.findByTestId('item-size-input').fill(height.toString())
+}
+
+const setItemCount = (count: number): void => {
+  cy.findByTestId('item-count-input').fill(count.toString())
+}
+
+const setOverscanCount = (count: number): void => {
+  cy.findByTestId('overscan-count-input').fill(count.toString())
+}
+
+const setInitialScrollTo = (px: number): void => {
+  cy.findByTestId('initial-scroll-px-input').fill(px.toString())
+  toggleVisibility()
+}
+
+const setInitialScrollToItem = (index: number, position: string): void => {
+  cy.findByTestId('initial-scroll-index-input').fill(index.toString())
+  cy.findByTestId('initial-scroll-position-select').select(position)
+  toggleVisibility()
+}
+
+const getItemByIndex = (
+  index: number
+): Cypress.Chainable<JQuery<HTMLElement>> => {
+  return cy.findByText(`Item #${index}`)
+}
+
+const checkRenderedItemsCount = (count: number): void => {
+  cy.findAllByTestId('item').should('have.length', count)
+}
+
+const checkContainerSize = ({
+  height,
+  scrollHeight
+}: {
+  height: number
+  scrollHeight: number
+}): void => {
+  cy.findByTestId('container').as('container').should('be.visible')
+  cy.get('@container').getClientHeight().should('eq', height)
+  cy.get('@container').getScrollHeight().should('eq', scrollHeight)
+}
+
+const scrollContainer = ({
+  x = 0,
+  y = 0
+}: {
+  x?: number
+  y?: number
+}): void => {
+  cy.findByTestId('container').scrollTo(x, y, { duration: 30 })
+}
+
 beforeEach(() => {
   cy.visit('/')
+
+  checkContainerSize({
+    height: 510,
+    scrollHeight: 1000 // 50px * 20
+  })
 })
 
 it('handles scrolling correctly', () => {
-  cy.findByTestId('container').as('container').should('be.visible')
-  cy.get('@container').getClientHeight().should('eq', 510)
-  cy.get('@container').getScrollHeight().should('eq', 1000) // 50px * 20
-
-  cy.findByText('Item #12').should('not.exist')
-  cy.findByText('Item #11').should('not.be.visible')
-  cy.findByText('Item #10').should('be.visible')
-  cy.findByText('Item #0').should('be.visible')
-  cy.findAllByTestId('item').should('have.length', 12)
+  getItemByIndex(12).should('not.exist')
+  getItemByIndex(11).should('not.be.visible')
+  getItemByIndex(10).should('be.visible')
+  getItemByIndex(0).should('be.visible')
+  checkRenderedItemsCount(12)
 
   // scroll one item down
-  cy.get('@container').scrollTo(0, 55, { duration: 300, easing: 'swing' })
+  scrollContainer({ y: 55 })
 
-  cy.findByText('Item #13').should('not.exist')
-  cy.findByText('Item #12').should('not.be.visible')
-  cy.findByText('Item #11').should('be.visible')
-  cy.findByText('Item #0').should('not.be.visible')
-  cy.findAllByTestId('item').should('have.length', 13)
+  getItemByIndex(13).should('not.exist')
+  getItemByIndex(12).should('not.be.visible')
+  getItemByIndex(11).should('be.visible')
+  getItemByIndex(0).should('not.be.visible')
+  checkRenderedItemsCount(13)
 
   // scroll some items down
-  cy.get('@container').scrollTo(0, 151, { duration: 300, easing: 'swing' })
+  scrollContainer({ y: 151 })
 
-  cy.findByText('Item #15').should('not.exist')
-  cy.findByText('Item #14').should('not.be.visible')
-  cy.findByText('Item #13').should('be.visible')
-  cy.findByText('Item #3').should('be.visible')
-  cy.findByText('Item #2').should('not.be.visible')
-  cy.findByText('Item #0').should('not.exist')
-  cy.findAllByTestId('item').should('have.length', 13)
+  getItemByIndex(15).should('not.exist')
+  getItemByIndex(14).should('not.be.visible')
+  getItemByIndex(13).should('be.visible')
+  getItemByIndex(3).should('be.visible')
+  getItemByIndex(2).should('not.be.visible')
+  getItemByIndex(0).should('not.exist')
+  checkRenderedItemsCount(13)
 
   // scroll to the down
-  cy.get('@container').scrollTo(0, 490, { duration: 300, easing: 'swing' })
+  scrollContainer({ y: 490 })
 
-  cy.findByText('Item #19').should('be.visible')
-  cy.findByText('Item #9').should('be.visible')
-  cy.findByText('Item #8').should('not.be.visible')
-  cy.findByText('Item #7').should('not.exist')
-  cy.findAllByTestId('item').should('have.length', 12)
+  getItemByIndex(19).should('be.visible')
+  getItemByIndex(9).should('be.visible')
+  getItemByIndex(8).should('not.be.visible')
+  getItemByIndex(7).should('not.exist')
+  checkRenderedItemsCount(12)
 })
 
 it('handles container resizing', () => {
-  cy.findByTestId('container').as('container').should('be.visible')
-  cy.get('@container').getClientHeight().should('eq', 510)
-  cy.get('@container').getScrollHeight().should('eq', 1000) // 50px * 20
-
   // expand container
-  cy.findByTestId('container-size-input').fill('810')
-  cy.get('@container').getClientHeight().should('eq', 810)
-  cy.get('@container').getScrollHeight().should('eq', 1000) // 50px * 20
+  setContainerSize(810)
+  checkContainerSize({
+    height: 810,
+    scrollHeight: 1000 // 50px * 20
+  })
 
-  cy.findByText('Item #18').should('not.exist')
-  cy.findByText('Item #17').should('not.be.visible')
-  cy.findByText('Item #16').should('be.visible')
-  cy.findByText('Item #0').should('be.visible')
-  cy.findAllByTestId('item').should('have.length', 18)
+  getItemByIndex(18).should('not.exist')
+  getItemByIndex(17).should('not.be.visible')
+  getItemByIndex(16).should('be.visible')
+  getItemByIndex(0).should('be.visible')
+  checkRenderedItemsCount(18)
 
   // shrink container
-  cy.findByTestId('container-size-input').fill('210')
-  cy.get('@container').getClientHeight().should('eq', 210)
-  cy.get('@container').getScrollHeight().should('eq', 1000) // 50px * 20
+  setContainerSize(210)
+  checkContainerSize({
+    height: 210,
+    scrollHeight: 1000 // 50px * 20
+  })
 
-  cy.findByText('Item #6').should('not.exist')
-  cy.findByText('Item #5').should('not.be.visible')
-  cy.findByText('Item #4').should('be.visible')
-  cy.findByText('Item #0').should('be.visible')
-  cy.findAllByTestId('item').should('have.length', 6)
+  getItemByIndex(6).should('not.exist')
+  getItemByIndex(5).should('not.be.visible')
+  getItemByIndex(4).should('be.visible')
+  getItemByIndex(0).should('be.visible')
+  checkRenderedItemsCount(6)
 
   // scroll to the down
-  cy.get('@container').scrollTo(0, 790, { duration: 300, easing: 'swing' })
-  cy.findByText('Item #19').should('be.visible')
-  cy.findByText('Item #15').should('be.visible')
-  cy.findByText('Item #14').should('not.be.visible')
-  cy.findByText('Item #13').should('not.exist')
-  cy.findAllByTestId('item').should('have.length', 6)
+  scrollContainer({ y: 790 })
+  getItemByIndex(19).should('be.visible')
+  getItemByIndex(15).should('be.visible')
+  getItemByIndex(14).should('not.be.visible')
+  getItemByIndex(13).should('not.exist')
+  checkRenderedItemsCount(6)
 
   // double size
-  cy.findByTestId('container-size-input').fill('420')
-  cy.get('@container').getClientHeight().should('eq', 420)
-  cy.get('@container').getScrollHeight().should('eq', 1000) // 50px * 20
+  setContainerSize(420)
+  checkContainerSize({
+    height: 420,
+    scrollHeight: 1000 // 50px * 20
+  })
 
-  cy.findByText('Item #19').should('be.visible')
-  cy.findByText('Item #11').should('be.visible')
-  cy.findByText('Item #10').should('not.be.visible')
-  cy.findByText('Item #9').should('not.exist')
-  cy.findAllByTestId('item').should('have.length', 10)
+  getItemByIndex(19).should('be.visible')
+  getItemByIndex(11).should('be.visible')
+  getItemByIndex(10).should('not.be.visible')
+  getItemByIndex(9).should('not.exist')
+  checkRenderedItemsCount(10)
 })
 
 it('handles item resizing', () => {
-  cy.findByTestId('container').as('container').should('be.visible')
-  cy.get('@container').getClientHeight().should('eq', 510)
-  cy.get('@container').getScrollHeight().should('eq', 1000) // 50px * 20
-
   // expand items
-  cy.findByTestId('item-size-input').fill('90')
-  cy.get('@container').getClientHeight().should('eq', 510)
-  cy.get('@container').getScrollHeight().should('eq', 1800) // 90px * 20
+  setItemSize(90)
+  checkContainerSize({
+    height: 510,
+    scrollHeight: 1800 // 90px * 20
+  })
 
-  cy.findByText('Item #7').should('not.exist')
-  cy.findByText('Item #6').should('not.be.visible')
-  cy.findByText('Item #5').should('be.visible')
-  cy.findByText('Item #0').should('be.visible')
-  cy.findAllByTestId('item').should('have.length', 7)
+  getItemByIndex(7).should('not.exist')
+  getItemByIndex(6).should('not.be.visible')
+  getItemByIndex(5).should('be.visible')
+  getItemByIndex(0).should('be.visible')
+  checkRenderedItemsCount(7)
 
   // shrink items
-  cy.findByTestId('item-size-input').fill('30')
-  cy.get('@container').getClientHeight().should('eq', 510)
-  cy.get('@container').getScrollHeight().should('eq', 600) // 30px * 20
+  setItemSize(30)
+  checkContainerSize({
+    height: 510,
+    scrollHeight: 600 // 30px * 20
+  })
 
-  cy.findByText('Item #18').should('not.exist')
-  cy.findByText('Item #17').should('be.visible') // visible because in the 510 border
-  cy.findByText('Item #0').should('be.visible')
-  cy.findAllByTestId('item').should('have.length', 18)
+  getItemByIndex(18).should('not.exist')
+  getItemByIndex(17).should('be.visible') // visible because in the 510 border
+  getItemByIndex(0).should('be.visible')
+  checkRenderedItemsCount(18)
 
   // scroll to the down
-  cy.get('@container').scrollTo(0, 90, { duration: 300, easing: 'swing' })
-  cy.findByText('Item #19').should('be.visible')
-  cy.findByText('Item #3').should('be.visible')
-  cy.findByText('Item #2').should('be.visible')
-  cy.findByText('Item #1').should('not.exist')
-  cy.findAllByTestId('item').should('have.length', 18)
+  scrollContainer({ y: 90 })
+  getItemByIndex(19).should('be.visible')
+  getItemByIndex(3).should('be.visible')
+  getItemByIndex(2).should('be.visible')
+  getItemByIndex(1).should('not.exist')
+  checkRenderedItemsCount(18)
 
   // double size
-  cy.findByTestId('item-size-input').fill('60')
-  cy.get('@container').getClientHeight().should('eq', 510)
-  cy.get('@container').getScrollHeight().should('eq', 1200) // 60px * 20
+  setItemSize(60)
+  checkContainerSize({
+    height: 510,
+    scrollHeight: 1200 // 60px * 20
+  })
 
-  cy.findByText('Item #11').should('not.exist')
-  cy.findByText('Item #10').should('be.visible')
-  cy.findByText('Item #9').should('be.visible')
-  cy.findByText('Item #1').should('be.visible')
-  cy.findByText('Item #0').should('not.be.visible')
-  cy.findAllByTestId('item').should('have.length', 11)
+  getItemByIndex(11).should('not.exist')
+  getItemByIndex(10).should('be.visible')
+  getItemByIndex(9).should('be.visible')
+  getItemByIndex(1).should('be.visible')
+  getItemByIndex(0).should('not.be.visible')
+  checkRenderedItemsCount(11)
 })
 
 it('handles item count change', () => {
-  cy.findByTestId('container').as('container').should('be.visible')
-  cy.get('@container').getClientHeight().should('eq', 510)
-  cy.get('@container').getScrollHeight().should('eq', 1000) // 50px * 20
-
   // decrease item count
-  cy.findByTestId('item-count-input').fill('15')
-  cy.get('@container').getClientHeight().should('eq', 510)
-  cy.get('@container').getScrollHeight().should('eq', 750) // 50px * 15
+  setItemCount(15)
+  checkContainerSize({
+    height: 510,
+    scrollHeight: 750 // 50px * 15
+  })
 
-  cy.findByText('Item #12').should('not.exist')
-  cy.findByText('Item #11').should('not.be.visible')
-  cy.findByText('Item #10').should('be.visible')
-  cy.findByText('Item #0').should('be.visible')
-  cy.findAllByTestId('item').should('have.length', 12)
+  getItemByIndex(12).should('not.exist')
+  getItemByIndex(11).should('not.be.visible')
+  getItemByIndex(10).should('be.visible')
+  getItemByIndex(0).should('be.visible')
+  checkRenderedItemsCount(12)
 
   // scroll to the down
-  cy.get('@container').scrollTo(0, 240, { duration: 300, easing: 'swing' })
-  cy.findByText('Item #14').should('be.visible')
-  cy.findByText('Item #4').should('be.visible')
-  cy.findByText('Item #3').should('not.be.visible')
-  cy.findByText('Item #2').should('not.exist')
-  cy.findAllByTestId('item').should('have.length', 12)
+  scrollContainer({ y: 240 })
+  getItemByIndex(14).should('be.visible')
+  getItemByIndex(4).should('be.visible')
+  getItemByIndex(3).should('not.be.visible')
+  getItemByIndex(2).should('not.exist')
+  checkRenderedItemsCount(12)
 
   // scroll up and increase item count
-  cy.get('@container').scrollTo(0, 0, { duration: 300, easing: 'swing' })
-  cy.findByTestId('item-count-input').fill('1000')
-  cy.get('@container').getClientHeight().should('eq', 510)
-  cy.get('@container').getScrollHeight().should('eq', 50000) // 50px * 1000
+  scrollContainer({ y: 0 })
+  setItemCount(1000)
+  checkContainerSize({
+    height: 510,
+    scrollHeight: 50000 // 50px * 1000
+  })
 
   // scroll to the down
-  cy.get('@container').scrollTo(0, 49490, { duration: 300, easing: 'swing' })
-  cy.findByText('Item #999').should('be.visible')
-  cy.findByText('Item #989').should('be.visible')
-  cy.findByText('Item #988').should('not.be.visible')
-  cy.findByText('Item #987').should('not.exist')
-  cy.findAllByTestId('item').should('have.length', 12)
+  scrollContainer({ y: 49490 })
+  getItemByIndex(999).should('be.visible')
+  getItemByIndex(989).should('be.visible')
+  getItemByIndex(988).should('not.be.visible')
+  getItemByIndex(987).should('not.exist')
+  checkRenderedItemsCount(12)
 
   // cause overscroll
-  cy.findByTestId('item-count-input').fill('100')
-  cy.get('@container').getClientHeight().should('eq', 510)
-  cy.get('@container').getScrollHeight().should('eq', 5000) // 50px * 100
+  setItemCount(100)
+  checkContainerSize({
+    height: 510,
+    scrollHeight: 5000 // 50px * 100
+  })
 
-  cy.findByText('Item #99').should('be.visible')
-  cy.findByText('Item #89').should('be.visible')
-  cy.findByText('Item #88').should('not.be.visible')
-  cy.findByText('Item #87').should('not.exist')
-  cy.findAllByTestId('item').should('have.length', 12)
+  getItemByIndex(99).should('be.visible')
+  getItemByIndex(89).should('be.visible')
+  getItemByIndex(88).should('not.be.visible')
+  getItemByIndex(87).should('not.exist')
+  checkRenderedItemsCount(12)
 
   // cause overscroll again
-  cy.findByTestId('item-count-input').fill('10')
-  cy.get('@container').getClientHeight().should('eq', 510)
-  cy.get('@container').getScrollHeight().should('eq', 510) // 50px * 10 < 510
+  setItemCount(10)
+  checkContainerSize({
+    height: 510,
+    scrollHeight: 510 // 50px * 10 < 510
+  })
 
-  cy.findByText('Item #9').should('be.visible')
-  cy.findByText('Item #9').should('be.visible')
-  cy.findByText('Item #0').should('be.visible')
-  cy.findAllByTestId('item').should('have.length', 10)
+  getItemByIndex(9).should('be.visible')
+  getItemByIndex(0).should('be.visible')
+  checkRenderedItemsCount(10)
+
+  // cause overscroll again
+  setItemCount(0)
+  checkContainerSize({
+    height: 510,
+    scrollHeight: 510 // 50px * 0 < 510
+  })
+
+  getItemByIndex(0).should('not.exist')
+  checkRenderedItemsCount(0)
 })
 
 it('handles overscan count change', () => {
-  cy.findByTestId('container').as('container').should('be.visible')
-  cy.get('@container').getClientHeight().should('eq', 510)
-  cy.get('@container').getScrollHeight().should('eq', 1000) // 50px * 20
-
   // increase overscan count
-  cy.findByTestId('overscan-count-input').fill('3')
-  cy.get('@container').getClientHeight().should('eq', 510)
-  cy.get('@container').getScrollHeight().should('eq', 1000) // 50px * 20
+  setOverscanCount(3)
+  checkContainerSize({
+    height: 510,
+    scrollHeight: 1000 // 50px * 20
+  })
 
-  cy.findByText('Item #14').should('not.exist')
-  cy.findByText('Item #13').should('not.be.visible')
-  cy.findByText('Item #12').should('not.be.visible')
-  cy.findByText('Item #11').should('not.be.visible')
-  cy.findByText('Item #10').should('be.visible')
-  cy.findByText('Item #0').should('be.visible')
-  cy.findAllByTestId('item').should('have.length', 14)
+  getItemByIndex(14).should('not.exist')
+  getItemByIndex(13).should('not.be.visible')
+  getItemByIndex(12).should('not.be.visible')
+  getItemByIndex(11).should('not.be.visible')
+  getItemByIndex(10).should('be.visible')
+  getItemByIndex(0).should('be.visible')
+  checkRenderedItemsCount(14)
 
   // scroll some items down
-  cy.get('@container').scrollTo(0, 201, { duration: 300, easing: 'swing' })
+  scrollContainer({ y: 201 })
 
-  cy.findByText('Item #18').should('not.exist')
-  cy.findByText('Item #17').should('not.be.visible')
-  cy.findByText('Item #16').should('not.be.visible')
-  cy.findByText('Item #15').should('not.be.visible')
-  cy.findByText('Item #14').should('be.visible')
-  cy.findByText('Item #13').should('be.visible')
-  cy.findByText('Item #4').should('be.visible')
-  cy.findByText('Item #3').should('not.be.visible')
-  cy.findByText('Item #2').should('not.be.visible')
-  cy.findByText('Item #1').should('not.be.visible')
-  cy.findByText('Item #0').should('not.exist')
-  cy.findAllByTestId('item').should('have.length', 17)
+  getItemByIndex(18).should('not.exist')
+  getItemByIndex(17).should('not.be.visible')
+  getItemByIndex(16).should('not.be.visible')
+  getItemByIndex(15).should('not.be.visible')
+  getItemByIndex(14).should('be.visible')
+  getItemByIndex(13).should('be.visible')
+  getItemByIndex(4).should('be.visible')
+  getItemByIndex(3).should('not.be.visible')
+  getItemByIndex(2).should('not.be.visible')
+  getItemByIndex(1).should('not.be.visible')
+  getItemByIndex(0).should('not.exist')
+  checkRenderedItemsCount(17)
 
   // scroll to the down
-  cy.get('@container').scrollTo(0, 490, { duration: 300, easing: 'swing' })
+  scrollContainer({ y: 490 })
 
-  cy.findByText('Item #19').should('be.visible')
-  cy.findByText('Item #9').should('be.visible')
-  cy.findByText('Item #8').should('not.be.visible')
-  cy.findByText('Item #7').should('not.be.visible')
-  cy.findByText('Item #6').should('not.be.visible')
-  cy.findByText('Item #5').should('not.exist')
-  cy.findAllByTestId('item').should('have.length', 14)
+  getItemByIndex(19).should('be.visible')
+  getItemByIndex(9).should('be.visible')
+  getItemByIndex(8).should('not.be.visible')
+  getItemByIndex(7).should('not.be.visible')
+  getItemByIndex(6).should('not.be.visible')
+  getItemByIndex(5).should('not.exist')
+  checkRenderedItemsCount(14)
 
   // set overscan count to 0
-  cy.findByTestId('overscan-count-input').fill('0')
-  cy.get('@container').getClientHeight().should('eq', 510)
-  cy.get('@container').getScrollHeight().should('eq', 1000) // 50px * 20
+  setOverscanCount(0)
+  checkContainerSize({
+    height: 510,
+    scrollHeight: 1000 // 50px * 20
+  })
 
-  cy.findByText('Item #19').should('be.visible')
-  cy.findByText('Item #9').should('be.visible')
-  cy.findByText('Item #8').should('not.exist')
-  cy.findAllByTestId('item').should('have.length', 11)
+  getItemByIndex(19).should('be.visible')
+  getItemByIndex(9).should('be.visible')
+  getItemByIndex(8).should('not.exist')
+  checkRenderedItemsCount(11)
 
   // scroll some items up
-  cy.get('@container').scrollTo(0, 201, { duration: 300, easing: 'swing' })
+  scrollContainer({ y: 201 })
 
-  cy.findByText('Item #15').should('not.exist')
-  cy.findByText('Item #14').should('be.visible')
-  cy.findByText('Item #13').should('be.visible')
-  cy.findByText('Item #4').should('be.visible')
-  cy.findByText('Item #3').should('not.exist')
-  cy.findAllByTestId('item').should('have.length', 11)
+  getItemByIndex(15).should('not.exist')
+  getItemByIndex(14).should('be.visible')
+  getItemByIndex(13).should('be.visible')
+  getItemByIndex(4).should('be.visible')
+  getItemByIndex(3).should('not.exist')
+  checkRenderedItemsCount(11)
 
   // scroll up
-  cy.get('@container').scrollTo(0, 0, { duration: 300, easing: 'swing' })
+  scrollContainer({ y: 0 })
 
-  cy.findByText('Item #11').should('not.exist')
-  cy.findByText('Item #10').should('be.visible')
-  cy.findByText('Item #0').should('be.visible')
-  cy.findAllByTestId('item').should('have.length', 11)
+  getItemByIndex(11).should('not.exist')
+  getItemByIndex(10).should('be.visible')
+  getItemByIndex(0).should('be.visible')
+  checkRenderedItemsCount(11)
 })
 
 it('scrolls to initial position', () => {
-  cy.findByTestId('container').should('be.visible')
+  setInitialScrollTo(55)
+
+  getItemByIndex(13).should('not.exist')
+  getItemByIndex(12).should('not.be.visible')
+  getItemByIndex(11).should('be.visible')
+  getItemByIndex(0).should('not.be.visible')
+  checkRenderedItemsCount(13)
 
   // change initial scroll and toggle visibility twise
-  cy.findByTestId('initial-scroll-px-input').fill('55')
-  cy.findByTestId('visibility-checkbox').click()
-  cy.findByTestId('container').should('not.exist')
-  cy.findByTestId('visibility-checkbox').click()
-  cy.findByTestId('container').as('container').should('be.visible')
-  cy.get('@container').getClientHeight().should('eq', 510)
-  cy.get('@container').getScrollHeight().should('eq', 1000) // 50px * 20
+  setInitialScrollTo(490)
 
-  cy.findByText('Item #13').should('not.exist')
-  cy.findByText('Item #12').should('not.be.visible')
-  cy.findByText('Item #11').should('be.visible')
-  cy.findByText('Item #0').should('not.be.visible')
-  cy.findAllByTestId('item').should('have.length', 13)
-
-  // change initial scroll and toggle visibility twise
-  cy.findByTestId('initial-scroll-px-input').fill('490')
-  cy.findByTestId('visibility-checkbox').click()
-  cy.findByTestId('container').should('not.exist')
-  cy.findByTestId('visibility-checkbox').click()
-  cy.findByTestId('container').as('container').should('be.visible')
-  cy.get('@container').getClientHeight().should('eq', 510)
-  cy.get('@container').getScrollHeight().should('eq', 1000) // 50px * 20
-
-  cy.findByText('Item #19').should('be.visible')
-  cy.findByText('Item #9').should('be.visible')
-  cy.findByText('Item #8').should('not.be.visible')
-  cy.findByText('Item #7').should('not.exist')
-  cy.findAllByTestId('item').should('have.length', 12)
+  getItemByIndex(19).should('be.visible')
+  getItemByIndex(9).should('be.visible')
+  getItemByIndex(8).should('not.be.visible')
+  getItemByIndex(7).should('not.exist')
+  checkRenderedItemsCount(12)
 })
 
-it('scrolls to initial position by item index', () => {
-  cy.findByTestId('container').should('be.visible')
+describe('scrolls to initial position by item index', () => {
+  it('position: start', () => {
+    setInitialScrollToItem(4, 'start')
 
-  // change to start position
-  cy.findByTestId('initial-scroll-index-input').fill('4')
-  cy.findByTestId('initial-scroll-position-select').select('start')
-  cy.findByTestId('visibility-checkbox').click()
-  cy.findByTestId('container').should('not.exist')
-  cy.findByTestId('visibility-checkbox').click()
-  cy.findByTestId('container').as('container').should('be.visible')
-  cy.get('@container').getClientHeight().should('eq', 510)
-  cy.get('@container').getScrollHeight().should('eq', 1000) // 50px * 20
+    getItemByIndex(16).should('not.exist')
+    getItemByIndex(15).should('not.be.visible')
+    getItemByIndex(14).should('be.visible')
+    getItemByIndex(4).should('be.visible')
+    getItemByIndex(3).should('be.visible') // visible because in the border
+    getItemByIndex(2).should('not.exist')
+    checkRenderedItemsCount(13)
+  })
 
-  cy.findByText('Item #16').should('not.exist')
-  cy.findByText('Item #15').should('not.be.visible')
-  cy.findByText('Item #14').should('be.visible')
-  cy.findByText('Item #4').should('be.visible')
-  cy.findByText('Item #3').should('be.visible') // visible because in the border
-  cy.findByText('Item #2').should('not.exist')
-  cy.findAllByTestId('item').should('have.length', 13)
+  it('position: end', () => {
+    setInitialScrollToItem(17, 'end')
 
-  // change to end position
-  cy.findByTestId('initial-scroll-index-input').fill('17')
-  cy.findByTestId('initial-scroll-position-select').select('end')
-  cy.findByTestId('visibility-checkbox').click()
-  cy.findByTestId('container').should('not.exist')
-  cy.findByTestId('visibility-checkbox').click()
-  cy.findByTestId('container').as('container').should('be.visible')
-  cy.get('@container').getClientHeight().should('eq', 510)
-  cy.get('@container').getScrollHeight().should('eq', 1000) // 50px * 20
+    getItemByIndex(19).should('not.exist')
+    getItemByIndex(18).should('be.visible')
+    getItemByIndex(17).should('be.visible')
+    getItemByIndex(7).should('be.visible')
+    getItemByIndex(6).should('not.be.visible')
+    getItemByIndex(5).should('not.exist')
+    checkRenderedItemsCount(13)
+  })
 
-  cy.findByText('Item #19').should('not.exist')
-  cy.findByText('Item #18').should('be.visible')
-  cy.findByText('Item #17').should('be.visible')
-  cy.findByText('Item #7').should('be.visible')
-  cy.findByText('Item #6').should('not.be.visible')
-  cy.findByText('Item #5').should('not.exist')
-  cy.findAllByTestId('item').should('have.length', 13)
+  it('position: center', () => {
+    setInitialScrollToItem(11, 'center')
+
+    getItemByIndex(18).should('not.exist')
+    getItemByIndex(17).should('not.be.visible')
+    getItemByIndex(16).should('be.visible')
+    getItemByIndex(6).should('be.visible')
+    getItemByIndex(5).should('not.be.visible')
+    getItemByIndex(4).should('not.exist')
+    checkRenderedItemsCount(13)
+  })
 })
