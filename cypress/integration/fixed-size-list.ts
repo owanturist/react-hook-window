@@ -31,6 +31,21 @@ const setInitialScrollToItem = (index: number, position: string): void => {
   toggleVisibility()
 }
 
+const setDynamicScrollTo = (px: number): void => {
+  cy.findByTestId('scrolling').should('not.be.checked')
+  cy.findByTestId('dynamic-scroll-px-input').fill(px.toString())
+  cy.findByTestId('scrolling').should('be.checked')
+  cy.findByTestId('scrolling').should('not.be.checked')
+}
+
+const setDynamicScrollToItem = (index: number, position: string): void => {
+  cy.findByTestId('scrolling').should('not.be.checked')
+  cy.findByTestId('dynamic-scroll-index-input').fill(index.toString())
+  cy.findByTestId('dynamic-scroll-position-select').select(position)
+  cy.findByTestId('scrolling').should('be.checked')
+  cy.findByTestId('scrolling').should('not.be.checked')
+}
+
 const getItemByIndex = (
   index: number
 ): Cypress.Chainable<JQuery<HTMLElement>> => {
@@ -354,59 +369,118 @@ it('handles overscan count change', () => {
   checkRenderedItemsCount(11)
 })
 
-it('scrolls to initial position', () => {
-  setInitialScrollTo(55)
+describe('initial position', () => {
+  it('scrolls to px', () => {
+    setInitialScrollTo(55)
 
-  getItemByIndex(13).should('not.exist')
-  getItemByIndex(12).should('not.be.visible')
-  getItemByIndex(11).should('be.visible')
-  getItemByIndex(0).should('not.be.visible')
-  checkRenderedItemsCount(13)
+    getItemByIndex(13).should('not.exist')
+    getItemByIndex(12).should('not.be.visible')
+    getItemByIndex(11).should('be.visible')
+    getItemByIndex(0).should('not.be.visible')
+    checkRenderedItemsCount(13)
 
-  // change initial scroll and toggle visibility twise
-  setInitialScrollTo(490)
+    setInitialScrollTo(490)
 
-  getItemByIndex(19).should('be.visible')
-  getItemByIndex(9).should('be.visible')
-  getItemByIndex(8).should('not.be.visible')
-  getItemByIndex(7).should('not.exist')
-  checkRenderedItemsCount(12)
+    getItemByIndex(19).should('be.visible')
+    getItemByIndex(9).should('be.visible')
+    getItemByIndex(8).should('not.be.visible')
+    getItemByIndex(7).should('not.exist')
+    checkRenderedItemsCount(12)
+  })
+
+  describe('scrolls to item', () => {
+    it('position: start', () => {
+      setInitialScrollToItem(4, 'start')
+
+      getItemByIndex(16).should('not.exist')
+      getItemByIndex(15).should('not.be.visible')
+      getItemByIndex(14).should('be.visible')
+      getItemByIndex(4).should('be.visible')
+      getItemByIndex(3).should('be.visible') // visible because in the border
+      getItemByIndex(2).should('not.exist')
+      checkRenderedItemsCount(13)
+    })
+
+    it('position: end', () => {
+      setInitialScrollToItem(17, 'end')
+
+      getItemByIndex(19).should('not.exist')
+      getItemByIndex(18).should('be.visible')
+      getItemByIndex(17).should('be.visible')
+      getItemByIndex(7).should('be.visible')
+      getItemByIndex(6).should('not.be.visible')
+      getItemByIndex(5).should('not.exist')
+      checkRenderedItemsCount(13)
+    })
+
+    it('position: center', () => {
+      setInitialScrollToItem(11, 'center')
+
+      getItemByIndex(18).should('not.exist')
+      getItemByIndex(17).should('not.be.visible')
+      getItemByIndex(16).should('be.visible')
+      getItemByIndex(6).should('be.visible')
+      getItemByIndex(5).should('not.be.visible')
+      getItemByIndex(4).should('not.exist')
+      checkRenderedItemsCount(13)
+    })
+  })
 })
 
-describe('scrolls to initial position by item index', () => {
-  it('position: start', () => {
-    setInitialScrollToItem(4, 'start')
+describe('dynamic position', () => {
+  it('scrolls to px', () => {
+    setDynamicScrollTo(55)
 
-    getItemByIndex(16).should('not.exist')
-    getItemByIndex(15).should('not.be.visible')
-    getItemByIndex(14).should('be.visible')
-    getItemByIndex(4).should('be.visible')
-    getItemByIndex(3).should('be.visible') // visible because in the border
-    getItemByIndex(2).should('not.exist')
+    getItemByIndex(13).should('not.exist')
+    getItemByIndex(12).should('not.be.visible')
+    getItemByIndex(11).should('be.visible')
+    getItemByIndex(0).should('not.be.visible')
     checkRenderedItemsCount(13)
+
+    setDynamicScrollTo(490)
+
+    getItemByIndex(19).should('be.visible')
+    getItemByIndex(9).should('be.visible')
+    getItemByIndex(8).should('not.be.visible')
+    getItemByIndex(7).should('not.exist')
+    checkRenderedItemsCount(12)
   })
 
-  it('position: end', () => {
-    setInitialScrollToItem(17, 'end')
+  describe('scrolls to item', () => {
+    it('position: start', () => {
+      setDynamicScrollToItem(4, 'start')
 
-    getItemByIndex(19).should('not.exist')
-    getItemByIndex(18).should('be.visible')
-    getItemByIndex(17).should('be.visible')
-    getItemByIndex(7).should('be.visible')
-    getItemByIndex(6).should('not.be.visible')
-    getItemByIndex(5).should('not.exist')
-    checkRenderedItemsCount(13)
-  })
+      getItemByIndex(16).should('not.exist')
+      getItemByIndex(15).should('not.be.visible')
+      getItemByIndex(14).should('be.visible')
+      getItemByIndex(4).should('be.visible')
+      getItemByIndex(3).should('be.visible') // visible because in the border
+      getItemByIndex(2).should('not.exist')
+      checkRenderedItemsCount(13)
+    })
 
-  it('position: center', () => {
-    setInitialScrollToItem(11, 'center')
+    it('position: end', () => {
+      setDynamicScrollToItem(17, 'end')
 
-    getItemByIndex(18).should('not.exist')
-    getItemByIndex(17).should('not.be.visible')
-    getItemByIndex(16).should('be.visible')
-    getItemByIndex(6).should('be.visible')
-    getItemByIndex(5).should('not.be.visible')
-    getItemByIndex(4).should('not.exist')
-    checkRenderedItemsCount(13)
+      getItemByIndex(19).should('not.exist')
+      getItemByIndex(18).should('be.visible')
+      getItemByIndex(17).should('be.visible')
+      getItemByIndex(7).should('be.visible')
+      getItemByIndex(6).should('not.be.visible')
+      getItemByIndex(5).should('not.exist')
+      checkRenderedItemsCount(13)
+    })
+
+    it('position: center', () => {
+      setDynamicScrollToItem(11, 'center')
+
+      getItemByIndex(18).should('not.exist')
+      getItemByIndex(17).should('not.be.visible')
+      getItemByIndex(16).should('be.visible')
+      getItemByIndex(6).should('be.visible')
+      getItemByIndex(5).should('not.be.visible')
+      getItemByIndex(4).should('not.exist')
+      checkRenderedItemsCount(13)
+    })
   })
 })

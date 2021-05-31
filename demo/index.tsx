@@ -16,9 +16,18 @@ const SCROLL_POSITIONS: ReadonlyArray<ScrollPosition> = [
 ]
 
 const InitialScrollControl: React.VFC<{
+  scrollToPxName: string
+  scrollToItemPositionName: string
+  scrollToItemIndexName: string
   initialScroll?: InitialListScroll
   onChange(initialScroll: InitialListScroll): void
-}> = ({ initialScroll = 0, onChange }) => {
+}> = ({
+  scrollToPxName,
+  scrollToItemPositionName,
+  scrollToItemIndexName,
+  initialScroll = 0,
+  onChange
+}) => {
   const [px, index, position] =
     typeof initialScroll === 'number'
       ? [initialScroll, 0, SCROLL_POSITIONS[0]]
@@ -34,7 +43,7 @@ const InitialScrollControl: React.VFC<{
         />
         {' by px '}
         <input
-          data-testid="initial-scroll-px-input"
+          data-testid={scrollToPxName}
           type="number"
           value={px}
           onChange={event => onChange(Number(event.target.value))}
@@ -50,7 +59,7 @@ const InitialScrollControl: React.VFC<{
 
         {' by item index '}
         <select
-          data-testid="initial-scroll-position-select"
+          data-testid={scrollToItemPositionName}
           value={position}
           onChange={event => {
             onChange({
@@ -67,7 +76,7 @@ const InitialScrollControl: React.VFC<{
         </select>
 
         <input
-          data-testid="initial-scroll-index-input"
+          data-testid={scrollToItemIndexName}
           type="number"
           value={index}
           onChange={event => {
@@ -81,6 +90,31 @@ const InitialScrollControl: React.VFC<{
     </div>
   )
 }
+
+const DynamicScrollControl = React.memo<{
+  scrollTo(px: number): void
+  scrollToItem(index: number, position?: ScrollPosition): void
+}>(({ scrollTo, scrollToItem }) => {
+  const [scroll, setScroll] = React.useState<InitialListScroll>(0)
+
+  return (
+    <InitialScrollControl
+      scrollToPxName="dynamic-scroll-px-input"
+      scrollToItemPositionName="dynamic-scroll-position-select"
+      scrollToItemIndexName="dynamic-scroll-index-input"
+      initialScroll={scroll}
+      onChange={nextScroll => {
+        if (typeof nextScroll === 'number') {
+          scrollTo(nextScroll)
+        } else {
+          scrollToItem(nextScroll.index, nextScroll.position)
+        }
+
+        setScroll(nextScroll)
+      }}
+    />
+  )
+})
 
 interface FixedSizeOptions extends UseWindowedListOptions {
   itemSize: number
@@ -170,6 +204,9 @@ const ControlPanel = React.memo<{
     <div>
       Initial scroll
       <InitialScrollControl
+        scrollToPxName="initial-scroll-px-input"
+        scrollToItemPositionName="initial-scroll-position-select"
+        scrollToItemIndexName="initial-scroll-index-input"
         initialScroll={options.initialScroll}
         onChange={initialScroll =>
           setOptions(current => ({ ...current, initialScroll }))
@@ -182,12 +219,21 @@ const ControlPanel = React.memo<{
 const FixedSizeList = React.memo<{
   options: FixedSizeOptions
 }>(({ options }) => {
-  const { setRef, isScrolling, startSpace, endSpace, indexes } =
-    useWindowedList(options)
+  const {
+    setRef,
+    startSpace,
+    endSpace,
+    indexes,
+    isScrolling,
+    scrollTo,
+    scrollToItem
+  } = useWindowedList(options)
 
   return (
     <>
       <div>
+        Dynamic scroll
+        <DynamicScrollControl scrollTo={scrollTo} scrollToItem={scrollToItem} />
         <input
           data-testid="scrolling"
           type="checkbox"
