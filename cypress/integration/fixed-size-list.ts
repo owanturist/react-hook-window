@@ -42,7 +42,6 @@ const setDynamicScrollToItem = (index: number, position: string): void => {
   cy.findByTestId('scrolling').should('not.be.checked')
   cy.findByTestId('dynamic-scroll-index-input').fill(index.toString())
   cy.findByTestId('dynamic-scroll-position-select').select(position)
-  cy.findByTestId('scrolling').should('be.checked')
   cy.findByTestId('scrolling').should('not.be.checked')
 }
 
@@ -480,6 +479,129 @@ describe('dynamic position', () => {
       getItemByIndex(6).should('be.visible')
       getItemByIndex(5).should('not.be.visible')
       getItemByIndex(4).should('not.exist')
+      checkRenderedItemsCount(13)
+    })
+
+    it('position: auto', () => {
+      // not scroll, already visible
+      setDynamicScrollToItem(4, 'auto')
+
+      getItemByIndex(12).should('not.exist')
+      getItemByIndex(11).should('not.be.visible')
+      getItemByIndex(10).should('be.visible')
+      getItemByIndex(0).should('be.visible')
+      checkRenderedItemsCount(12)
+
+      // move down a little bit untill almost fully visible item appears
+      setDynamicScrollToItem(10, 'auto')
+
+      getItemByIndex(12).should('not.exist')
+      getItemByIndex(11).should('be.visible')
+      getItemByIndex(10).should('be.visible')
+      getItemByIndex(0).should('be.visible')
+      checkRenderedItemsCount(12)
+
+      // move down far
+      setDynamicScrollToItem(17, 'auto')
+
+      getItemByIndex(19).should('not.exist')
+      getItemByIndex(18).should('be.visible')
+      getItemByIndex(17).should('be.visible')
+      getItemByIndex(7).should('be.visible')
+      getItemByIndex(6).should('not.be.visible')
+      getItemByIndex(5).should('not.exist')
+      checkRenderedItemsCount(13)
+
+      // no scroll, already visible
+      setDynamicScrollToItem(13, 'auto')
+
+      getItemByIndex(19).should('not.exist')
+      getItemByIndex(18).should('be.visible')
+      getItemByIndex(17).should('be.visible')
+      getItemByIndex(7).should('be.visible')
+      getItemByIndex(6).should('not.be.visible')
+      getItemByIndex(5).should('not.exist')
+      checkRenderedItemsCount(13)
+
+      // move back up
+      setDynamicScrollToItem(4, 'auto')
+
+      getItemByIndex(16).should('not.exist')
+      getItemByIndex(15).should('not.be.visible')
+      getItemByIndex(14).should('be.visible')
+      getItemByIndex(4).should('be.visible')
+      getItemByIndex(3).should('be.visible') // visible because in the border
+      getItemByIndex(0).should('not.exist')
+      checkRenderedItemsCount(13)
+    })
+
+    it('position: smart', () => {
+      setItemCount(100)
+      checkContainerSize({
+        height: 510,
+        scrollHeight: 5000 // 50px * 100
+      })
+
+      // not scroll, already visible
+      setDynamicScrollToItem(4, 'smart')
+
+      getItemByIndex(12).should('not.exist')
+      getItemByIndex(11).should('not.be.visible')
+      getItemByIndex(10).should('be.visible')
+      getItemByIndex(0).should('be.visible')
+      checkRenderedItemsCount(12)
+
+      // move down a little bit untill almost fully visible item appears
+      setDynamicScrollToItem(10, 'smart')
+
+      getItemByIndex(12).should('not.exist')
+      getItemByIndex(11).should('be.visible')
+      getItemByIndex(10).should('be.visible')
+      getItemByIndex(0).should('be.visible')
+      checkRenderedItemsCount(12)
+
+      // move down to item closer than 1 viewport (20 - 10) * 50px < 510px
+      setDynamicScrollToItem(20, 'smart')
+
+      getItemByIndex(22).should('not.exist')
+      getItemByIndex(21).should('be.visible')
+      getItemByIndex(20).should('be.visible')
+      getItemByIndex(10).should('be.visible')
+      getItemByIndex(9).should('not.be.visible')
+      getItemByIndex(8).should('not.exist')
+      checkRenderedItemsCount(13)
+
+      // move down to item further than 1 viewport (31 - 20) * 50px > 510px
+      setDynamicScrollToItem(31, 'smart')
+
+      getItemByIndex(38).should('not.exist')
+      getItemByIndex(37).should('not.be.visible')
+      getItemByIndex(36).should('be.visible')
+      getItemByIndex(26).should('be.visible')
+      getItemByIndex(25).should('not.be.visible')
+      getItemByIndex(24).should('not.exist')
+      checkRenderedItemsCount(13)
+
+      // move up to item closer than 1 viewport (31 - 21) * 50px < 510px
+      setDynamicScrollToItem(21, 'smart')
+
+      getItemByIndex(33).should('not.exist')
+      getItemByIndex(32).should('not.be.visible')
+      getItemByIndex(31).should('be.visible')
+      getItemByIndex(21).should('be.visible')
+      getItemByIndex(20).should('be.visible') // visible because in the border
+      getItemByIndex(19).should('not.exist')
+      checkRenderedItemsCount(13)
+
+      // move up to item further than 1 viewport (21 - 10) * 50px > 510px
+      setDynamicScrollToItem(10, 'smart')
+
+      getItemByIndex(17).should('not.exist')
+      getItemByIndex(16).should('not.be.visible')
+      getItemByIndex(15).should('be.visible')
+      getItemByIndex(5).should('be.visible')
+      getItemByIndex(4).should('not.be.visible')
+      getItemByIndex(3).should('not.exist')
       checkRenderedItemsCount(13)
     })
   })
