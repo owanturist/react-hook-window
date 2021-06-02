@@ -78,7 +78,7 @@ const scrollContainer = ({
 }
 
 beforeEach(() => {
-  cy.visit('/')
+  cy.visit('/fixed-size-list')
 
   checkContainerSize({
     height: 510,

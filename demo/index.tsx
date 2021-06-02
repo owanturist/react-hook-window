@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import { useWindowedList } from '../src'
 import { DynamicScrollControl } from './ScrollControl'
 import { ControlPanelOptions, ControlPanel } from './ControlPanel'
+import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
 const FixedSizeList = React.memo<{
   options: ControlPanelOptions
@@ -84,7 +85,13 @@ const FixedSizeListDemo = React.memo(() => {
 
 ReactDOM.render(
   <React.StrictMode>
-    <FixedSizeListDemo />
+    <BrowserRouter>
+      <Switch>
+        <Route exact strict path="/fixed-size-list">
+          <FixedSizeListDemo />
+        </Route>
+      </Switch>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
 )
