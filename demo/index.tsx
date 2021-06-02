@@ -18,7 +18,7 @@ const FixedSizeList = React.memo<{
   } = useWindowedList(options)
 
   return (
-    <>
+    <div>
       <div>
         Dynamic scroll
         <DynamicScrollControl scrollTo={scrollTo} scrollToItem={scrollToItem} />
@@ -37,6 +37,7 @@ const FixedSizeList = React.memo<{
         ref={setRef}
         style={{
           overflow: 'auto',
+          boxShadow: '0 0 0 2px #888',
           height: options.containerSize
         }}
       >
@@ -60,7 +61,7 @@ const FixedSizeList = React.memo<{
           ))}
         </div>
       </div>
-    </>
+    </div>
   )
 })
 
@@ -73,7 +74,7 @@ const FixedSizeListDemo = React.memo(() => {
   })
 
   return (
-    <div>
+    <div style={{ display: 'flex' }}>
       <ControlPanel options={options} setOptions={setOptions} />
 
       {options.visible && <FixedSizeList options={options} />}
