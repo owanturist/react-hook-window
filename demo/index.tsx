@@ -1,14 +1,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
-import { FixedSizeListDemo } from './FixedSizeListDemo'
+import { WindowedListDemo } from './WindowedListDemo'
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <Switch>
         <Route exact strict path="/fixed-size-list">
-          <FixedSizeListDemo />
+          <WindowedListDemo itemSize={50} />
         </Route>
       </Switch>
     </BrowserRouter>

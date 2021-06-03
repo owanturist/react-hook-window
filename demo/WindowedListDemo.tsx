@@ -3,7 +3,7 @@ import { useWindowedList } from '../src'
 import { DynamicScrollControl } from './ScrollControl'
 import { ControlPanelOptions, ControlPanel } from './ControlPanel'
 
-const FixedSizeList = React.memo<{
+const WindowedList = React.memo<{
   options: ControlPanelOptions
 }>(({ options }) => {
   const {
@@ -66,10 +66,12 @@ const FixedSizeList = React.memo<{
   )
 })
 
-export const FixedSizeListDemo = React.memo(() => {
+export const WindowedListDemo = React.memo<{
+  itemSize: number | ((index: number) => number)
+}>(({ itemSize }) => {
   const [options, setOptions] = React.useState<ControlPanelOptions>({
     containerSize: 510,
-    itemSize: 50,
+    itemSize,
     itemCount: 20,
     visible: true
   })
@@ -78,7 +80,7 @@ export const FixedSizeListDemo = React.memo(() => {
     <div style={{ display: 'flex' }}>
       <ControlPanel options={options} setOptions={setOptions} />
 
-      {options.visible && <FixedSizeList options={options} />}
+      {options.visible && <WindowedList options={options} />}
     </div>
   )
 })
