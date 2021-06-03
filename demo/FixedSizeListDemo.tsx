@@ -15,6 +15,8 @@ const FixedSizeList = React.memo<{
     scrollTo,
     scrollToItem
   } = useWindowedList(options)
+  const { itemSize } = options
+  const getItemSize = typeof itemSize === 'function' ? itemSize : () => itemSize
 
   return (
     <div>
@@ -51,7 +53,7 @@ const FixedSizeList = React.memo<{
               data-testid="item"
               key={index}
               style={{
-                height: options.itemSize,
+                height: getItemSize(index),
                 background: index % 2 === 0 ? '#eee' : '#ddd'
               }}
             >

@@ -3,9 +3,56 @@ import { UseWindowedListOptions } from '../src'
 import { ScrollControl } from './ScrollControl'
 
 export interface ControlPanelOptions extends UseWindowedListOptions {
-  itemSize: number
   visible: boolean
 }
+
+const ItemSizePicker = React.memo<{
+  itemSize: number | ((index: number) => number)
+  setOptions: React.Dispatch<React.SetStateAction<ControlPanelOptions>>
+}>(({ itemSize, setOptions }) => {
+  if (typeof itemSize === 'number') {
+    return (
+      <input
+        data-testid="item-size-input"
+        type="number"
+        value={itemSize}
+        onChange={event =>
+          setOptions(current => ({
+            ...current,
+            itemSize: Number(event.target.value)
+          }))
+        }
+      />
+    )
+  }
+
+  const onChange = (x: number): void => {
+    setOptions(current => ({
+      ...current,
+      itemSize: (index: number) => x * itemSize(index)
+    }))
+  }
+
+  return (
+    <>
+      <button
+        data-testid="item-size-half"
+        type="button"
+        onClick={() => onChange(0.5)}
+      >
+        Half
+      </button>
+
+      <button
+        data-testid="item-size-double"
+        type="button"
+        onClick={() => onChange(2)}
+      >
+        Double
+      </button>
+    </>
+  )
+})
 
 export const ControlPanel = React.memo<{
   options: ControlPanelOptions
@@ -44,17 +91,7 @@ export const ControlPanel = React.memo<{
 
     <div>
       Item size{' '}
-      <input
-        data-testid="item-size-input"
-        type="number"
-        value={options.itemSize}
-        onChange={event =>
-          setOptions(current => ({
-            ...current,
-            itemSize: Number(event.target.value)
-          }))
-        }
-      />
+      <ItemSizePicker itemSize={options.itemSize} setOptions={setOptions} />
     </div>
 
     <div>
