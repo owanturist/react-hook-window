@@ -462,7 +462,7 @@ describe('dynamic position', () => {
       // move back up
       setDynamicScrollToItem(4, 'auto')
 
-      getItemByIndex(0).should('not.exist')
+      getItemByIndex(2).should('not.exist')
       getItemByIndex(3).should('be.visible') // visible because in the border
       getItemByIndex(4).should('be.visible')
       getItemByIndex(14).should('be.visible')

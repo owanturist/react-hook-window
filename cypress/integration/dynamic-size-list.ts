@@ -4,6 +4,10 @@ import {
   halfItemSize,
   setItemCount,
   setOverscanCount,
+  setInitialScrollTo,
+  setInitialScrollToItem,
+  setDynamicScrollTo,
+  setDynamicScrollToItem,
   getItemByIndex,
   checkRenderedItemsCount,
   checkContainerSize,
@@ -47,7 +51,7 @@ it('handles scrolling correctly', () => {
   checkRenderedItemsCount(10)
 
   // scroll to the down
-  scrollContainer({ y: 821 }) // 1330 - 510
+  scrollContainer({ y: 820 }) // 1330 - 510
 
   getItemByIndex(10).should('not.exist')
   getItemByIndex(11).should('not.be.visible')
@@ -306,4 +310,246 @@ it('handles overscan count change', () => {
   getItemByIndex(7).should('be.visible')
   getItemByIndex(8).should('not.exist')
   checkRenderedItemsCount(8)
+})
+
+describe('initial position', () => {
+  it('scrolls to px', () => {
+    setInitialScrollTo(387) // [0, 6)
+
+    getItemByIndex(4).should('not.exist')
+    getItemByIndex(5).should('not.be.visible')
+    getItemByIndex(6).should('be.visible')
+    getItemByIndex(13).should('be.visible')
+    getItemByIndex(14).should('not.be.visible')
+    getItemByIndex(15).should('not.exist')
+    checkRenderedItemsCount(10)
+
+    setInitialScrollTo(820) // 1330 - 510
+
+    getItemByIndex(10).should('not.exist')
+    getItemByIndex(11).should('not.be.visible')
+    getItemByIndex(12).should('be.visible')
+    getItemByIndex(19).should('be.visible')
+    checkRenderedItemsCount(9)
+  })
+
+  describe('scrolls to item', () => {
+    it('position: start', () => {
+      setInitialScrollToItem(6, 'start')
+
+      getItemByIndex(4).should('not.exist')
+      getItemByIndex(5).should('be.visible') // visible because in the border
+      getItemByIndex(6).should('be.visible')
+      getItemByIndex(13).should('be.visible')
+      getItemByIndex(14).should('not.be.visible')
+      getItemByIndex(15).should('not.exist')
+      checkRenderedItemsCount(10)
+    })
+
+    it('position: end', () => {
+      setInitialScrollToItem(17, 'end')
+
+      getItemByIndex(8).should('not.exist')
+      getItemByIndex(9).should('not.be.visible')
+      getItemByIndex(10).should('be.visible')
+      getItemByIndex(17).should('be.visible')
+      getItemByIndex(18).should('be.visible') // visible because in the border
+      getItemByIndex(19).should('not.exist')
+      checkRenderedItemsCount(10)
+    })
+
+    it('position: center', () => {
+      setInitialScrollToItem(13, 'center')
+
+      getItemByIndex(7).should('not.exist')
+      getItemByIndex(8).should('not.be.visible')
+      getItemByIndex(9).should('be.visible')
+      getItemByIndex(17).should('be.visible')
+      getItemByIndex(18).should('not.be.visible')
+      getItemByIndex(19).should('not.exist')
+      checkRenderedItemsCount(11)
+    })
+  })
+})
+
+describe('dynamic position', () => {
+  it('scrolls to px', () => {
+    setDynamicScrollTo(387) // [0, 6)
+
+    getItemByIndex(4).should('not.exist')
+    getItemByIndex(5).should('not.be.visible')
+    getItemByIndex(6).should('be.visible')
+    getItemByIndex(13).should('be.visible')
+    getItemByIndex(14).should('not.be.visible')
+    getItemByIndex(15).should('not.exist')
+    checkRenderedItemsCount(10)
+
+    setDynamicScrollTo(820) // 1330 - 510
+
+    getItemByIndex(10).should('not.exist')
+    getItemByIndex(11).should('not.be.visible')
+    getItemByIndex(12).should('be.visible')
+    getItemByIndex(19).should('be.visible')
+    checkRenderedItemsCount(9)
+  })
+
+  describe('scrolls to item', () => {
+    it('position: start', () => {
+      setDynamicScrollToItem(6, 'start')
+
+      getItemByIndex(4).should('not.exist')
+      getItemByIndex(5).should('be.visible') // visible because in the border
+      getItemByIndex(6).should('be.visible')
+      getItemByIndex(13).should('be.visible')
+      getItemByIndex(14).should('not.be.visible')
+      getItemByIndex(15).should('not.exist')
+      checkRenderedItemsCount(10)
+    })
+
+    it('position: end', () => {
+      setDynamicScrollToItem(17, 'end')
+
+      getItemByIndex(8).should('not.exist')
+      getItemByIndex(9).should('not.be.visible')
+      getItemByIndex(10).should('be.visible')
+      getItemByIndex(17).should('be.visible')
+      getItemByIndex(18).should('be.visible') // visible because in the border
+      getItemByIndex(19).should('not.exist')
+      checkRenderedItemsCount(10)
+    })
+
+    it('position: center', () => {
+      setDynamicScrollToItem(13, 'center')
+
+      getItemByIndex(7).should('not.exist')
+      getItemByIndex(8).should('not.be.visible')
+      getItemByIndex(9).should('be.visible')
+      getItemByIndex(17).should('be.visible')
+      getItemByIndex(18).should('not.be.visible')
+      getItemByIndex(19).should('not.exist')
+      checkRenderedItemsCount(11)
+    })
+
+    it('position: auto', () => {
+      // not scroll, already visible
+      setDynamicScrollToItem(4, 'auto')
+
+      getItemByIndex(0).should('be.visible')
+      getItemByIndex(7).should('be.visible')
+      getItemByIndex(8).should('not.be.visible')
+      getItemByIndex(9).should('not.exist')
+      checkRenderedItemsCount(9)
+
+      // move down a little bit untill almost fully visible item appears
+      setDynamicScrollToItem(7, 'auto')
+
+      getItemByIndex(0).should('be.visible')
+      getItemByIndex(7).should('be.visible')
+      getItemByIndex(8).should('be.visible') // visible because in the border
+      getItemByIndex(9).should('not.exist')
+      checkRenderedItemsCount(9)
+
+      // move down far
+      setDynamicScrollToItem(15, 'auto')
+
+      getItemByIndex(5).should('not.exist')
+      getItemByIndex(6).should('not.be.visible')
+      getItemByIndex(7).should('be.visible')
+      getItemByIndex(15).should('be.visible')
+      getItemByIndex(16).should('be.visible') // visible because in the border
+      getItemByIndex(17).should('not.exist')
+      checkRenderedItemsCount(11)
+
+      // no scroll, already visible
+      setDynamicScrollToItem(13, 'auto')
+
+      getItemByIndex(5).should('not.exist')
+      getItemByIndex(6).should('not.be.visible')
+      getItemByIndex(7).should('be.visible')
+      getItemByIndex(15).should('be.visible')
+      getItemByIndex(16).should('be.visible') // visible because in the border
+      getItemByIndex(17).should('not.exist')
+      checkRenderedItemsCount(11)
+
+      // move back up
+      setDynamicScrollToItem(4, 'auto')
+
+      getItemByIndex(2).should('not.exist')
+      getItemByIndex(3).should('be.visible') // visible because in the border
+      getItemByIndex(4).should('be.visible')
+      getItemByIndex(11).should('be.visible')
+      getItemByIndex(12).should('not.be.visible')
+      getItemByIndex(13).should('not.exist')
+      checkRenderedItemsCount(10)
+    })
+
+    it('position: smart', () => {
+      setItemCount(100)
+      checkContainerSize({
+        height: 510,
+        scrollHeight: 6684 // [0, 100)
+      })
+
+      // not scroll, already visible
+      setDynamicScrollToItem(4, 'smart')
+
+      getItemByIndex(0).should('be.visible')
+      getItemByIndex(7).should('be.visible')
+      getItemByIndex(8).should('not.be.visible')
+      getItemByIndex(9).should('not.exist')
+      checkRenderedItemsCount(9)
+
+      // move down a little bit untill almost fully visible item appears
+      setDynamicScrollToItem(7, 'smart')
+
+      getItemByIndex(0).should('be.visible')
+      getItemByIndex(7).should('be.visible')
+      getItemByIndex(8).should('be.visible') // visible because in the border
+      getItemByIndex(9).should('not.exist')
+      checkRenderedItemsCount(9)
+
+      // move down to item closer than 1 viewport
+      setDynamicScrollToItem(15, 'smart')
+
+      getItemByIndex(5).should('not.exist')
+      getItemByIndex(6).should('not.be.visible')
+      getItemByIndex(7).should('be.visible')
+      getItemByIndex(15).should('be.visible')
+      getItemByIndex(16).should('be.visible') // visible because in the border
+      getItemByIndex(17).should('not.exist')
+      checkRenderedItemsCount(11)
+
+      // move down to item further than 1 viewport
+      setDynamicScrollToItem(23, 'smart')
+
+      getItemByIndex(17).should('not.exist')
+      getItemByIndex(18).should('not.be.visible')
+      getItemByIndex(19).should('be.visible')
+      getItemByIndex(27).should('be.visible')
+      getItemByIndex(28).should('not.be.visible')
+      getItemByIndex(29).should('not.exist')
+      checkRenderedItemsCount(11)
+
+      // move up to item closer than 1 viewport
+      setDynamicScrollToItem(12, 'smart')
+
+      getItemByIndex(10).should('not.exist')
+      getItemByIndex(11).should('be.visible') // visible because in the border
+      getItemByIndex(12).should('be.visible')
+      getItemByIndex(19).should('be.visible')
+      getItemByIndex(20).should('not.be.visible')
+      getItemByIndex(21).should('not.exist')
+      checkRenderedItemsCount(10)
+
+      // move up to item further than 1 viewport
+      setDynamicScrollToItem(4, 'smart')
+
+      getItemByIndex(0).should('not.be.visible')
+      getItemByIndex(1).should('be.visible')
+      getItemByIndex(8).should('be.visible')
+      getItemByIndex(9).should('not.be.visible')
+      getItemByIndex(10).should('not.exist')
+      checkRenderedItemsCount(10)
+    })
+  })
 })
