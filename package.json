@@ -26,6 +26,7 @@
     "test": "jest ./tests",
     "test:watch": "yarn test -- --watch",
     "cy:open": "yarn cypress open",
+    "cy:run": "yarn cypress run",
     "lint": "eslint . --config=.eslintrc.prod.json --ext=js,ts",
     "prettify": "prettier . --write",
     "typecheck": "tsc -p tsconfig.json --noEmit",
