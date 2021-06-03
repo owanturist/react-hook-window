@@ -12,6 +12,14 @@ export const setItemSize = (height: number): void => {
   cy.findByTestId('item-size-input').fill(height.toString())
 }
 
+export const doubleItemSize = (): void => {
+  cy.findByTestId('item-size-double').click()
+}
+
+export const halfItemSize = (): void => {
+  cy.findByTestId('item-size-half').click()
+}
+
 export const setItemCount = (count: number): void => {
   cy.findByTestId('item-count-input').fill(count.toString())
 }
@@ -68,6 +76,7 @@ export const checkContainerSize = ({
   height: number
   scrollHeight: number
 }): void => {
+  cy.findByTestId('scrolling').should('not.be.checked')
   cy.findByTestId('container').as('container').should('be.visible')
   cy.get('@container').getClientHeight().should('eq', height)
   cy.get('@container').getScrollHeight().should('eq', scrollHeight)
