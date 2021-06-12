@@ -18,11 +18,13 @@ import {
 for (const layout of LIST_LAYOUTS) {
   describe(`Dynamic size ${layout} list`, () => {
     beforeEach(() => {
-      cy.visit(
-        layout === 'vertical'
-          ? '/dynamic-size-list'
-          : '/dynamic-size-list/horizontal'
-      )
+      if (layout === 'horizontal') {
+        cy.visit('/dynamic-size-list/horizontal')
+      } else if (layout === 'horizontal-rtl') {
+        cy.visit('/dynamic-size-list/horizontal-rtl')
+      } else {
+        cy.visit('/dynamic-size-list')
+      }
 
       checkContainerSize({
         layout,

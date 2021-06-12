@@ -4,9 +4,8 @@ import { DynamicScrollControl } from './ScrollControl'
 import { ControlPanelOptions, ControlPanel } from './ControlPanel'
 
 const WindowedList = React.memo<{
-  isVerticalLayout: boolean
   options: ControlPanelOptions
-}>(({ isVerticalLayout, options }) => {
+}>(({ options }) => {
   const {
     setRef,
     startSpace,
@@ -18,8 +17,11 @@ const WindowedList = React.memo<{
   } = useWindowedList(options)
   const { itemSize } = options
   const getItemSize = typeof itemSize === 'function' ? itemSize : () => itemSize
+  const isVertical = options.layout === 'vertical'
+  const isRTL = options.layout === 'horizontal-rtl'
+
   const makeStyles = (px: number): React.CSSProperties => {
-    return isVerticalLayout ? { height: px } : { flex: `0 0 ${px}px` }
+    return isVertical ? { height: px } : { flex: `0 0 ${px}px` }
   }
 
   return (
@@ -41,12 +43,13 @@ const WindowedList = React.memo<{
         data-testid="container"
         ref={setRef}
         style={{
-          display: isVerticalLayout ? 'block' : 'flex',
-          flexDirection: isVerticalLayout ? 'unset' : 'row',
+          display: isVertical ? 'block' : 'flex',
+          flexDirection: isVertical ? 'unset' : 'row',
+          direction: isRTL ? 'rtl' : 'inherit',
           overflow: 'auto',
           boxShadow: '0 0 0 2px #888',
-          width: isVerticalLayout ? 400 : options.containerSize,
-          height: isVerticalLayout ? options.containerSize : 400
+          width: isVertical ? 400 : options.containerSize,
+          height: isVertical ? options.containerSize : 400
         }}
       >
         <div style={makeStyles(startSpace)} />
@@ -84,12 +87,7 @@ export const WindowedListDemo = React.memo<{
     <div style={{ display: 'flex' }}>
       <ControlPanel options={options} setOptions={setOptions} />
 
-      {options.visible && (
-        <WindowedList
-          isVerticalLayout={layout === 'vertical'}
-          options={options}
-        />
-      )}
+      {options.visible && <WindowedList options={options} />}
     </div>
   )
 })

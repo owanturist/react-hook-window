@@ -1,6 +1,10 @@
 import { useRef, useState, useEffect, useMemo } from 'react'
 import throttle from 'lodash.throttle'
 import debounce from 'lodash.debounce'
+import {
+  setNormalizedScrollLeft,
+  getNormalizedScrollLeft
+} from 'normalize-scroll-left'
 
 import { usePermanent } from './use-permanent'
 import { useRefCallback } from './use-ref-callback'
@@ -13,15 +17,41 @@ const DEFAULT_OVERSCAN_COUNT = 1
 const DEFAULT_SCROLL_THROTTLE_MS = 16 // ~ 60fps
 const IS_SCROLLING_DEBOUNCE_MS = 150
 
-const scrollTo = (
+const layoutDirection = (layout: ListLayout): 'rtl' | 'ltr' => {
+  return layout === 'horizontal-rtl' ? 'rtl' : 'ltr'
+}
+
+const getLayoutScroll = (node: HTMLElement, layout: ListLayout): number => {
+  if (layout === 'vertical') {
+    return node.scrollTop
+  }
+
+  if (layout === 'horizontal') {
+    return node.scrollLeft
+  }
+
+  return (
+    node.scrollWidth -
+    node.clientWidth -
+    getNormalizedScrollLeft(node, layoutDirection(layout))
+  )
+}
+
+const scrollLayoutTo = (
   node: HTMLElement,
-  isVerticalLayout: boolean,
+  layout: ListLayout,
   position: number
 ): void => {
-  if (isVerticalLayout) {
-    node.scrollTo(node.scrollLeft, position)
+  if (layout === 'vertical') {
+    node.scrollTop = position
+  } else if (layout === 'horizontal') {
+    node.scrollLeft = position
   } else {
-    node.scrollTo(position, node.scrollTop)
+    setNormalizedScrollLeft(
+      node,
+      node.scrollWidth - node.clientWidth - position,
+      layoutDirection(layout)
+    )
   }
 }
 
@@ -64,7 +94,7 @@ export interface ListRenderedRange {
   visibleStop: number
 }
 
-export type ListLayout = 'vertical' | 'horizontal'
+export type ListLayout = 'vertical' | 'horizontal' | 'horizontal-rtl'
 
 export type InitialListScroll =
   | number
@@ -103,7 +133,6 @@ export const useWindowedList = <E extends HTMLElement>({
   onItemsRendered
 }: UseWindowedListOptions): UseWindowedListResult<E> => {
   // it wants to keep track when a container gets changed
-  const isVerticalLayout = layout === 'vertical'
   const [container, setContainer] = useState<null | E>(null)
   const onScrollRef = useRef<(scrollTop: number) => void>(noop)
   const onScrollingRef = useRef<VoidFunction>(noop)
@@ -148,27 +177,25 @@ export const useWindowedList = <E extends HTMLElement>({
   // set initial scroll
   useEffect(() => {
     if (container != null) {
-      scrollTo(
+      scrollLayoutTo(
         container,
-        isVerticalLayout,
+        layout,
         calcInitialScroll(initialScroll, viewport, containerSize)
       )
     }
 
     // it does not want to watch the values' changes on purpose
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [container, isVerticalLayout])
+  }, [container, layout])
 
   // props.height and props.itemHeight monitor
   useEffect(() => {
     if (container != null) {
-      const scrollPosition = isVerticalLayout
-        ? container.scrollTop
-        : container.scrollLeft
+      const scrollPosition = getLayoutScroll(container, layout)
 
       setBoundaries(viewport.calcBoundaries(containerSize, scrollPosition))
     }
-  }, [setBoundaries, container, isVerticalLayout, viewport, containerSize])
+  }, [setBoundaries, container, layout, viewport, containerSize])
 
   // define onScrolling handler
   useEffect(() => {
@@ -222,11 +249,9 @@ export const useWindowedList = <E extends HTMLElement>({
 
     return onPassiveScroll(container, () => {
       onScrollingRef.current()
-      onScrollRef.current(
-        isVerticalLayout ? container.scrollTop : container.scrollLeft
-      )
+      onScrollRef.current(getLayoutScroll(container, layout))
     })
-  }, [container, isVerticalLayout])
+  }, [container, layout])
 
   return {
     isScrolling,
@@ -249,21 +274,21 @@ export const useWindowedList = <E extends HTMLElement>({
 
     scrollTo: useRefCallback(px => {
       if (container != null) {
-        scrollTo(container, isVerticalLayout, px)
+        scrollLayoutTo(container, layout, px)
       }
     }),
 
     scrollToItem: useRefCallback((index, position = 'auto') => {
       if (container != null) {
-        scrollTo(
+        scrollLayoutTo(
           container,
-          isVerticalLayout,
+          layout,
           calcScrollPosition(
             position,
             viewport.getSpaceBefore(index),
             viewport.getItemSize(index),
             containerSize,
-            isVerticalLayout ? container.scrollTop : container.scrollLeft
+            getLayoutScroll(container, layout)
           )
         )
       }

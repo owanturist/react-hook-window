@@ -69,11 +69,12 @@ export const checkRenderedItemsCount = (count: number): void => {
   cy.findAllByTestId('item').should('have.length', count)
 }
 
-export type ListLayout = 'vertical' | 'horizontal'
+export type ListLayout = 'vertical' | 'horizontal' | 'horizontal-rtl'
 
 export const LIST_LAYOUTS: ReadonlyArray<ListLayout> = [
   'vertical',
-  'horizontal'
+  'horizontal',
+  'horizontal-rtl'
 ]
 
 export const checkContainerSize = ({
@@ -109,7 +110,12 @@ export const scrollContainer = ({
   layout: ListLayout
   scroll: number
 }): void => {
-  const [x, y] = layout === 'vertical' ? [0, scroll] : [scroll, 0]
+  const [x, y] =
+    layout === 'vertical'
+      ? [0, scroll]
+      : layout === 'horizontal'
+      ? [scroll, 0]
+      : [-scroll, 0]
 
   cy.findByTestId('container').scrollTo(x, y, { duration: 30 })
 }

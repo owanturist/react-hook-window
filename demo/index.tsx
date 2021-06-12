@@ -33,12 +33,20 @@ ReactDOM.render(
           <WindowedListDemo itemSize={50} layout="horizontal" />
         </Route>
 
+        <Route exact strict path="/fixed-size-list/horizontal-rtl">
+          <WindowedListDemo itemSize={50} layout="horizontal-rtl" />
+        </Route>
+
         <Route exact strict path="/dynamic-size-list">
           <WindowedListDemo itemSize={getItemSize} />
         </Route>
 
         <Route exact strict path="/dynamic-size-list/horizontal">
           <WindowedListDemo itemSize={getItemSize} layout="horizontal" />
+        </Route>
+
+        <Route exact strict path="/dynamic-size-list/horizontal-rtl">
+          <WindowedListDemo itemSize={getItemSize} layout="horizontal-rtl" />
         </Route>
 
         <Route>
@@ -54,12 +62,24 @@ ReactDOM.render(
             </li>
 
             <li>
+              <Link to="/fixed-size-list/horizontal-rtl">
+                Horizontal Fixed Size RTL List
+              </Link>
+            </li>
+
+            <li>
               <Link to="/dynamic-size-list">Dynamic Size List</Link>
             </li>
 
             <li>
               <Link to="/dynamic-size-list/horizontal">
                 Horizontal Dynamic Size List
+              </Link>
+            </li>
+
+            <li>
+              <Link to="/dynamic-size-list/horizontal-rtl">
+                Horizontal Dynamic Size RTL List
               </Link>
             </li>
           </ul>

@@ -17,11 +17,13 @@ import {
 for (const layout of LIST_LAYOUTS) {
   describe(`Fixed size ${layout} list`, () => {
     beforeEach(() => {
-      cy.visit(
-        layout === 'vertical'
-          ? '/fixed-size-list'
-          : '/fixed-size-list/horizontal'
-      )
+      if (layout === 'horizontal') {
+        cy.visit('/fixed-size-list/horizontal')
+      } else if (layout === 'horizontal-rtl') {
+        cy.visit('/fixed-size-list/horizontal-rtl')
+      } else {
+        cy.visit('/fixed-size-list')
+      }
 
       checkContainerSize({
         layout,

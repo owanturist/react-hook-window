@@ -91,7 +91,8 @@
   },
   "dependencies": {
     "lodash.debounce": "^4.0.8",
-    "lodash.throttle": "^4.1.1"
+    "lodash.throttle": "^4.1.1",
+    "normalize-scroll-left": "^0.2.1"
   },
   "jest": {
     "testEnvironment": "jsdom"
