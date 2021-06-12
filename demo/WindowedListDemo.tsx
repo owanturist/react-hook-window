@@ -18,6 +18,9 @@ const WindowedList = React.memo<{
   } = useWindowedList(options)
   const { itemSize } = options
   const getItemSize = typeof itemSize === 'function' ? itemSize : () => itemSize
+  const makeStyles = (px: number): React.CSSProperties => {
+    return isVerticalLayout ? { height: px } : { flex: `0 0 ${px}px` }
+  }
 
   return (
     <div>
@@ -38,28 +41,28 @@ const WindowedList = React.memo<{
         data-testid="container"
         ref={setRef}
         style={{
-          display: 'flex',
-          flexDirection: isVerticalLayout ? 'column' : 'row',
+          display: isVerticalLayout ? 'block' : 'flex',
+          flexDirection: isVerticalLayout ? 'unset' : 'row',
           overflow: 'auto',
           boxShadow: '0 0 0 2px #888',
           width: isVerticalLayout ? 400 : options.containerSize,
           height: isVerticalLayout ? options.containerSize : 400
         }}
       >
-        <div style={{ flex: `1 0 ${startSpace}px` }} />
+        <div style={makeStyles(startSpace)} />
         {indexes.map(index => (
           <div
             data-testid="item"
             key={index}
             style={{
-              flex: `1 0 ${getItemSize(index)}px`,
+              ...makeStyles(getItemSize(index)),
               background: index % 2 === 0 ? '#eee' : '#ddd'
             }}
           >
             #{index}
           </div>
         ))}
-        <div style={{ flex: `1 0 ${endSpace}px` }} />
+        <div style={makeStyles(endSpace)} />
       </div>
     </div>
   )

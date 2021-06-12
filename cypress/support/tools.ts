@@ -69,25 +69,47 @@ export const checkRenderedItemsCount = (count: number): void => {
   cy.findAllByTestId('item').should('have.length', count)
 }
 
+export type ListLayout = 'vertical' | 'horizontal'
+
+export const LIST_LAYOUTS: ReadonlyArray<ListLayout> = [
+  'vertical',
+  'horizontal'
+]
+
 export const checkContainerSize = ({
-  height,
-  scrollHeight
+  layout,
+  size,
+  scrollSize
 }: {
-  height: number
-  scrollHeight: number
+  layout: ListLayout
+  size: number
+  scrollSize: number
 }): void => {
   cy.findByTestId('scrolling').should('not.be.checked')
-  cy.findByTestId('container').as('container').should('be.visible')
-  cy.get('@container').getClientHeight().should('eq', height)
-  cy.get('@container').getScrollHeight().should('eq', scrollHeight)
+  cy.findByTestId('container')
+    .as('container')
+    .should('be.visible')
+    .should($ => {
+      const node = $.get(0)
+
+      if (layout === 'vertical') {
+        assert.equal(node.clientHeight, size)
+        assert.equal(node.scrollHeight, scrollSize)
+      } else {
+        assert.equal(node.clientWidth, size)
+        assert.equal(node.scrollWidth, scrollSize)
+      }
+    })
 }
 
 export const scrollContainer = ({
-  x = 0,
-  y = 0
+  layout,
+  scroll
 }: {
-  x?: number
-  y?: number
+  layout: ListLayout
+  scroll: number
 }): void => {
+  const [x, y] = layout === 'vertical' ? [0, scroll] : [scroll, 0]
+
   cy.findByTestId('container').scrollTo(x, y, { duration: 30 })
 }

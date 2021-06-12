@@ -21,13 +21,8 @@ import './commands'
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace, @typescript-eslint/no-unused-vars
-  namespace Cypress {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
-    interface Chainable<Subject = any, T = any> {
-      getScrollHeight(): Chainable<number>
-      getClientHeight(): Chainable<number>
-    }
-  }
-}
+// declare global {
+//   namespace Cypress {
+//     interface Chainable<Subject = any, T = any> {}
+//   }
+// }
