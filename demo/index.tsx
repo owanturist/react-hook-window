@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { BrowserRouter, Switch, Route } from 'react-router-dom'
+import { BrowserRouter, Switch, Route, Link } from 'react-router-dom'
 import { WindowedListDemo } from './WindowedListDemo'
 
 const dynamicItemSizes = `
@@ -29,8 +29,30 @@ ReactDOM.render(
           <WindowedListDemo itemSize={50} />
         </Route>
 
+        <Route exact strict path="/fixed-size-list/horizontal">
+          <WindowedListDemo itemSize={50} layout="horizontal" />
+        </Route>
+
         <Route exact strict path="/dynamic-size-list">
           <WindowedListDemo itemSize={getItemSize} />
+        </Route>
+
+        <Route>
+          <ul>
+            <li>
+              <Link to="/fixed-size-list">Fixed Size List</Link>
+            </li>
+
+            <li>
+              <Link to="/fixed-size-list/horizontal">
+                Horizontal Fixed Size List
+              </Link>
+            </li>
+
+            <li>
+              <Link to="/dynamic-size-list">Dynamic Size List</Link>
+            </li>
+          </ul>
         </Route>
       </Switch>
     </BrowserRouter>

@@ -149,11 +149,12 @@ it('handles item resizing', () => {
     scrollHeight: 1200 // 60px * 20
   })
 
-  getItemByIndex(0).should('not.be.visible')
-  getItemByIndex(1).should('be.visible')
-  getItemByIndex(9).should('be.visible')
-  getItemByIndex(10).should('be.visible')
-  getItemByIndex(11).should('not.exist')
+  getItemByIndex(1).should('not.exist')
+  getItemByIndex(2).should('be.visible') // visible because in the border
+  getItemByIndex(3).should('be.visible')
+  getItemByIndex(11).should('be.visible')
+  getItemByIndex(12).should('not.be.visible')
+  getItemByIndex(13).should('not.exist')
   checkRenderedItemsCount(11)
 })
 

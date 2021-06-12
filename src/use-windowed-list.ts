@@ -13,6 +13,18 @@ const DEFAULT_OVERSCAN_COUNT = 1
 const DEFAULT_SCROLL_THROTTLE_MS = 16 // ~ 60fps
 const IS_SCROLLING_DEBOUNCE_MS = 150
 
+const scrollTo = (
+  node: HTMLElement,
+  isVerticalLayout: boolean,
+  position: number
+): void => {
+  if (isVerticalLayout) {
+    node.scrollTo(node.scrollLeft, position)
+  } else {
+    node.scrollTo(position, node.scrollTop)
+  }
+}
+
 const calcInitialScroll = (
   options: InitialListScroll,
   viewport: ListViewport,
@@ -52,6 +64,8 @@ export interface ListRenderedRange {
   visibleStop: number
 }
 
+export type ListLayout = 'vertical' | 'horizontal'
+
 export type InitialListScroll =
   | number
   | { index: number; position?: ScrollPosition }
@@ -61,6 +75,7 @@ export interface UseWindowedListOptions {
   itemSize: number | ((index: number) => number)
   itemCount: number
   overscanCount?: number
+  layout?: ListLayout
   initialScroll?: InitialListScroll
   scrollThrottling?: number
   onItemsRendered?(renderedRange: ListRenderedRange): void
@@ -82,14 +97,16 @@ export const useWindowedList = <E extends HTMLElement>({
   itemSize,
   itemCount,
   overscanCount = DEFAULT_OVERSCAN_COUNT,
+  layout = 'vertical',
   initialScroll = 0,
   scrollThrottling = DEFAULT_SCROLL_THROTTLE_MS,
   onItemsRendered
 }: UseWindowedListOptions): UseWindowedListResult<E> => {
   // it wants to keep track when a container gets changed
+  const isVerticalLayout = layout === 'vertical'
   const [container, setContainer] = useState<null | E>(null)
   const onScrollRef = useRef<(scrollTop: number) => void>(noop)
-  const onScrollingRef = useRef<() => void>(noop)
+  const onScrollingRef = useRef<VoidFunction>(noop)
 
   const viewport = useMemo(
     () => initListViewport(itemSize, itemCount),
@@ -130,20 +147,28 @@ export const useWindowedList = <E extends HTMLElement>({
 
   // set initial scroll
   useEffect(() => {
-    container?.scrollTo(
-      container.scrollLeft,
-      calcInitialScroll(initialScroll, viewport, containerSize)
-    )
+    if (container != null) {
+      scrollTo(
+        container,
+        isVerticalLayout,
+        calcInitialScroll(initialScroll, viewport, containerSize)
+      )
+    }
+
     // it does not want to watch the values' changes on purpose
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [container])
+  }, [container, isVerticalLayout])
 
   // props.height and props.itemHeight monitor
   useEffect(() => {
     if (container != null) {
-      setBoundaries(viewport.calcBoundaries(containerSize, container.scrollTop))
+      const scrollPosition = isVerticalLayout
+        ? container.scrollTop
+        : container.scrollLeft
+
+      setBoundaries(viewport.calcBoundaries(containerSize, scrollPosition))
     }
-  }, [setBoundaries, container, viewport, containerSize])
+  }, [setBoundaries, container, isVerticalLayout, viewport, containerSize])
 
   // define onScrolling handler
   useEffect(() => {
@@ -174,8 +199,8 @@ export const useWindowedList = <E extends HTMLElement>({
   // define onScroll handler
   useEffect(() => {
     const onScroll = throttle(
-      (scrollTop: number) => {
-        setBoundaries(viewport.calcBoundaries(containerSize, scrollTop))
+      (scrollPosition: number) => {
+        setBoundaries(viewport.calcBoundaries(containerSize, scrollPosition))
       },
       scrollThrottling,
       // execute on END of interval so it always applies actual boundaries
@@ -197,9 +222,11 @@ export const useWindowedList = <E extends HTMLElement>({
 
     return onPassiveScroll(container, () => {
       onScrollingRef.current()
-      onScrollRef.current(container.scrollTop)
+      onScrollRef.current(
+        isVerticalLayout ? container.scrollTop : container.scrollLeft
+      )
     })
-  }, [container])
+  }, [container, isVerticalLayout])
 
   return {
     isScrolling,
@@ -221,20 +248,25 @@ export const useWindowedList = <E extends HTMLElement>({
     indexes: useMemo(() => range(start, stop), [start, stop]),
 
     scrollTo: useRefCallback(px => {
-      container?.scrollTo(container.scrollLeft, px)
+      if (container != null) {
+        scrollTo(container, isVerticalLayout, px)
+      }
     }),
 
     scrollToItem: useRefCallback((index, position = 'auto') => {
-      container?.scrollTo(
-        container.scrollLeft,
-        calcScrollPosition(
-          position,
-          viewport.getSpaceBefore(index),
-          viewport.getItemSize(index),
-          containerSize,
-          container.scrollTop
+      if (container != null) {
+        scrollTo(
+          container,
+          isVerticalLayout,
+          calcScrollPosition(
+            position,
+            viewport.getSpaceBefore(index),
+            viewport.getItemSize(index),
+            containerSize,
+            isVerticalLayout ? container.scrollTop : container.scrollLeft
+          )
         )
-      )
+      }
     })
   }
 }

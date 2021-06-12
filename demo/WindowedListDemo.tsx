@@ -1,11 +1,12 @@
 import React from 'react'
-import { useWindowedList } from '../src'
+import { ListLayout, useWindowedList } from '../src'
 import { DynamicScrollControl } from './ScrollControl'
 import { ControlPanelOptions, ControlPanel } from './ControlPanel'
 
 const WindowedList = React.memo<{
+  isVerticalLayout: boolean
   options: ControlPanelOptions
-}>(({ options }) => {
+}>(({ isVerticalLayout, options }) => {
   const {
     setRef,
     startSpace,
@@ -37,42 +38,42 @@ const WindowedList = React.memo<{
         data-testid="container"
         ref={setRef}
         style={{
+          display: 'flex',
+          flexDirection: isVerticalLayout ? 'column' : 'row',
           overflow: 'auto',
           boxShadow: '0 0 0 2px #888',
-          height: options.containerSize
+          width: isVerticalLayout ? 400 : options.containerSize,
+          height: isVerticalLayout ? options.containerSize : 400
         }}
       >
-        <div
-          style={{
-            paddingTop: startSpace,
-            paddingBottom: endSpace
-          }}
-        >
-          {indexes.map(index => (
-            <div
-              data-testid="item"
-              key={index}
-              style={{
-                height: getItemSize(index),
-                background: index % 2 === 0 ? '#eee' : '#ddd'
-              }}
-            >
-              Item #{index}
-            </div>
-          ))}
-        </div>
+        <div style={{ flex: `1 0 ${startSpace}px` }} />
+        {indexes.map(index => (
+          <div
+            data-testid="item"
+            key={index}
+            style={{
+              flex: `1 0 ${getItemSize(index)}px`,
+              background: index % 2 === 0 ? '#eee' : '#ddd'
+            }}
+          >
+            #{index}
+          </div>
+        ))}
+        <div style={{ flex: `1 0 ${endSpace}px` }} />
       </div>
     </div>
   )
 })
 
 export const WindowedListDemo = React.memo<{
+  layout?: ListLayout
   itemSize: number | ((index: number) => number)
-}>(({ itemSize }) => {
+}>(({ layout = 'vertical', itemSize }) => {
   const [options, setOptions] = React.useState<ControlPanelOptions>({
     containerSize: 510,
     itemSize,
     itemCount: 20,
+    layout,
     visible: true
   })
 
@@ -80,7 +81,12 @@ export const WindowedListDemo = React.memo<{
     <div style={{ display: 'flex' }}>
       <ControlPanel options={options} setOptions={setOptions} />
 
-      {options.visible && <WindowedList options={options} />}
+      {options.visible && (
+        <WindowedList
+          isVerticalLayout={layout === 'vertical'}
+          options={options}
+        />
+      )}
     </div>
   )
 })

@@ -156,13 +156,13 @@ it('handles item resizing', () => {
     scrollHeight: 1330 // [0, 20)
   })
 
-  getItemByIndex(0).should('not.exist')
-  getItemByIndex(1).should('not.be.visible')
-  getItemByIndex(2).should('be.visible')
-  getItemByIndex(9).should('be.visible')
-  getItemByIndex(10).should('not.be.visible')
-  getItemByIndex(11).should('not.exist')
-  checkRenderedItemsCount(10)
+  getItemByIndex(2).should('not.exist')
+  getItemByIndex(3).should('not.be.visible')
+  getItemByIndex(4).should('be.visible')
+  getItemByIndex(12).should('be.visible')
+  getItemByIndex(13).should('not.be.visible')
+  getItemByIndex(14).should('not.exist')
+  checkRenderedItemsCount(11)
 })
 
 it('handles item count change', () => {

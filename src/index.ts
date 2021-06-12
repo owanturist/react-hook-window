@@ -1,6 +1,7 @@
 export type { ScrollPosition } from './scroll-position'
 
 export type {
+  ListLayout,
   InitialListScroll,
   ListRenderedRange,
   UseWindowedListOptions,

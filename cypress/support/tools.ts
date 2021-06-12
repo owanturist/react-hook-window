@@ -62,7 +62,7 @@ export const setDynamicScrollToItem = (
 export const getItemByIndex = (
   index: number
 ): Cypress.Chainable<JQuery<HTMLElement>> => {
-  return cy.findByText(`Item #${index}`)
+  return cy.findByText(`#${index}`)
 }
 
 export const checkRenderedItemsCount = (count: number): void => {
