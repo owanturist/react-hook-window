@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useEffect } from 'react'
 
 const calcUnloadedRanges = (
   isLoaded: (index: number) => boolean,
@@ -32,38 +32,40 @@ const calcUnloadedRanges = (
   return ranges
 }
 
-export interface InfiniteLoaderRenderedRange {
-  overscanStart: number
-  overscanStop: number
+export interface LoadMoreItemsOptions {
+  startIndex: number
+  stopIndex: number
+  count: number
 }
 
 export interface UseInfiniteLoaderOptions {
+  isScrolling: boolean
+  overscanStart: number
+  overscanStop: number
   isItemLoaded(index: number): boolean
-  loadMoreItems(startIndex: number, stopIndex: number): void
-}
-
-export interface UseInfiniteLoaderResult {
-  onItemsRendered(renderedRange: InfiniteLoaderRenderedRange): void
+  loadMoreItems(options: LoadMoreItemsOptions): void
 }
 
 export const useInfiniteLoader = ({
+  isScrolling,
+  overscanStart,
+  overscanStop,
   isItemLoaded,
   loadMoreItems
-}: UseInfiniteLoaderOptions): UseInfiniteLoaderResult => {
-  const onItemsRendered = useCallback(
-    ({ overscanStart, overscanStop }: InfiniteLoaderRenderedRange) => {
-      const ranges = calcUnloadedRanges(
-        isItemLoaded,
-        overscanStart,
-        overscanStop
-      )
+}: UseInfiniteLoaderOptions): void => {
+  useEffect(() => {
+    if (isScrolling) {
+      return
+    }
 
-      for (const [start, stop] of ranges) {
-        loadMoreItems(start, stop)
-      }
-    },
-    [isItemLoaded, loadMoreItems]
-  )
+    const ranges = calcUnloadedRanges(isItemLoaded, overscanStart, overscanStop)
 
-  return { onItemsRendered }
+    for (const [startIndex, stopIndex] of ranges) {
+      loadMoreItems({
+        startIndex,
+        stopIndex,
+        count: stopIndex - startIndex
+      })
+    }
+  }, [isScrolling, overscanStart, overscanStop, isItemLoaded, loadMoreItems])
 }

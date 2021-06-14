@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter, Switch, Route, Link } from 'react-router-dom'
 import { WindowedListDemo } from './WindowedListDemo'
+import { InfiniteLoaderDemo } from './InfiniteLoaderDemo'
 
 const dynamicItemSizes = `
   48 84 78 86 46 44 76 78 88 56 _684px
@@ -49,6 +50,10 @@ ReactDOM.render(
           <WindowedListDemo itemSize={getItemSize} layout="horizontal-rtl" />
         </Route>
 
+        <Route exact strict path="/infinite-loader">
+          <InfiniteLoaderDemo />
+        </Route>
+
         <Route>
           <ul>
             <li>
@@ -81,6 +86,10 @@ ReactDOM.render(
               <Link to="/dynamic-size-list/horizontal-rtl">
                 Horizontal Dynamic Size RTL List
               </Link>
+            </li>
+
+            <li>
+              <Link to="infinite-loader">Infinite Loader</Link>
             </li>
           </ul>
         </Route>

@@ -9,8 +9,5 @@ export type {
 } from './use-windowed-list'
 export { useWindowedList } from './use-windowed-list'
 
-export type {
-  UseInfiniteLoaderOptions,
-  UseInfiniteLoaderResult
-} from './use-infinite-loader'
+export type { UseInfiniteLoaderOptions } from './use-infinite-loader'
 export { useInfiniteLoader } from './use-infinite-loader'
