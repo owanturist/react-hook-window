@@ -1,4 +1,4 @@
-import React from 'react'
+import * as React from 'react'
 import { ListLayout, useWindowedList } from '../src'
 import { DynamicScrollControl } from './ScrollControl'
 import { ControlPanelOptions, ControlPanel } from './ControlPanel'

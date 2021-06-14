@@ -1,8 +1,9 @@
-import React from 'react'
+import * as React from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter, Switch, Route, Link } from 'react-router-dom'
 import { WindowedListDemo } from './WindowedListDemo'
 import { InfiniteLoaderDemo } from './InfiniteLoaderDemo'
+import { TrelloDemo } from './TrelloDemo'
 
 const dynamicItemSizes = `
   48 84 78 86 46 44 76 78 88 56 _684px
@@ -54,6 +55,10 @@ ReactDOM.render(
           <InfiniteLoaderDemo />
         </Route>
 
+        <Route exact strict path="/trello">
+          <TrelloDemo />
+        </Route>
+
         <Route>
           <ul>
             <li>
@@ -90,6 +95,10 @@ ReactDOM.render(
 
             <li>
               <Link to="/infinite-loader">Infinite Loader</Link>
+            </li>
+
+            <li>
+              <Link to="/trello">trello</Link>
             </li>
           </ul>
         </Route>

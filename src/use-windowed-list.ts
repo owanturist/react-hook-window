@@ -114,6 +114,7 @@ export interface UseWindowedListOptions {
 
 export interface UseWindowedListResult<E extends HTMLElement>
   extends ListRenderedRange {
+  container: null | E
   startSpace: number
   endSpace: number
   indexes: Array<number>
@@ -261,6 +262,7 @@ export const useWindowedList = <E extends HTMLElement>({
   }, [container, layout])
 
   return {
+    container,
     isScrolling,
     setRef: setContainer,
 

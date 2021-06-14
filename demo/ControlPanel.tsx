@@ -1,4 +1,4 @@
-import React from 'react'
+import * as React from 'react'
 import { UseWindowedListOptions } from '../src'
 import { ScrollControl } from './ScrollControl'
 
