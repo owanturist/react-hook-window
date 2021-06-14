@@ -8,7 +8,7 @@ export const clamp = (min: number, max: number, value: number): number => {
   return Math.max(min, Math.min(value, max))
 }
 
-export const range = (from: number, to: number): ReadonlyArray<number> => {
+export const range = (from: number, to: number): Array<number> => {
   const N = Math.max(0, to - from)
   const acc = new Array<number>(N)
 

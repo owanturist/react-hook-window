@@ -89,7 +89,7 @@ ReactDOM.render(
             </li>
 
             <li>
-              <Link to="infinite-loader">Infinite Loader</Link>
+              <Link to="/infinite-loader">Infinite Loader</Link>
             </li>
           </ul>
         </Route>

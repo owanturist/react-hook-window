@@ -116,7 +116,7 @@ export interface UseWindowedListResult<E extends HTMLElement>
   extends ListRenderedRange {
   startSpace: number
   endSpace: number
-  indexes: ReadonlyArray<number>
+  indexes: Array<number>
   isScrolling: boolean
   setRef(node: null | E): void
   scrollTo(px: number): void
