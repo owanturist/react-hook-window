@@ -168,6 +168,52 @@ const InfinitePagedLoaderDemo = React.memo(() => {
   )
 })
 
+const UndefinitePagedLoaderDemo = React.memo(() => {
+  const containerSize = 500
+  const itemSize = 30
+  const pageSize = 10
+  const [items, setItems] = React.useState<ReadonlyArray<string>>([])
+  const isItemLoaded = React.useCallback(index => index < items.length, [items])
+
+  const {
+    setRef,
+    startSpace,
+    endSpace,
+    indexes,
+    isScrolling,
+    overscanStart,
+    overscanStop
+  } = useWindowedList({
+    containerSize,
+    itemSize,
+    itemCount: items.length + 1
+  })
+
+  useInfiniteLoader({
+    isScrolling,
+    overscanStart,
+    overscanStop,
+    isItemLoaded,
+    loadMoreItems: React.useCallback(() => {
+      loadRange(items.length, pageSize, 200).then(data => {
+        setItems(current => [...current, ...data])
+      })
+    }, [items.length])
+  })
+
+  return (
+    <ItemsList
+      ref={setRef}
+      containerSize={containerSize}
+      itemSize={itemSize}
+      indexes={indexes}
+      startSpace={startSpace}
+      endSpace={endSpace}
+      getItemData={index => (index < items.length ? items[index] : null)}
+    />
+  )
+})
+
 export const InfiniteLoaderDemo: React.VFC = () => (
   <div style={{ display: 'flex' }}>
     <InfiniteRangeLoaderDemo />
@@ -175,5 +221,9 @@ export const InfiniteLoaderDemo: React.VFC = () => (
     <div style={{ width: 30 }} />
 
     <InfinitePagedLoaderDemo />
+
+    <div style={{ width: 30 }} />
+
+    <UndefinitePagedLoaderDemo />
   </div>
 )
