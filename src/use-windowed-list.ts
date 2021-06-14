@@ -15,7 +15,7 @@ import { noop, range, onPassiveScroll, positive } from './helpers'
 
 const DEFAULT_OVERSCAN_COUNT = 1
 const DEFAULT_SCROLL_THROTTLE_MS = 16 // ~ 60fps
-const IS_SCROLLING_DEBOUNCE_MS = 150
+const DEFAULT_IS_SCROLLING_DEBOUNCE_MS = 150
 
 const layoutDirection = (layout: ListLayout): 'rtl' | 'ltr' => {
   return layout === 'horizontal-rtl' ? 'rtl' : 'ltr'
@@ -107,8 +107,8 @@ export interface UseWindowedListOptions {
   overscanCount?: number
   layout?: ListLayout
   initialScroll?: InitialListScroll
-  scrollThrottling?: number
-  isScrollingDebouncing?: number
+  containerOnScrollThrottleInterval?: number
+  containerIsScrollingDebounceInterval?: number
   onItemsRendered?(renderedRange: ListRenderedRange): void
 }
 
@@ -130,8 +130,8 @@ export const useWindowedList = <E extends HTMLElement>({
   overscanCount = DEFAULT_OVERSCAN_COUNT,
   layout = 'vertical',
   initialScroll = 0,
-  scrollThrottling = DEFAULT_SCROLL_THROTTLE_MS,
-  isScrollingDebouncing = IS_SCROLLING_DEBOUNCE_MS,
+  containerOnScrollThrottleInterval = DEFAULT_SCROLL_THROTTLE_MS,
+  containerIsScrollingDebounceInterval = DEFAULT_IS_SCROLLING_DEBOUNCE_MS,
   onItemsRendered
 }: UseWindowedListOptions): UseWindowedListResult<E> => {
   // it wants to keep track when a container gets changed
@@ -203,13 +203,13 @@ export const useWindowedList = <E extends HTMLElement>({
   useEffect(() => {
     const onScrollBegin = debounce(
       () => setIsScrolling(true),
-      isScrollingDebouncing,
+      containerIsScrollingDebounceInterval,
       { leading: true, trailing: false }
     )
 
     const onScrollEnd = debounce(
       () => setIsScrolling(false),
-      isScrollingDebouncing,
+      containerIsScrollingDebounceInterval,
       { leading: false, trailing: true }
     )
 
@@ -223,7 +223,7 @@ export const useWindowedList = <E extends HTMLElement>({
       onScrollBegin.cancel()
       onScrollEnd.cancel()
     }
-  }, [isScrollingDebouncing])
+  }, [containerIsScrollingDebounceInterval])
 
   // define onScroll handler
   useEffect(() => {
@@ -231,7 +231,7 @@ export const useWindowedList = <E extends HTMLElement>({
       (scrollPosition: number) => {
         setBoundaries(viewport.calcBoundaries(containerSize, scrollPosition))
       },
-      scrollThrottling,
+      containerOnScrollThrottleInterval,
       // execute on END of interval so it always applies actual boundaries
       { leading: false, trailing: true }
     )
@@ -241,7 +241,12 @@ export const useWindowedList = <E extends HTMLElement>({
     onScrollRef.current = onScroll
 
     return onScroll.cancel
-  }, [setBoundaries, viewport, containerSize, scrollThrottling])
+  }, [
+    setBoundaries,
+    viewport,
+    containerSize,
+    containerOnScrollThrottleInterval
+  ])
 
   // container scroll monitor
   useEffect(() => {
