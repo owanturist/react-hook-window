@@ -108,6 +108,7 @@ export interface UseWindowedListOptions {
   layout?: ListLayout
   initialScroll?: InitialListScroll
   scrollThrottling?: number
+  isScrollingDebouncing?: number
   onItemsRendered?(renderedRange: ListRenderedRange): void
 }
 
@@ -130,6 +131,7 @@ export const useWindowedList = <E extends HTMLElement>({
   layout = 'vertical',
   initialScroll = 0,
   scrollThrottling = DEFAULT_SCROLL_THROTTLE_MS,
+  isScrollingDebouncing = IS_SCROLLING_DEBOUNCE_MS,
   onItemsRendered
 }: UseWindowedListOptions): UseWindowedListResult<E> => {
   // it wants to keep track when a container gets changed
@@ -201,13 +203,13 @@ export const useWindowedList = <E extends HTMLElement>({
   useEffect(() => {
     const onScrollBegin = debounce(
       () => setIsScrolling(true),
-      IS_SCROLLING_DEBOUNCE_MS,
+      isScrollingDebouncing,
       { leading: true, trailing: false }
     )
 
     const onScrollEnd = debounce(
       () => setIsScrolling(false),
-      IS_SCROLLING_DEBOUNCE_MS,
+      isScrollingDebouncing,
       { leading: false, trailing: true }
     )
 
@@ -221,7 +223,7 @@ export const useWindowedList = <E extends HTMLElement>({
       onScrollBegin.cancel()
       onScrollEnd.cancel()
     }
-  }, [])
+  }, [isScrollingDebouncing])
 
   // define onScroll handler
   useEffect(() => {
