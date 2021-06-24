@@ -215,72 +215,73 @@ const ViewTicket = React.memo<{
   }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        borderRadius: 3,
-        margin: '4px 0',
-        padding: '6px 8px',
-        lineHeight: `${TICKET_LINE_HEIGHT}px`,
-        background: '#fff',
-        boxShadow: '0 1px 0 rgb(9 30 66 / 25%)'
-      }}
-    >
+    <div style={{ padding: '4px 0' }}>
       <div
-        style={{ flex: '1 1 auto' }}
-        onDoubleClick={() => {
-          if (editingTitle == null) {
-            setEditingTitle(ticket.title)
-          }
-        }}
-      >
-        {editingTitle == null ? (
-          ticket.title.split('\n').map((fragment, i) => (
-            <React.Fragment key={i}>
-              {fragment}
-              <br />
-            </React.Fragment>
-          ))
-        ) : (
-          <form
-            onSubmit={event => {
-              onChangeTitle(ticketId, editingTitle)
-              setEditingTitle(null)
-
-              event.preventDefault()
-            }}
-          >
-            <textarea
-              style={{
-                resize: 'none'
-              }}
-              rows={4}
-              value={editingTitle}
-              onChange={event => setEditingTitle(event.target.value)}
-            />
-            <div style={{ marginTop: 4 }}>
-              <button type="button" onClick={() => setEditingTitle(null)}>
-                Cancel
-              </button>
-              <button style={{ marginLeft: 4 }} type="submit">
-                Save
-              </button>
-            </div>
-          </form>
-        )}
-      </div>
-
-      <button
-        type="button"
         style={{
-          border: 'none',
-          background: '#c99'
+          display: 'flex',
+          alignItems: 'flex-start',
+          borderRadius: 3,
+          padding: '6px 8px',
+          lineHeight: `${TICKET_LINE_HEIGHT}px`,
+          background: '#fff',
+          boxShadow: '0 1px 0 rgb(9 30 66 / 25%)'
         }}
-        onClick={() => onRemove(ticketId)}
       >
-        &times;
-      </button>
+        <div
+          style={{ flex: '1 1 auto' }}
+          onDoubleClick={() => {
+            if (editingTitle == null) {
+              setEditingTitle(ticket.title)
+            }
+          }}
+        >
+          {editingTitle == null ? (
+            ticket.title.split('\n').map((fragment, i) => (
+              <React.Fragment key={i}>
+                {fragment}
+                <br />
+              </React.Fragment>
+            ))
+          ) : (
+            <form
+              onSubmit={event => {
+                onChangeTitle(ticketId, editingTitle)
+                setEditingTitle(null)
+
+                event.preventDefault()
+              }}
+            >
+              <textarea
+                style={{
+                  resize: 'none'
+                }}
+                rows={4}
+                value={editingTitle}
+                onChange={event => setEditingTitle(event.target.value)}
+              />
+              <div style={{ marginTop: 4 }}>
+                <button type="button" onClick={() => setEditingTitle(null)}>
+                  Cancel
+                </button>
+                <button style={{ marginLeft: 4 }} type="submit">
+                  Save
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+
+        <button
+          type="button"
+          style={{
+            border: 'none',
+            background: '#c99'
+          }}
+          onClick={() => onRemove(ticketId)}
+        >
+          &times;
+        </button>
+      </div>
     </div>
   )
 })
