@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useWindowedList, useInfiniteLoader } from '../src'
+import { useWindowedList, useInfiniteLoader } from '../../src'
 
 const loadRange = (
   start: number,

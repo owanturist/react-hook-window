@@ -34,9 +34,9 @@
     "lint": "eslint . --config=.eslintrc.prod.json --ext=js,ts",
     "prettify": "prettier . --write",
     "typecheck": "tsc -p tsconfig.json --noEmit && yarn workspace cypress typecheck",
-    "demo": "parcel ./demo/index.html",
-    "demo:build": "parcel build ./demo/index.html --no-cache",
-    "predemo:build": "yarn run clean"
+    "sandbox": "parcel ./sandbox/public/index.html",
+    "sandbox:build": "parcel build ./sandbox/public/index.html --no-cache",
+    "presandbox:build": "yarn run clean"
   },
   "husky": {
     "hooks": {

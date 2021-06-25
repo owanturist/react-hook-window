@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { InitialListScroll, ScrollPosition } from '../src'
+import { InitialListScroll, ScrollPosition } from '../../src'
 
 const SCROLL_POSITIONS: ReadonlyArray<ScrollPosition> = [
   'auto',
