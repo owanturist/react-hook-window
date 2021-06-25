@@ -59,9 +59,7 @@ export const setDynamicScrollToItem = (
   cy.findByTestId('scrolling').should('not.be.checked')
 }
 
-export const getItemByIndex = (
-  index: number
-): Cypress.Chainable<JQuery<HTMLElement>> => {
+export const getItemByIndex = (index: number): Cypress.Chainable<JQuery> => {
   return cy.findByText(`#${index}`)
 }
 

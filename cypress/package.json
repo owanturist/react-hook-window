@@ -11,8 +11,5 @@
     "@testing-library/cypress": "^7.0.6",
     "cypress": "^7.6.0",
     "cypress-fill-command": "^1.0.2"
-  },
-  "devDependencies": {
-    "eslint-plugin-cypress": "^2.11.3"
   }
 }
