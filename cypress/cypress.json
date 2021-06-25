@@ -6,5 +6,9 @@
   "defaultCommandTimeout": 500,
   "video": false,
   "videoUploadOnPasses": true,
-  "screenshotOnRunFailure": false
+  "screenshotOnRunFailure": false,
+  "fixturesFolder": "./fixtures",
+  "integrationFolder": "./integration",
+  "pluginsFile": "./plugins/index.js",
+  "supportFile": "./support/index.ts"
 }

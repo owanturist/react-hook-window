@@ -1,4 +1,8 @@
 {
+  "private": true,
+  "workspaces": [
+    "cypress"
+  ],
   "name": "react-hook-window",
   "version": "1.0.0",
   "repository": "git@github.com:owanturist/react-hook-window.git",
@@ -25,11 +29,11 @@
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag v$PACKAGE_VERSION && git push --tags",
     "test": "jest ./tests",
     "test:watch": "yarn test -- --watch",
-    "cy:open": "yarn cypress open",
-    "cy:run": "yarn cypress run",
+    "cy:open": "yarn workspace cypress open",
+    "cy:run": "yarn workspace cypress run",
     "lint": "eslint . --config=.eslintrc.prod.json --ext=js,ts",
     "prettify": "prettier . --write",
-    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p cypress/tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit && yarn workspace cypress typecheck",
     "demo": "parcel ./demo/index.html",
     "demo:build": "parcel build ./demo/index.html --no-cache",
     "predemo:build": "yarn run clean"
@@ -58,7 +62,6 @@
     "@babel/preset-react": "^7.14.5",
     "@babel/preset-typescript": "^7.14.5",
     "@rollup/plugin-node-resolve": "^13.0.0",
-    "@testing-library/cypress": "^7.0.6",
     "@types/jest": "^26.0.23",
     "@types/lodash.debounce": "^4.0.6",
     "@types/lodash.throttle": "^4.1.6",
@@ -68,11 +71,8 @@
     "@typescript-eslint/eslint-plugin": "^4.28.0",
     "@typescript-eslint/parser": "^4.28.0",
     "babel-jest": "^27.0.2",
-    "cypress": "^7.5.0",
-    "cypress-fill-command": "^1.0.2",
     "eslint": "^7.29.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-cypress": "^2.11.3",
     "eslint-plugin-jest": "^24.3.6",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.24.0",
