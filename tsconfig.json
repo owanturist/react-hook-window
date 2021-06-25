@@ -8,5 +8,5 @@
   "compilerOptions": {
     "sourceMap": true
   },
-  "include": ["./src/**/*.ts", "./tests/**/*.test.ts", "./demo/**/*.ts*"]
+  "include": ["./src/**/*.ts", "./tests/**/*.test.ts", "./sandbox/**/*.ts*"]
 }
