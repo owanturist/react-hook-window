@@ -21,7 +21,9 @@ const dynamicItemSizes = `
   .map(Number)
   .filter(Boolean)
 
-const getItemSize = (index: number): number => dynamicItemSizes[index] ?? 0
+const getItemSize = (index: number): number => {
+  return dynamicItemSizes[index % dynamicItemSizes.length]
+}
 
 ReactDOM.render(
   <React.StrictMode>
