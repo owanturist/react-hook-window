@@ -12,6 +12,7 @@
     "project": ["./tsconfig.json"]
   },
   "extends": ["eslint:recommended"],
+  "globals": {},
   "rules": {
     // Possible Errors
     "no-extra-parens": "warn", // https://eslint.org/docs/rules/no-extra-parens
@@ -182,6 +183,17 @@
         "jest/no-disabled-tests": "off",
         "jest/no-focused-tests": "warn"
       }
+    },
+    {
+      "files": ["cypress/**/*.ts", "cypress/**/*.js"],
+      "parserOptions": {
+        "project": ["./cypress/tsconfig.json"]
+      },
+      "env": {
+        "cypress/globals": true
+      },
+      "plugins": ["cypress"],
+      "extends": ["plugin:cypress/recommended"]
     }
   ]
 }
