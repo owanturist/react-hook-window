@@ -9,9 +9,14 @@
     },
     "ecmaVersion": 2018,
     "sourceType": "module",
-    "project": ["./tsconfig.json"]
+    "project": [
+      "./tsconfig.json"
+    ]
   },
-  "extends": ["eslint:recommended"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:import/recommended"
+  ],
   "globals": {},
   "rules": {
     // Possible Errors
@@ -23,7 +28,10 @@
     "consistent-return": "error", // https://eslint.org/docs/rules/consistent-return
     "curly": "error", // https://eslint.org/docs/rules/curly
     "default-param-last": "error", // https://eslint.org/docs/rules/default-param-last
-    "dot-location": ["warn", "property"], // https://eslint.org/docs/rules/dot-location
+    "dot-location": [
+      "warn",
+      "property"
+    ], // https://eslint.org/docs/rules/dot-location
     "dot-notation": [
       "error",
       {
@@ -47,7 +55,9 @@
     "no-empty-function": [
       "warn",
       {
-        "allow": ["constructors"]
+        "allow": [
+          "constructors"
+        ]
       }
     ], // https://eslint.org/docs/rules/no-empty-function
     "no-eval": "error", // https://eslint.org/docs/rules/no-eval
@@ -95,19 +105,27 @@
   "overrides": [
     {
       "parser": "@typescript-eslint/parser",
-      "files": ["**/*.ts", "**/*.tsx"],
+      "files": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
       "env": {
         "es6": true,
         "browser": true,
         "node": false
       },
-      "plugins": ["react", "@typescript-eslint", "jest"],
+      "plugins": [
+        "react",
+        "@typescript-eslint",
+        "jest"
+      ],
       "extends": [
         "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended",
         "prettier",
         "plugin:prettier/recommended",
-        "plugin:react-hooks/recommended"
+        "plugin:react-hooks/recommended",
+        "plugin:import/typescript"
       ],
       "rules": {
         "no-unused-vars": "off",
@@ -136,7 +154,10 @@
             "allowExpressions": true
           }
         ],
-        "@typescript-eslint/method-signature-style": ["error", "method"],
+        "@typescript-eslint/method-signature-style": [
+          "error",
+          "method"
+        ],
         "@typescript-eslint/no-non-null-assertion": "error",
         "@typescript-eslint/no-extraneous-class": "error",
         "@typescript-eslint/no-invalid-void-type": "error",
@@ -168,16 +189,39 @@
         "react/display-name": "off",
         // React-Hooks Eslint
         "react-hooks/rules-of-hooks": "error",
-        "react-hooks/exhaustive-deps": "warn"
+        "react-hooks/exhaustive-deps": "warn",
+        // Import
+        "import/order": "warn",
+        "import/no-relative-packages": "off",
+        "import/no-extraneous-dependencies": [
+          "error",
+          {
+            "packageDir": [
+              "./cypress",
+              "./sandbox"
+            ],
+            "devDependencies": [
+              "**/*.test.js",
+              "**/*.spec.js"
+            ]
+          }
+        ]
       }
     },
     {
-      "files": ["tests/**/*.ts"],
+      "files": [
+        "tests/**/*.ts"
+      ],
       "env": {
         "jest": true
       },
-      "plugins": ["jest"],
-      "extends": ["plugin:jest/recommended", "plugin:jest/style"],
+      "plugins": [
+        "jest"
+      ],
+      "extends": [
+        "plugin:jest/recommended",
+        "plugin:jest/style"
+      ],
       "rules": {
         // Jest
         "jest/no-disabled-tests": "off",
@@ -185,15 +229,24 @@
       }
     },
     {
-      "files": ["cypress/**/*.ts", "cypress/**/*.js"],
+      "files": [
+        "cypress/**/*.ts",
+        "cypress/**/*.js"
+      ],
       "parserOptions": {
-        "project": ["./cypress/tsconfig.json"]
+        "project": [
+          "./cypress/tsconfig.json"
+        ]
       },
       "env": {
         "cypress/globals": true
       },
-      "plugins": ["cypress"],
-      "extends": ["plugin:cypress/recommended"]
+      "plugins": [
+        "cypress"
+      ],
+      "extends": [
+        "plugin:cypress/recommended"
+      ]
     }
   ]
 }

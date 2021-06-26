@@ -1,7 +1,8 @@
 {
   "private": true,
   "workspaces": [
-    "cypress"
+    "cypress",
+    "sandbox"
   ],
   "name": "react-hook-window",
   "version": "1.0.0",
@@ -34,9 +35,8 @@
     "lint": "eslint . --config=.eslintrc.prod.json --ext=js,ts",
     "prettify": "prettier . --write",
     "typecheck": "tsc -p tsconfig.json --noEmit && yarn workspace cypress typecheck",
-    "sandbox": "parcel ./sandbox/public/index.html",
-    "sandbox:build": "parcel build ./sandbox/public/index.html --no-cache",
-    "presandbox:build": "yarn run clean"
+    "sandbox:dev": "yarn workspace sandbox dev",
+    "sandbox:build": "yarn workspace sandbox build"
   },
   "husky": {
     "hooks": {
@@ -53,8 +53,7 @@
     ]
   },
   "peerDependencies": {
-    "react": "^16.8.0 | ^17.0.0",
-    "react-dom": "^16.8.0 | ^17.0.0"
+    "react": "^16.8.0 | ^17.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.14.6",
@@ -66,14 +65,13 @@
     "@types/lodash.debounce": "^4.0.6",
     "@types/lodash.throttle": "^4.1.6",
     "@types/react": "^17.0.11",
-    "@types/react-dom": "^17.0.8",
-    "@types/react-router-dom": "^5.1.7",
     "@typescript-eslint/eslint-plugin": "^4.28.0",
     "@typescript-eslint/parser": "^4.28.0",
     "babel-jest": "^27.0.2",
     "eslint": "^7.29.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-cypress": "^2.11.3",
+    "eslint-plugin-import": "^2.23.4",
     "eslint-plugin-jest": "^24.3.6",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.24.0",
@@ -81,11 +79,8 @@
     "husky": "^4.3.7",
     "jest": "^27.0.4",
     "lint-staged": "^11.0.0",
-    "parcel-bundler": "^1.12.5",
     "prettier": "^2.3.1",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-router-dom": "^5.2.0",
     "rollup": "^2.52.2",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.30.0",
