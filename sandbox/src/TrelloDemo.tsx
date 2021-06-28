@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useWindowedList } from '../../src'
+import { useWindowedList } from 'react-hook-window'
 
 import { Dict } from './Dict'
 import { useResizeObserver } from './useResizeObserver'

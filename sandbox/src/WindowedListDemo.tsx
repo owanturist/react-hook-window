@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ListLayout, useWindowedList } from '../../src'
+import { ListLayout, useWindowedList } from 'react-hook-window'
 import { DynamicScrollControl } from './ScrollControl'
 import { ControlPanelOptions, ControlPanel } from './ControlPanel'
 
