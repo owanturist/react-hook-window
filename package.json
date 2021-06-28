@@ -25,10 +25,10 @@
     }
   },
   "lint-staged": {
-    "**/*.{js,ts,json,md}": [
+    "**/*.{js,jsx,ts,tsx,json,md}": [
       "prettier --write"
     ],
-    "**/*.{js,ts}": [
+    "**/*.{js,jsx,ts,tsx}": [
       "eslint --config=.eslintrc.prod.json --fix"
     ]
   },
