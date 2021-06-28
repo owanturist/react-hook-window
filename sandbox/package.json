@@ -6,13 +6,14 @@
     "clean": "rm -rf dist",
     "typecheck": "tsc -p ./tsconfig.json --noEmit",
     "dev": "parcel ./public/index.html",
-    "build": "parcel build ./public/index.html --no-cache",
+    "build": "parcel build ./public/index.html --out-file=200.html --no-cache",
     "prebuild": "yarn run clean"
   },
   "dependencies": {
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-router-dom": "^5.2.0"
+    "react-router-dom": "^5.2.0",
+    "react-hook-window": "*"
   },
   "devDependencies": {
     "@types/react": "^17.0.11",

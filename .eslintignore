@@ -1,6 +1,5 @@
-es
-lib
-dist
-types
-
 node_modules
+
+# production
+lib/dist
+lib/types

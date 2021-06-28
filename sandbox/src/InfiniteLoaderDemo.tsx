@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useWindowedList, useInfiniteLoader } from '../../src'
+import { useWindowedList, useInfiniteLoader } from 'react-hook-window'
 
 const loadRange = (
   start: number,
