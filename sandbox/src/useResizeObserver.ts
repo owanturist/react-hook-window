@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useRef, useEffect } from 'react'
 
 const createObserver = (): ((
   handler: (node: Element) => void,
@@ -16,29 +16,25 @@ const createObserver = (): ((
   })
 
   return (handler, node) => {
+    const handlerRef = useRef(handler)
+
+    useEffect(() => {
+      handlerRef.current = handler
+    }, [handler])
+
     useEffect(() => {
       if (node == null) {
         return
       }
 
       obs.observe(node)
+      handlers.set(node, target => handlerRef.current(target))
 
       return () => {
         obs.unobserve(node)
-      }
-    }, [node])
-
-    useEffect(() => {
-      if (node == null) {
-        return
-      }
-
-      handlers.set(node, handler)
-
-      return () => {
         handlers.delete(node)
       }
-    }, [node, handler])
+    }, [node])
   }
 }
 

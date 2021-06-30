@@ -347,10 +347,7 @@ const ObservedTicket: React.FC<{
   const nodeRef = React.useRef<HTMLDivElement>(null)
   const [nodeHeight, setNodeHeight] = React.useState(0)
 
-  useResizeObserver(
-    React.useCallback(node => setNodeHeight(node.clientHeight), []),
-    nodeRef.current
-  )
+  useResizeObserver(node => setNodeHeight(node.clientHeight), nodeRef.current)
   const shouldSetHeight = nodeHeight > 0 && nodeHeight !== height
 
   React.useEffect(() => {
@@ -470,10 +467,7 @@ const ViewWindowedColumn = React.memo<{
     initialScroll
   })
 
-  useResizeObserver(
-    React.useCallback(node => setContainerHeight(node.clientHeight), []),
-    container
-  )
+  useResizeObserver(node => setContainerHeight(node.clientHeight), container)
 
   React.useLayoutEffect(() => {
     if (container == null) {
