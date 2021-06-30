@@ -6,7 +6,7 @@
     "clean": "rm -rf dist",
     "typecheck": "tsc -p ./tsconfig.json --noEmit",
     "dev": "parcel ./public/index.html",
-    "build": "parcel build ./public/index.html --out-file=200.html --no-cache",
+    "build": "parcel build ./public/index.html --no-cache && cp ./dist/index.html ./dist/200.html",
     "prebuild": "yarn run clean"
   },
   "dependencies": {
