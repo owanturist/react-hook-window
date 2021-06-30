@@ -100,6 +100,8 @@ export type InitialListScroll =
   | number
   | { index: number; position?: ScrollPosition }
 
+// @TODO add containerRef as an option
+// @TODO add offset to set a scroll position from which first item starts
 export interface UseWindowedListOptions {
   containerSize: number
   itemSize: number | ((index: number) => number)
