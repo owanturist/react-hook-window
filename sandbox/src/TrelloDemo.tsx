@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { useWindowedList } from 'react-hook-window'
 
+import createStore from 'zustand'
+import shallowEqual from 'zustand/shallow'
 import { Dict } from './Dict'
 import { useResizeObserver } from './useResizeObserver'
-import { createStore, shallowEqual } from './store'
 
 const uuid = (): string => {
   return `id-${Date.now()}-${uuid.next++}`
