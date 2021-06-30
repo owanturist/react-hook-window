@@ -694,7 +694,7 @@ const ViewWindowedTrello = React.memo<{
   const { container, setRef, indexes, startSpace, endSpace } = useWindowedList({
     containerSize: containerWidth,
     itemSize: 300,
-    itemCount: flow.length + 1,
+    itemCount: flow.length,
     layout: 'horizontal'
   })
 
@@ -707,23 +707,19 @@ const ViewWindowedTrello = React.memo<{
     <StyledColumnsScroller ref={setRef}>
       <div style={{ display: 'inline-block', width: startSpace }} />
 
-      {indexes.map(index => {
-        if (index < flow.length) {
-          return (
-            <StyledColumnContainer key={flow[index]}>
-              <ViewWindowedColumn
-                columnId={flow[index]}
-                initialScroll={getScrollPosition(flow[index])}
-                saveScrollPosition={setScrollPosition}
-              />
-            </StyledColumnContainer>
-          )
-        }
-
-        return <ViewControlColumn key="control" />
-      })}
+      {indexes.map(index => (
+        <StyledColumnContainer key={flow[index]}>
+          <ViewWindowedColumn
+            columnId={flow[index]}
+            initialScroll={getScrollPosition(flow[index])}
+            saveScrollPosition={setScrollPosition}
+          />
+        </StyledColumnContainer>
+      ))}
 
       <div style={{ display: 'inline-block', width: endSpace }} />
+
+      <ViewControlColumn key="control" />
     </StyledColumnsScroller>
   )
 })
