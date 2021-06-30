@@ -182,7 +182,6 @@
         "import/no-extraneous-dependencies": [
           "error",
           {
-            "packageDir": ["./cypress", "./sandbox", "./lib"],
             "devDependencies": ["**/*.test.js", "**/*.spec.js"]
           }
         ]
