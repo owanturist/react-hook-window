@@ -5,18 +5,18 @@
   "author": "Anton Ovechkin <owanturist@gmail.com>",
   "license": "BSD-3-Clause",
   "sideEffects": false,
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
   "types": "types/index.d.ts",
   "files": [
     "dist",
     "types"
   ],
   "exports": {
-    "import": "./dist/index.esm.js",
-    "require": "./dist/index.cjs.js",
-    "browser": "./dist/index.mjs",
-    "default": "./dist/index.cjs.js"
+    "import": "./dist/index.mjs",
+    "require": "./dist/index.cjs",
+    "browser": "./dist/index.js",
+    "default": "./dist/index.cjs"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./types",
