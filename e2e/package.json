@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "cypress",
+  "name": "e2e",
   "version": "1.0.0",
   "scripts": {
     "cy:open": "cypress open",
