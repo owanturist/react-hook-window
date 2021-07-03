@@ -2,7 +2,7 @@
   "private": true,
   "name": "root",
   "workspaces": [
-    "cypress",
+    "e2e",
     "sandbox",
     "lib"
   ],
@@ -10,8 +10,8 @@
     "build": "yarn workspace react-hook-window build",
     "test": "jest ./tests",
     "test:watch": "yarn test -- --watch",
-    "cy:open": "yarn workspace cypress cy:open",
-    "cy:run": "yarn workspace cypress cy:run",
+    "cy:open": "yarn workspace e2e cy:open",
+    "cy:run": "yarn workspace e2e cy:run",
     "lint": "eslint . --config=.eslintrc.prod.json --ext=js,ts",
     "prettify": "prettier . --write",
     "typecheck": "yarn workspaces run typecheck",

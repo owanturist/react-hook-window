@@ -201,9 +201,9 @@
       }
     },
     {
-      "files": ["cypress/**/*.ts", "cypress/**/*.js"],
+      "files": ["e2e/**/*.ts", "e2e/**/*.js"],
       "parserOptions": {
-        "project": ["./cypress/tsconfig.json"]
+        "project": ["./e2e/tsconfig.json"]
       },
       "env": {
         "cypress/globals": true
