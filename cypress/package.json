@@ -3,8 +3,8 @@
   "name": "cypress",
   "version": "1.0.0",
   "scripts": {
-    "open": "cypress open",
-    "run": "cypress run",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
     "typecheck": "tsc -p ./tsconfig.json --noEmit"
   },
   "dependencies": {
