@@ -12,7 +12,7 @@
     "test:watch": "yarn test -- --watch",
     "cy:open": "yarn workspace e2e cy:open",
     "cy:run": "yarn workspace e2e cy:run",
-    "lint": "eslint . --config=.eslintrc.prod.json --ext=js,ts",
+    "lint": "eslint . --config=.eslintrc.prod.json --ext=js,jsx,ts,tsx",
     "prettify": "prettier . --write",
     "typecheck": "yarn workspaces run typecheck",
     "sandbox:dev": "yarn workspace sandbox dev",
