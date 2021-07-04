@@ -4,7 +4,8 @@
   "workspaces": [
     "e2e",
     "sandbox",
-    "lib"
+    "lib",
+    "website"
   ],
   "scripts": {
     "build": "yarn workspace react-hook-window build",
@@ -16,7 +17,10 @@
     "prettify": "prettier . --write",
     "typecheck": "yarn workspaces run typecheck",
     "sandbox:dev": "yarn workspace sandbox dev",
-    "sandbox:build": "yarn workspace sandbox build"
+    "sandbox:build": "yarn workspace sandbox build",
+    "website:dev": "yarn workspace website dev",
+    "website:build": "yarn workspace website build",
+    "website:serve": "yarn workspace website serve"
   },
   "husky": {
     "hooks": {
