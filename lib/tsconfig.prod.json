@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "esnext",
     "sourceMap": false,
-    "declarationDir": "types"
+    "declarationDir": "dist/types"
   },
   "extends": "./tsconfig.json",
   "include": ["./src/**/*.ts"]

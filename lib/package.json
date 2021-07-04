@@ -7,10 +7,9 @@
   "sideEffects": false,
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
-  "types": "types/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "files": [
-    "dist",
-    "types"
+    "dist"
   ],
   "exports": {
     "import": "./dist/index.mjs",
@@ -19,7 +18,7 @@
     "default": "./dist/index.cjs"
   },
   "scripts": {
-    "clean": "rm -rf ./dist ./types",
+    "clean": "rm -rf ./dist",
     "prebuild": "yarn run clean",
     "build": "rollup --config",
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep 'version' | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag v$PACKAGE_VERSION && git push --tags",
