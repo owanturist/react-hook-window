@@ -1,18 +1,9 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "lib": [
-      "es6",
-      "dom"
-    ],
-    "types": [
-      "cypress",
-      "@testing-library/cypress"
-    ],
+    "lib": ["es6", "dom"],
+    "types": ["cypress", "@testing-library/cypress"],
     "isolatedModules": false
   },
-  "include": [
-    "./**/*.ts",
-    "./**/*.js"
-  ]
+  "include": ["./**/*.ts", "./**/*.js"]
 }
