@@ -4,8 +4,7 @@
   "rules": {
     "no-console": "error",
     "no-debugger": "error",
-    "no-warning-comments": "error",
-    "no-unused-vars": "error"
+    "no-warning-comments": "error"
   },
 
   "overrides": [

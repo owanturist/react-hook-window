@@ -13,7 +13,7 @@
     "test:watch": "yarn test -- --watch",
     "cy:open": "yarn workspace e2e cy:open",
     "cy:run": "yarn workspace e2e cy:run",
-    "lint": "eslint . --config=.eslintrc.prod.json --ext=js,jsx,ts,tsx",
+    "lint": "eslint . --config=.eslintrc.prod.json --ext=js,jsx,ts,tsx,md,mdx",
     "prettify": "prettier . --write",
     "typecheck": "yarn workspaces run typecheck",
     "sandbox:dev": "yarn workspace sandbox dev",
@@ -29,10 +29,10 @@
     }
   },
   "lint-staged": {
-    "**/*.{js,jsx,ts,tsx,json,md}": [
+    "**/*.{js,jsx,ts,tsx,json,md,mdx}": [
       "prettier --write"
     ],
-    "**/*.{js,jsx,ts,tsx}": [
+    "**/*.{js,jsx,ts,tsx,md,mdx}": [
       "eslint --config=.eslintrc.prod.json --fix"
     ]
   },
@@ -50,6 +50,8 @@
     "eslint-plugin-cypress": "^2.11.3",
     "eslint-plugin-import": "^2.23.4",
     "eslint-plugin-jest": "^24.3.6",
+    "eslint-plugin-markdown": "^2.2.0",
+    "eslint-plugin-mdx": "^1.13.0",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.2.0",
