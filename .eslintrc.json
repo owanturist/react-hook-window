@@ -10,9 +10,11 @@
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
+  "plugins": ["react"],
   "extends": [
     "eslint:recommended",
     "plugin:import/recommended",
+    "plugin:react-hooks/recommended",
     "prettier",
     "plugin:prettier/recommended"
   ],
@@ -85,15 +87,44 @@
     "prefer-arrow-callback": "error", // https://eslint.org/docs/rules/prefer-arrow-callback
     "radix": "error", // https://eslint.org/docs/rules/radix
     "require-await": "warn", // https://eslint.org/docs/rules/require-await
+
     // Variables
     "init-declarations": "error", // https://eslint.org/docs/rules/init-declarations
     "no-shadow": "error", // https://eslint.org/docs/rules/no-shadow
     "no-undefined": "error", // https://eslint.org/docs/rules/no-undefined
     "no-unused-vars": "warn", // https://eslint.org/docs/rules/no-unused-vars
+
     // ECMAScript 6
     "no-var": "error", // https://eslint.org/docs/rules/no-var
+
     // Typescript Eslint
-    "@typescript-eslint/explicit-function-return-type": "off"
+    "@typescript-eslint/explicit-function-return-type": "off",
+
+    // React Eslint
+    "react/button-has-type": ["warn", { "reset": false }],
+    "react/prop-types": "off",
+    "react/no-unescaped-entities": "off",
+    "react/jsx-curly-brace-presence": "error",
+    "react/display-name": "off",
+
+    // React-Hooks Eslint
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+
+    // Import
+    "import/order": "warn",
+    "import/no-relative-packages": "error",
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": [
+          "**/*.test.js",
+          "**/*.spec.js",
+          "lib/*.js",
+          "website/*.js"
+        ]
+      }
+    ]
   },
   "overrides": [
     {
@@ -107,15 +138,14 @@
         "browser": true,
         "node": false
       },
-      "plugins": ["react", "@typescript-eslint", "jest"],
       "extends": [
         "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended",
         "prettier",
         "plugin:prettier/recommended",
-        "plugin:react-hooks/recommended",
         "plugin:import/typescript"
       ],
+      "plugins": ["@typescript-eslint"],
       "rules": {
         "no-unused-vars": "off",
         "array-callback-return": "off",
@@ -161,30 +191,7 @@
         "@typescript-eslint/prefer-ts-expect-error": "error",
         "@typescript-eslint/require-array-sort-compare": "error",
         "@typescript-eslint/restrict-plus-operands": "error",
-        "@typescript-eslint/switch-exhaustiveness-check": "error",
-        // React Eslint
-        "react/button-has-type": [
-          "warn",
-          {
-            "reset": false
-          }
-        ],
-        "react/prop-types": "off",
-        "react/no-unescaped-entities": "off",
-        "react/jsx-curly-brace-presence": "error",
-        "react/display-name": "off",
-        // React-Hooks Eslint
-        "react-hooks/rules-of-hooks": "error",
-        "react-hooks/exhaustive-deps": "warn",
-        // Import
-        "import/order": "warn",
-        "import/no-relative-packages": "error",
-        "import/no-extraneous-dependencies": [
-          "error",
-          {
-            "devDependencies": ["**/*.test.js", "**/*.spec.js"]
-          }
-        ]
+        "@typescript-eslint/switch-exhaustiveness-check": "error"
       }
     },
     {
@@ -192,8 +199,8 @@
       "env": {
         "jest": true
       },
-      "plugins": ["jest"],
       "extends": ["plugin:jest/recommended", "plugin:jest/style"],
+      "plugins": ["jest"],
       "rules": {
         // Jest
         "jest/no-disabled-tests": "off",
@@ -208,8 +215,20 @@
       "env": {
         "cypress/globals": true
       },
-      "plugins": ["cypress"],
-      "extends": ["plugin:cypress/recommended"]
+      "extends": ["plugin:cypress/recommended"],
+      "plugins": ["cypress"]
+    },
+    {
+      "files": ["**/*.md"],
+      "extends": ["plugin:markdown/recommended"]
+    },
+    {
+      "files": ["**/*.mdx"],
+      "extends": ["plugin:mdx/code-blocks", "plugin:mdx/recommended"],
+
+      "settings": {
+        "mdx/code-blocks": true
+      }
     }
   ]
 }

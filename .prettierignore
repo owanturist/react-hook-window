@@ -1,5 +1,6 @@
 node_modules
 yarn.lock
+.cache
 
 npm-debug.log*
 yarn-debug.log*
@@ -7,5 +8,4 @@ yarn-error.log*
 .nyc_output
 
 dist
-.cache
-types
+website/public
