@@ -9,9 +9,11 @@
     "typecheck": "# No TypeScript found 💫"
   },
   "dependencies": {
+    "@xstyled/styled-components": "^3.0.3",
     "gatsby": "^3.8.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-hook-window": "*",
     "smooth-doc": "^8.0.1"
   }
 }
