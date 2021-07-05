@@ -3444,7 +3444,7 @@
   dependencies:
     "@xstyled/system" "^3.0.2"
 
-"@xstyled/styled-components@^3.0.2":
+"@xstyled/styled-components@^3.0.2", "@xstyled/styled-components@^3.0.3":
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@xstyled/styled-components/-/styled-components-3.0.3.tgz#a872bd6ad41a43ca25547402ba429a9b645aa2ee"
   integrity sha512-Lm916dkm4EsknwdrGPpD6NXpclUw1s7F5SoBWpnFdMBlheLrxPHuiAT7kMU15j0Asf2Sqsmfh1ZAbPHK2UX+aA==

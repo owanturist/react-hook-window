@@ -1,4 +1,5 @@
 import {
+  ScreenContainer,
   Button,
   HeroSection,
   Hero,
@@ -8,15 +9,16 @@ import {
   HeroActionList,
   HeroAction
 } from 'smooth-doc/components'
+import heroBackgroundImageURL from '../images/hero-background.png'
 
 <HeroSection>
-  <Hero>
+  <Hero backgroundImageURL={heroBackgroundImageURL}>
     <HeroBody>
-      <HeroTitle>Your Smooth DOC setup is complete!</HeroTitle>
-      <HeroTeaser>Edit `pages/index.mdx` to personalize homepage.</HeroTeaser>
+      <HeroTitle>react-hook-window</HeroTitle>
+      <HeroTeaser>Don't render what users won't see!</HeroTeaser>
       <HeroActionList>
         <HeroAction>
-          <Button variant="neutral" forwardedAs="a" href="/docs/">
+          <Button variant="neutral" as="a" href="/docs/">
             Browse Docs
           </Button>
         </HeroAction>

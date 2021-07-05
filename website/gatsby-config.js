@@ -3,8 +3,8 @@ module.exports = {
     {
       resolve: 'smooth-doc',
       options: {
-        name: 'Smooth DOC Starter',
-        description: 'Use your own description...',
+        name: 'React Hook Window',
+        description: "Don't render what users won't see",
         siteUrl: 'https://example.com'
       }
     }
