@@ -3,4 +3,4 @@ sandbox/dist
 lib/dist
 lib/types
 
-website/public
+*.d.ts

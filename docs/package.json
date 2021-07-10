@@ -1,0 +1,25 @@
+{
+  "private": true,
+  "name": "docs",
+  "version": "1.0.0",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "typecheck": "tsc -p ./tsconfig.json --noEmit",
+    "dev": "yarn styleguidist server",
+    "build": "yarn styleguidist build",
+    "prebuild": "yarn run clean"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.14",
+    "babel-loader": "^8.2.2",
+    "css-loader": "^5.2.6",
+    "react-docgen-typescript": "^2.0.0",
+    "react-styleguidist": "^11.1.7",
+    "style-loader": "^3.0.0",
+    "webpack": "^5.43.0"
+  },
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-hook-window": "*"
+  }
+}

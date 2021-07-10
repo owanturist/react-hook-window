@@ -1,4 +1,23 @@
 {
+  "editor.autoClosingBrackets": "always",
+  "[markdown]": {
+    "editor.autoClosingBrackets": "always"
+  },
+  "[mdx]": {
+    "editor.autoClosingBrackets": "always"
+  },
+  "[javascript]": {
+    "editor.autoClosingBrackets": "always"
+  },
+  "[javascriptreact]": {
+    "editor.autoClosingBrackets": "always"
+  },
+  "[typescript]": {
+    "editor.autoClosingBrackets": "always"
+  },
+  "[typescriptreact]": {
+    "editor.autoClosingBrackets": "always"
+  },
   "eslint.options": {
     "extensions": [".js", ".jsx", ".md", ".mdx", ".ts", ".tsx"]
   },

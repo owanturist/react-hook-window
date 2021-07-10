@@ -5,7 +5,7 @@
     "e2e",
     "sandbox",
     "lib",
-    "website"
+    "docs"
   ],
   "scripts": {
     "build": "yarn workspace react-hook-window build",
@@ -18,9 +18,8 @@
     "typecheck": "yarn workspaces run typecheck",
     "sandbox:dev": "yarn workspace sandbox dev",
     "sandbox:build": "yarn workspace sandbox build",
-    "website:dev": "yarn workspace website dev",
-    "website:build": "yarn workspace website build",
-    "website:serve": "yarn workspace website serve"
+    "docs:dev": "yarn workspace docs dev",
+    "docs:build": "yarn workspace docs build"
   },
   "husky": {
     "hooks": {
@@ -51,7 +50,6 @@
     "eslint-plugin-import": "^2.23.4",
     "eslint-plugin-jest": "^24.3.6",
     "eslint-plugin-markdown": "^2.2.0",
-    "eslint-plugin-mdx": "^1.13.0",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.2.0",

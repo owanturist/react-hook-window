@@ -117,21 +117,16 @@
     "import/no-extraneous-dependencies": [
       "error",
       {
-        "devDependencies": [
-          "**/*.test.js",
-          "**/*.spec.js",
-          "lib/*.js",
-          "website/*.js"
-        ]
+        "devDependencies": ["**/*.test.js", "lib/*.js", "docs/*.js"]
       }
     ]
   },
   "overrides": [
     {
-      "files": ["**/*.ts", "**/*.tsx"],
+      "files": ["**/*.ts?(x)"],
       "parser": "@typescript-eslint/parser",
       "parserOptions": {
-        "project": ["./tsconfig.json"]
+        "project": ["./tsconfig.json", "./docs/tsconfig.json"]
       },
       "env": {
         "es6": true,
@@ -220,14 +215,18 @@
     },
     {
       "files": ["**/*.md"],
+      "processor": "markdown/markdown",
       "extends": ["plugin:markdown/recommended"]
     },
     {
-      "files": ["**/*.mdx"],
-      "extends": ["plugin:mdx/code-blocks", "plugin:mdx/recommended"],
-
-      "settings": {
-        "mdx/code-blocks": true
+      "globals": {
+        "React": true
+      },
+      "files": ["**/*.md/**/*.js?(x)*"],
+      "rules": {
+        "no-unused-vars": "off",
+        "react-hooks/rules-of-hooks": "off",
+        "import/no-unresolved": "off"
       }
     }
   ]
