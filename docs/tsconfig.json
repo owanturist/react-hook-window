@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.json",
+  "include": [
+    "./types.d.ts",
+    "./src/**/*.ts*",
+    "./sections/hooks/use-windowed-list.md/0_0.tsx"
+  ],
+  "compilerOptions": {
+    "paths": {
+      "~/*": ["./src/*"]
+    }
+  }
+}
