@@ -2,7 +2,13 @@ const path = require('path')
 const tsDocgen = require('react-docgen-typescript')
 
 module.exports = {
+  ribbon: {
+    url: 'https://github.com/owanturist/react-hook-window',
+    text: 'Fork me on GitHub'
+  },
+
   title: 'React Hook Window',
+  usageMode: 'expand',
   pagePerSection: true,
 
   sections: [
@@ -14,20 +20,28 @@ module.exports = {
       name: 'Hooks',
       exampleMode: 'expand',
       usageMode: 'expand',
-      sections: [
-        {
-          name: 'useWindowedList',
-          description: 'Description for useWindowedList',
-          content: 'sections/hooks/use-windowed-list.md'
-        },
-        {
-          name: 'useInfiniteLoader',
-          description: 'Description for useInfiniteLoader',
-          content: 'sections/hooks/use-infinite-loader.md'
-        }
+      sectionDepth: 2,
+      components: [
+        '../lib/src/use-windowed-list.ts',
+        '../lib/src/use-infinite-loader.ts'
       ]
     }
   ],
+
+  getComponentPathLine: componentPath => {
+    const { name } = path.parse(componentPath)
+    const camelCaseName = name.replace(/-\w/g, ([, second]) =>
+      second.toUpperCase()
+    )
+
+    return `import { ${camelCaseName} } from 'react-hook-window'`
+  },
+
+  getExampleFilename(componentPath) {
+    const { name } = path.parse(componentPath)
+
+    return path.join(__dirname, `./sections/hooks/${name}.md`)
+  },
 
   propsParser(filePath, source, resolver, handlers) {
     return tsDocgen.parse(filePath, source, resolver, handlers)
