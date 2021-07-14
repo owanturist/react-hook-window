@@ -102,10 +102,38 @@ export type InitialListScroll =
 
 // @TODO add containerRef as an option
 // @TODO add offset to set a scroll position from which first item starts
+/**
+ * @public
+ */
 export interface UseWindowedListOptions {
+  /**
+   * A size of the container which determine the number of items visible at any given time.
+   * Represents either hight for vertical or width for horizontal containers.
+   */
   containerSize: number
+  /**
+   * A size of an item.
+   * Can take a number representing constant items' size or
+   * a function returning an item's size by its index for variable size items.
+   * Represents either hight for vertical or width for horizontal containers.
+   */
   itemSize: number | ((index: number) => number)
+  /**
+   * A total count of items.
+   */
   itemCount: number
+  /**
+   * The number of items to render outside of the visible area.
+   *
+   * It's important to set the value to a number greater than 0
+   * to make it possible to focus via tab button on the next
+   * or previous not yet visible items.
+   *
+   * Setting the value too high will degrade performance but keeping
+   * the value reasonably low could improve UX by pre-rendering not yet visible items.
+   *
+   * @default 1
+   */
   overscanCount?: number
   layout?: ListLayout
   initialScroll?: InitialListScroll
@@ -114,9 +142,18 @@ export interface UseWindowedListOptions {
   onItemsRendered?(renderedRange: ListRenderedRange): void
 }
 
+/**
+ * @public
+ */
 export interface UseWindowedListResult<E extends HTMLElement>
   extends ListRenderedRange {
+  /**
+   * A container node.
+   */
   container: null | E
+  /**
+   * A blank space before the first visible item.
+   */
   startSpace: number
   endSpace: number
   indexes: Array<number>
@@ -126,6 +163,11 @@ export interface UseWindowedListResult<E extends HTMLElement>
   scrollToItem(index: number, position?: ScrollPosition): void
 }
 
+/**
+ * Title foo
+ *
+ * @returns {UseWindowedListResult}
+ */
 export const useWindowedList = <E extends HTMLElement>({
   containerSize,
   itemSize,
