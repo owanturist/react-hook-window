@@ -1,4 +1,5 @@
 const path = require('path')
+const fs = require('fs')
 const tsDocgen = require('react-docgen-typescript')
 
 module.exports = {
@@ -8,7 +9,7 @@ module.exports = {
   },
 
   title: 'React Hook Window',
-  usageMode: 'expand',
+  usageMode: 'hide',
   pagePerSection: true,
 
   sections: [
@@ -18,8 +19,6 @@ module.exports = {
     },
     {
       name: 'Hooks',
-      exampleMode: 'expand',
-      usageMode: 'expand',
       sectionDepth: 2,
       components: [
         '../lib/src/use-windowed-list.ts',
@@ -27,6 +26,35 @@ module.exports = {
       ]
     }
   ],
+
+  updateExample(props, exampleFilePath) {
+    const settings = props.settings || {}
+
+    if (typeof settings.example === 'string') {
+      try {
+        const { example, ...restSettings } = settings
+
+        const filepath = path.resolve(
+          path.dirname(exampleFilePath),
+          path.basename(exampleFilePath, '.md'),
+          `${example}.example.tsx`
+        )
+
+        return {
+          content: fs.readFileSync(filepath, 'utf8'),
+          settings: restSettings,
+          lang: 'tsx'
+        }
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(`\nStyleguidist.updateExample failed:\n%s`, error.message)
+
+        return props
+      }
+    }
+
+    return props
+  },
 
   getComponentPathLine: componentPath => {
     const { name } = path.parse(componentPath)

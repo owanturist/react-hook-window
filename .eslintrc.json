@@ -126,7 +126,7 @@
       "files": ["**/*.ts?(x)"],
       "parser": "@typescript-eslint/parser",
       "parserOptions": {
-        "project": ["./tsconfig.json", "./docs/tsconfig.json"]
+        "project": ["./tsconfig.json", "./*/tsconfig.json"]
       },
       "env": {
         "es6": true,
@@ -204,9 +204,6 @@
     },
     {
       "files": ["e2e/**/*.ts", "e2e/**/*.js"],
-      "parserOptions": {
-        "project": ["./e2e/tsconfig.json"]
-      },
       "env": {
         "cypress/globals": true
       },
@@ -219,10 +216,10 @@
       "extends": ["plugin:markdown/recommended"]
     },
     {
+      "files": ["**/*.example.tsx"],
       "globals": {
-        "React": true
+        // "React": true
       },
-      "files": ["**/*.md/**/*.js?(x)*"],
       "rules": {
         "no-unused-vars": "off",
         "react-hooks/rules-of-hooks": "off",

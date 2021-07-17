@@ -1,11 +1,8 @@
 {
   "extends": "../tsconfig.json",
-  "include": [
-    "./types.d.ts",
-    "./src/**/*.ts*",
-    "./sections/hooks/use-windowed-list.md/0_0.tsx"
-  ],
+  "include": ["./types.d.ts", "./src/**/*.ts*", "./sections/**/*.example.tsx"],
   "compilerOptions": {
+    "baseUrl": "./",
     "paths": {
       "~/*": ["./src/*"]
     }

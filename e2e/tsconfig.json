@@ -5,5 +5,5 @@
     "types": ["cypress", "@testing-library/cypress"],
     "isolatedModules": false
   },
-  "include": ["./**/*.ts", "./**/*.js"]
+  "include": ["./cypress/**/*.ts", "./cypress/**/*.js"]
 }
