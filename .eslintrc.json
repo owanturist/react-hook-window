@@ -211,15 +211,7 @@
       "plugins": ["cypress"]
     },
     {
-      "files": ["**/*.md"],
-      "processor": "markdown/markdown",
-      "extends": ["plugin:markdown/recommended"]
-    },
-    {
-      "files": ["**/*.example.tsx"],
-      "globals": {
-        // "React": true
-      },
+      "files": ["**/*.md.tsx"],
       "rules": {
         "no-unused-vars": "off",
         "react-hooks/rules-of-hooks": "off",

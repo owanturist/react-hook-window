@@ -1,6 +1,6 @@
 {
   "extends": "../tsconfig.json",
-  "include": ["./types.d.ts", "./src/**/*.ts*", "./sections/**/*.example.tsx"],
+  "include": ["./types.d.ts", "./src/**/*.ts*", "./sections/**/*.md.tsx"],
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {

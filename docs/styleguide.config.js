@@ -30,20 +30,16 @@ module.exports = {
   updateExample(props, exampleFilePath) {
     const settings = props.settings || {}
 
-    if (typeof settings.example === 'string') {
+    if (typeof settings.file === 'string') {
       try {
-        const { example, ...restSettings } = settings
+        const { file, ...restSettings } = settings
 
-        const filepath = path.resolve(
-          path.dirname(exampleFilePath),
-          path.basename(exampleFilePath, '.md'),
-          `${example}.example.tsx`
-        )
+        const filepath = path.resolve(path.dirname(exampleFilePath), file)
 
         return {
           content: fs.readFileSync(filepath, 'utf8'),
           settings: restSettings,
-          lang: 'tsx'
+          lang: path.extname(filepath).replace(/^\./, '')
         }
       } catch (error) {
         // eslint-disable-next-line no-console
