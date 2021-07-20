@@ -19,10 +19,47 @@ module.exports = {
     },
     {
       name: 'Hooks',
-      sectionDepth: 2,
-      components: [
-        '../lib/src/use-windowed-list.ts',
-        '../lib/src/use-infinite-loader.ts'
+      pagePerSection: true,
+      sectionDepth: 1,
+      sections: [
+        {
+          name: 'useWindowedList',
+          content: 'sections/hooks/use-windowed-list.md',
+          sections: [
+            {
+              name: 'indexes',
+              content: 'sections/getting-started.md'
+            },
+            {
+              name: 'startSpace',
+              content: 'sections/getting-started.md'
+            },
+            {
+              name: 'endSpace',
+              content: 'sections/getting-started.md'
+            },
+            {
+              name: 'isScrolling',
+              content: 'sections/getting-started.md'
+            },
+            {
+              name: 'container',
+              content: 'sections/getting-started.md'
+            },
+            {
+              name: 'setRef',
+              content: 'sections/getting-started.md'
+            },
+            {
+              name: 'scrollTo',
+              content: 'sections/getting-started.md'
+            },
+            {
+              name: 'scrollToItem',
+              content: 'sections/getting-started.md'
+            }
+          ]
+        }
       ]
     }
   ],
