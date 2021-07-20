@@ -1,6 +1,6 @@
 # production
 sandbox/dist
 lib/dist
-lib/types
 
 *.d.ts
+*.md

@@ -103,7 +103,7 @@ export type InitialListScroll =
 // @TODO add containerRef as an option
 // @TODO add offset to set a scroll position from which first item starts
 /**
- * @public
+ * A set of options to configure the windowed list.
  */
 export interface UseWindowedListOptions {
   /**
@@ -142,9 +142,6 @@ export interface UseWindowedListOptions {
   onItemsRendered?(renderedRange: ListRenderedRange): void
 }
 
-/**
- * @public
- */
 export interface UseWindowedListResult<E extends HTMLElement>
   extends ListRenderedRange {
   /**
@@ -163,11 +160,6 @@ export interface UseWindowedListResult<E extends HTMLElement>
   scrollToItem(index: number, position?: ScrollPosition): void
 }
 
-/**
- * Title foo
- *
- * @returns {UseWindowedListResult}
- */
 export const useWindowedList = <E extends HTMLElement>({
   containerSize,
   itemSize,
