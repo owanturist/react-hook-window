@@ -75,16 +75,34 @@ interface UseWindowedListOptions {
 }
 ```
 
-#### `containerSize: number`
+#### `UseWindowedListOptions.containerSize: number`
 
-A size of the container in pixels which determine the number of items visible at any given time.
-Represents either hight for vertical or width for horizontal containers.
+A size of the container in pixels which determine the number of items visible at any given time. Represents either hight for vertical or width for horizontal layout.
 
-> note: The hook does not read container size from a DOM node properties so the value must represent actual size of a container.
+> note: The hook does not read container size from a DOM node properties so the value must represent actual size of the given container.
 
-> tip: You can use any kind of approaches ([search for `use size react`](https://www.npmjs.com/search?q=use%20size%20react)) to determine size of a container in case it's unkown or changes dynamicly - the hook re-calculates output for a new size. See the example of unknown and dynamic container sizes (@TODO add links to the examples).
+> tip: You can use any kind of approaches ([search for `use size react`](https://www.npmjs.com/search?q=use%20size%20react)) to determine size of a container in case it's unkown or changes dynamicly - the hook re-calculates output when the value changes. See the example of unknown and dynamic container sizes (@TODO add links to the examples).
 
 > pro tip: it's recommended to use debouncing/throttline of the container size in case of high frequent changes to gain better performance. See the example of throttling the size value (@TODO add links to the example).
+
+#### `UseWindowedListOptions.itemSize: number`
+
+A size of every item in pixels. Represents either items' height for vertical or width for horisontal layout.
+
+It is an ideal option in cases when all items have the same size. In cases when items have different or unknown sizes, you can define the `itemSize` as a function (@TODO add link to the doc).
+
+> note: The hook does not read items size from DOM nodes properties so the value must represent actual size of the given items.
+
+#### `UseWindowedListOptions.itemSize: (index: number) => number`
+
+A function that determines an item's size by its index. Represents either items' height for vertical or width for horisontal layout.
+
+This is the only option to define a windowed list with variable items size.
+
+@TODO add cross mention to fixed size list
+@TODO add important note to memoize the function
+
+> note: The hook does not read items size from DOM nodes properties so the value must represent actual size of the given items.
 
 ```tsx { "file": "./use-windowed-list/basic.md.tsx" }
 
