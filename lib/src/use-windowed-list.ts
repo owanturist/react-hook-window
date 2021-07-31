@@ -117,6 +117,7 @@ export interface UseWindowedListOptions {
    * a function returning an item's size by its index for variable size items.
    * Represents either hight for vertical or width for horizontal containers.
    */
+  // @TODO introduce type ItemSize = number | ItemDynamicSize
   itemSize: number | ((index: number) => number)
   /**
    * A total count of items.
