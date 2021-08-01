@@ -109,9 +109,14 @@ This is the only option to define a windowed list with variable items size. In c
 > const itemSize = (index: number): number => ITEMS_SIZE_ARRAY[index] || 0
 > ```
 
-> important: in order to reduce amount of constructions of the `itemEndPositions` array the `itemSize` function should change as less often as possible. You can achieve that by using memoization technics. See the example of using React memoization tools (@TODO add links to the example). Read the "how it works" section right below the notice to understand why the memoizatin is imporant (@TODO add collapsible section).
+> important: in order to reduce amount of constructions of the `itemEndPositions` array the `itemSize` function should change as less often as possible. You can achieve that by using memoization technics. See the example of using React memoization tools (@TODO add links to the example). Click on the "How dynamic item size works" section right below the notice to understand why the memoizatin is imporant.
 
-Here is how it works: each time when `itemCount` or `itemSize` values change the hook calculates an array of the items' end positions by accumulating items' sizes. Consider this example:
+<details>
+  <summary>
+    How dynamic item size works?
+  </summary>
+
+Each time when `itemCount` or `itemSize` values change the hook calculates an array of the items' end positions by accumulating items' sizes. Consider this example:
 
 ```ts
 const ITEM_SIZE_ARRAY = [30, 10, 40, 50, 20]
@@ -142,6 +147,8 @@ There are two downsides of the binary search approach:
 
 The first downside could be overcome by assuming that real applications search for items positions much more often than it changes items size. The speed gain in performance easily defeats the second downside.
 
+</details>
+
 #### `UseWindowedListOptions.itemCount: number`
 
 The number of items. That's simple. The hook will re-calculate the output on each value update so don't be afraid to change it on fly.
@@ -154,14 +161,77 @@ The number of items to render outside of the visible area. The hook will update 
 
 > tip: setting the value too high will degrade performance but keeping the value reasonably low could improve UX by pre-rendering not yet visible items.
 
-#### `UseWindowedListOptions.layout?: ListLayout = 'vertical'`
+#### `UseWindowedListOptions.layout?: `[`ListLayout`][todo]` = 'vertical'`
 
-It determines the expected list layout to indicate which scrolling variables the hook should rely on. It's still up to you to decide styling preferences but it's important to let the hook know the direction its content should be windowed. By knowing so the hook can correctly extract current scrolling position and calculate desired ones on [`UseWindowedListResult.scrollTo`](https://@TODO-add-cross-link.com) and [`UseWindowedListResult.scrollToItem`](https://@TODO-add-cross-link.com) calls.
+The option determines in which direction a list's content will be windowed. By knowing the layout the hook can correctly extract current scrolling position and calculate desired ones on [`UseWindowedListResult.scrollTo`][todo] and [`UseWindowedListResult.scrollToItem`][todo] calls.
 
-##### `ListLayout: 'vertical'`
+#### `UseWindowedListOptions.initialScroll?: number = 0`
 
-The default layout value. Indicates the layout to be scrolling up and down, meaning that items from above of the first visible and from below of the last visible item might be not rendered. See an example of vertical windowed list (@TODO add link to the example).
+Scrolling position of the windowed list in pixels for an initial render only. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
 
-```tsx { "file": "./use-windowed-list/basic.md.tsx" }
+#### `UseWindowedListOptions.initialScroll?: { index: number; position?: `[`ScrollPosition`][todo]` }`
 
-```
+<!-- CONTINUE FROM HERE -->
+
+### `type ListLayout`
+
+A set of availale values of [`UseWindowedListOptions.layout`][todo] option:
+
+- `'vertical'` - the default value, indicates up/down scrolling.
+- `'horizontal'` - indicates left/right scrolling. See horizontal layout windowed list [example][todo].
+- `'horizontal-rtl'` - indicates right/left scrolling. See horizontal right-to-left layout windowed list [example][todo].
+  > why: the layout **does not** set any style properties but due to [inconsistent right-to-left browser scrolling position][rtl-scroll-inconsistency] implementation it's required for correct desired position calculations for [`UseWindowedListResult.scrollTo`][todo] and [`UseWindowedListResult.scrollToItem`][todo] calls.
+
+### `type ScrollPosition`
+
+A set of available values defining a target element when scrolling via [`UseWindowedListOptions.initialScroll`][todo] or [`UseWindowedListOptions.scrollToItem`][todo].
+
+- `auto` scroll as little as possible to ensure the item is visible. If the item is already visible, it won't scroll at all.
+  <details>
+    <summary>
+      Click to see graphical explanations!
+    </summary>
+
+  @TODO demostration
+  </details>
+
+- `smart` If the item is already visible, don't scroll at all. If it is less than one viewport away, scroll as little as possible so that it becomes visible. If it is more than one viewport away, scroll so that it is centered within the list.
+  <details>
+    <summary>
+      Click to see graphical explanations!
+    </summary>
+
+  @TODO demostration
+  </details>
+
+- `center` center align the item within the list.
+  <details>
+    <summary>
+      Click to see graphical explanations!
+    </summary>
+
+  @TODO demostration
+  </details>
+
+- `end` align the item to the end of the list (the bottom for vertical lists or the right for horizontal lists).
+  <details>
+      <summary>
+        Click to see graphical explanations!
+      </summary>
+
+  @TODO demostration
+    </details>
+
+- `start` align the item to the beginning of the list (the top for vertical lists or the left for horizontal lists).
+  <details>
+      <summary>
+        Click to see graphical explanations!
+      </summary>
+
+  @TODO demostration
+    </details>
+
+<!-- --------------------------------------------- -->
+
+[todo]: https://to.do
+[rtl-scroll-inconsistency]: https://stackoverflow.com/q/24276619/4582383
