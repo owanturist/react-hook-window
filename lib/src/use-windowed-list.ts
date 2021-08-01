@@ -94,6 +94,10 @@ export interface ListRenderedRange {
   visibleStop: number
 }
 
+export type ItemDynamicSize = (index: number) => number
+
+export type ItemSize = number | ItemDynamicSize
+
 export type ListLayout = 'vertical' | 'horizontal' | 'horizontal-rtl'
 
 export type InitialListScroll =
@@ -117,8 +121,7 @@ export interface UseWindowedListOptions {
    * a function returning an item's size by its index for variable size items.
    * Represents either hight for vertical or width for horizontal containers.
    */
-  // @TODO introduce type ItemSize = number | ItemDynamicSize
-  itemSize: number | ((index: number) => number)
+  itemSize: ItemSize
   /**
    * A total count of items.
    */
@@ -224,6 +227,7 @@ export const useWindowedList = <E extends HTMLElement>({
       )
     }
 
+    // @TODO try to avoid this
     // it does not want to watch the values' changes on purpose
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [container, layout])

@@ -19,6 +19,7 @@ import { positive } from './helpers'
  * - `start` align the item to the beginning of the list
  *   (the top for vertical lists or the left for horizontal lists).
  */
+// @TODO rename to ScrollStrategy
 export type ScrollPosition = 'auto' | 'smart' | 'center' | 'end' | 'start'
 
 export const calcEndPosition = (
