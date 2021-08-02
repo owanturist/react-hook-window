@@ -115,6 +115,7 @@ This is the only option to define a windowed list with variable items size. In c
   <summary>
     How dynamic item size works?
   </summary>
+<blockquote>
 
 Each time when `itemCount` or `itemSize` values change the hook calculates an array of the items' end positions by accumulating items' sizes. Consider this example:
 
@@ -147,7 +148,7 @@ There are two downsides of the binary search approach:
 
 The first downside could be overcome by assuming that real applications search for items positions much more often than it changes items size. The speed gain in performance easily defeats the second downside.
 
-</details>
+</blockquote></details>
 
 #### `UseWindowedListOptions.itemCount: number`
 
