@@ -222,14 +222,16 @@ A set of availale values of [`UseWindowedListOptions.layout`][todo] option:
 
 A set of available values defining a target element when scrolling via [`UseWindowedListOptions.initialScroll`][todo] or [`UseWindowedListOptions.scrollToItem`][todo].
 
-- `auto` scroll as little as possible to ensure the item is visible. If the item is already visible, it won't scroll at all.
-  <details>
-    <summary>
-      Click to see graphical explanations!
-    </summary>
+<details>
+  <summary>
+    <code>auto</code> scroll as little as possible to ensure the item is visible. If the item is already visible, it won't scroll at all.
+    </br>
+    <code>...</code>
+  </summary>
 
-  @TODO demostration
-  </details>
+@TODO demostration
+
+</details>
 
 - `smart` If the item is already visible, don't scroll at all. If it is less than one viewport away, scroll as little as possible so that it becomes visible. If it is more than one viewport away, scroll so that it is centered within the list.
   <details>
