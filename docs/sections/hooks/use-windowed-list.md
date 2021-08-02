@@ -59,19 +59,19 @@ If any of the 3 variables changes the hook updates resulting values and this is 
 
 ### `interface UseWindowedListOptions`
 
-A set of options to configure the windowed list.
+A collection of options to configure the windowed list.
 
 ```ts static
 interface UseWindowedListOptions {
   containerSize: number
-  itemSize: number | ((index: number) => number)
+  itemSize: ItemSize
   itemCount: number
   overscanCount?: number
   layout?: ListLayout
   initialScroll?: InitialListScroll
   containerOnScrollThrottleInterval?: number
   containerIsScrollingDebounceInterval?: number
-  onItemsRendered?(renderedRange: ListRenderedRange): void
+  onItemsRendered?: (renderedRange: ListRenderedRange) => void
 }
 ```
 
@@ -167,11 +167,47 @@ The option determines in which direction a list's content will be windowed. By k
 
 #### `UseWindowedListOptions.initialScroll?: number = 0`
 
-Scrolling position of the windowed list in pixels for an initial render only. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
+Scrolling position of a windowed list in pixels for an initial render only. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
 
 #### `UseWindowedListOptions.initialScroll?: { index: number; position?: `[`ScrollPosition`][todo]` }`
 
-<!-- CONTINUE FROM HERE -->
+Scrolling position of a windowed list based on element index for an initial render only. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
+
+- `index: number` - defines an element's index to be scroll to on initial render.
+- `position?: `[`ScrollPosition`][todo] - defines a strategy to use for scrolling to a desired element.
+
+#### `UseWindowedListOptions.containerOnScrollThrottleInterval?: number = 16`
+
+The value defining a throttle interval of a container scroll listener in milliseconds. High value makes UI response faster but degrade performance and another way around. The default value limits the listener on ~60 calls per second.
+
+#### `UseWindowedListOptions.containerIsScrollingDebounceInterval?: number = 150`
+
+The value defining an interval in milliseconds to determine the [`isScrolling`][todo] flag. The flag is `true` on the first on scroll listener and turns `false` after the time passed from the last call of the listener. The default value is an empiric based interval to provide natural feeling of the flag behaviour.
+
+```
+                  __ __ __ __ __ __ __                              __ __ __ __
+ on scroll calls  || || || || || || ||                              || || || ||
+                  || || || || || || ||                              || || || ||
+__________________||_||_||_||_||_||_||______________________________||_||_||_||_____________________
+........v.........v.........v.........v.........v.........v.........v.........v.........v.........v.
+        0        100       200       300       400       500       600       700       800       900
+                  .                  .                              .         .
+                  .                  .                              .         .
+                  ___________________________________               __________________________
+ is scrolling     |                  .              |               |         .              |
+                  |                  .              |               |         .              |
+__________________|                  .              |_______________|         .              |______
+........v.........v.........v.........v.........v.........v.........v.........v.........v.........v.
+        0        100       200       300       400  |    500       600       700       800   |   900
+                                     |    150 ms    |                         |    150 ms    |
+                                     |<------------>|                         |<------------>|
+```
+
+#### `UseWindowedListOptions.onItemsRendered?: (renderedRange: ListRenderedRange) => void`
+
+A callback to call when either visible or overscan ranges change. See [`ListRenderedRange`][todo] for more details about the ranges.
+
+> tip: it's important to memoize the callback, otherwise it will be called not only on the ranges change but on the callback value change as well.
 
 ### `type ListLayout`
 
@@ -230,6 +266,37 @@ A set of available values defining a target element when scrolling via [`UseWind
 
   @TODO demostration
     </details>
+
+### `interface ListRenderedRange`
+
+```ts
+export interface ListRenderedRange {
+  overscanStart: number
+  overscanStop: number
+  visibleStart: number
+  visibleStop: number
+}
+```
+
+A collection of values describing two half-open intervals:
+
+1. visible items ∈ `[visibleStart, visibleStop)` partially or entirelly visible on the current scroll position
+1. overscan items ∈ `[overscanStart, overscanStop)` includes visible items and some additional non visible defined via [UseWindowedListOptions.overscanCount][todo] value.
+
+Both intervals include the start indexes and exclude end onces, so the resulting index ranges might be iterated by `for (let i = start; i < stop; i++)`, for instance:
+
+```ts
+const range: ListRenderedRange = {
+  overscanStart: 15,
+  overscanStop: 21,
+  visibleStart: 16,
+  visibleStop: 20
+}:
+```
+
+The `range` indicates that elements with indexes `[16, 17, 18, 19]` are visible and `[15, 16, 17, 18, 19, 20]` are overscan.
+
+> why: you might thing that the ranges should be defined as closed interval. For example visible items ∈ `[visibleStart, visibleStop]` so indexes might be iterated via `for (let i = start; i <= stop; i++)`. It works fine until it defines non empty ranges. If for some reason a range is empty it should be defined like `[1, 0]` or `[16, 0]`, because `[1, 1]` and `[16, 16]` define single item ranges. It is confusing. Instead, it excludes stop index, so it the empty ranges converts to `[1, 1)` and `[16, 16)`.
 
 <!-- --------------------------------------------- -->
 
