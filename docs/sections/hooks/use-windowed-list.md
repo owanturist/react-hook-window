@@ -411,7 +411,7 @@ A set of available values defining a target element when scrolling via [`UseWind
 
 ```
 1. scrolling to 6th that is clother than one viewport - scroll as little as possible
-2. scrolling then to 11th that is father than one viewport
+2. scrolling to 11th that is father than one viewport - scroll to center the 11th item
 
   *=========================*             +---------------------+               +---------------------+
   ‖ | #0                  | ‖             | #0                  |               | #0                  |
@@ -471,9 +471,9 @@ A set of available values defining a target element when scrolling via [`UseWind
     |                     |               |                     |               |                     |
     +---------------------+               +---------------------+               +---------------------+
 
-                                                                                            ‖
-                                                                                         12 ‖ no change
-                                                                                            v
+3. scrolling to 12th that is already visible = no scroll needed                             ‖
+4. scrolling to 3th that is farther than one viewport - scroll to center the 3rd item    12 ‖ no change
+5. scrolling to 0th that is clother than one viewport - scroll as little as possible        v
 
   *=========================* ------      +---------------------+               +---------------------+
   ‖ | #0                  | ‖      ^      | #0                  |               | #0                  |
