@@ -189,8 +189,9 @@ The value defining an interval in milliseconds to determine the [`isScrolling`][
   <summary>
     <code>[click to see how it works]</code>
   </summary>
+  </br>
   <blockquote>
-</br>
+
 ```
                   __ __ __ __ __ __ __                              __ __ __ __
  on scroll calls  || || || || || || ||                              || || || ||
@@ -237,7 +238,7 @@ A set of available values defining a target element when scrolling via [`UseWind
   <summary>
     <code>auto</code> scroll as little as possible to ensure the item is visible. If the item is already visible, it won't scroll at all.
     </br>
-    &nbsp;&nbsp;&nbsp;<code>[click to see how it works]</code>
+    <code>[click to see how it works]</code>
   </summary>
   </br>
   <blockquote>
@@ -403,7 +404,7 @@ A set of available values defining a target element when scrolling via [`UseWind
   <summary>
     <code>smart</code> If the item is already visible, don't scroll at all. If it is less than one viewport away, scroll as little as possible so that it becomes visible (acting the same as <code>auto</code>). If it is more than one viewport away, scroll so that it is centered within the list (acting the same as <code>center</code>).
     </br>
-    &nbsp;&nbsp;&nbsp;<code>[click to see how it works]</code>
+    <code>[click to see how it works]</code>
   </summary>
   </br>
   <blockquote>
@@ -540,7 +541,7 @@ A set of available values defining a target element when scrolling via [`UseWind
   <summary>
     <code>start</code> align the item to the beginning of the list (the top for vertical lists or the left for horizontal lists).
     </br>
-    &nbsp;&nbsp;&nbsp;<code>[click to see how it works]</code>
+    <code>[click to see how it works]</code>
   </summary>
   </br>
   <blockquote>
@@ -626,7 +627,7 @@ A set of available values defining a target element when scrolling via [`UseWind
   <summary>
     <code>center</code> center align the item within the list.
     </br>
-    &nbsp;&nbsp;&nbsp;<code>[click to see how it works]</code>
+    <code>[click to see how it works]</code>
   </summary>
   </br>
   <blockquote>
@@ -712,7 +713,7 @@ A set of available values defining a target element when scrolling via [`UseWind
   <summary>
     <code>end</code> align the item to the end of the list (the bottom for vertical lists or the right for horizontal lists).
     </br>
-    &nbsp;&nbsp;&nbsp;<code>[click to see how it works]</code>
+    <code>[click to see how it works]</code>
   </summary>
   </br>
   <blockquote>
