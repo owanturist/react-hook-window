@@ -16,7 +16,7 @@ Under the hood the hook calculates range of visible items based on 3 variables:
 2. container size
 3. items size
 
-```txt
+```
       ----- +---------------------+           +---------------------+           +---------------------+
       ▲     | #0                  |           | start space =       |           | start space =       |
       |     |                     |           | #0.size +           |           | #0.size +           |
@@ -183,8 +183,14 @@ The value defining a throttle interval of a container scroll listener in millise
 
 #### `UseWindowedListOptions.containerIsScrollingDebounceInterval?: number = 150`
 
-The value defining an interval in milliseconds to determine the [`isScrolling`][todo] flag. The flag is `true` on the first on scroll listener and turns `false` after the time passed from the last call of the listener. The default value is an empiric based interval to provide natural feeling of the flag behaviour.
+The value defining an interval in milliseconds to determine the [`isScrolling`][todo] flag. The flag becomes `true` on the first onScroll listener call and turns `false` after the debounce interval time passed from the last call of the listener. The default value is an empiric based interval to provide natural feeling of the flag behaviour.
 
+<details>
+  <summary>
+    <code>[click to see how it works]</code>
+  </summary>
+  <blockquote>
+</br>
 ```
                   __ __ __ __ __ __ __                              __ __ __ __
  on scroll calls  || || || || || || ||                              || || || ||
@@ -202,7 +208,11 @@ __________________|                  .              |_______________|         . 
         0        100       200       300       400  |    500       600       700       800   |   900
                                      |    150 ms    |                         |    150 ms    |
                                      |<------------>|                         |<------------>|
+                                  the debounce interval                    the debounce interval
 ```
+
+  </blockquote>
+</details>
 
 #### `UseWindowedListOptions.onItemsRendered?: (renderedRange: ListRenderedRange) => void`
 
@@ -229,9 +239,10 @@ A set of available values defining a target element when scrolling via [`UseWind
     </br>
     &nbsp;&nbsp;&nbsp;<code>[click to see how it works]</code>
   </summary>
+  </br>
   <blockquote>
 
-```txt
+```
   containerSize > target itemSize
 
   *=========================*             +---------------------+               +---------------------+
@@ -309,7 +320,7 @@ A set of available values defining a target element when scrolling via [`UseWind
 
 @TODO fix it in the behaviour
 
-```txt
+```
   containerSize < target itemSize
 
   *=========================*             +---------------------+               +---------------------+
@@ -390,14 +401,14 @@ A set of available values defining a target element when scrolling via [`UseWind
 
 <details>
   <summary>
-    <code>smart</code> If the item is already visible, don't scroll at all. If it is less than one viewport away, scroll as little as possible so that it becomes visible. If it is more than one viewport away, scroll so that it is centered within the list.
+    <code>smart</code> If the item is already visible, don't scroll at all. If it is less than one viewport away, scroll as little as possible so that it becomes visible (acting the same as <code>auto</code>). If it is more than one viewport away, scroll so that it is centered within the list (acting the same as <code>center</code>).
     </br>
     &nbsp;&nbsp;&nbsp;<code>[click to see how it works]</code>
   </summary>
+  </br>
   <blockquote>
 
-```txt
-
+```
 1. scrolling to 6th that is clother than one viewport - scroll as little as possible
 2. scrolling then to 11th that is father than one viewport
 
@@ -531,9 +542,10 @@ A set of available values defining a target element when scrolling via [`UseWind
     </br>
     &nbsp;&nbsp;&nbsp;<code>[click to see how it works]</code>
   </summary>
+  </br>
   <blockquote>
 
-```txt
+```
   *=========================*             +---------------------+               +---------------------+
   ‖ | #0                  | ‖             | #0                  |               | #0                  |
   ‖ |                     | ‖             |                     |               |                     |
@@ -616,9 +628,10 @@ A set of available values defining a target element when scrolling via [`UseWind
     </br>
     &nbsp;&nbsp;&nbsp;<code>[click to see how it works]</code>
   </summary>
+  </br>
   <blockquote>
 
-```txt
+```
   *=========================*             +---------------------+               +---------------------+
   ‖ | #0                  | ‖             | #0                  |               | #0                  |
   ‖ |                     | ‖             |                     |               |                     |
@@ -701,9 +714,10 @@ A set of available values defining a target element when scrolling via [`UseWind
     </br>
     &nbsp;&nbsp;&nbsp;<code>[click to see how it works]</code>
   </summary>
+  </br>
   <blockquote>
 
-```txt
+```
   *=========================*             +---------------------+               +---------------------+
   ‖ | #0                  | ‖             | #0                  |               | #0                  |
   ‖ |                     | ‖           *=========================*             |                     |
@@ -739,42 +753,42 @@ A set of available values defining a target element when scrolling via [`UseWind
     +---------------------+               +---------------------+               +---------------------+
 
                                                                                             ‖
-                                                                                          3 ‖
+                                                                                          7 ‖
                                                                                             v
 
-  *=========================*           *=========================*             +---------------------+
-  ‖ | #0                  | ‖           ‖ | #0                  | ‖             | #0                  |
-  ‖ |                     | ‖           ‖ |                     | ‖           *=========================*
-  ‖ |                     | ‖           ‖ |                     | ‖           ‖ |                     | ‖
-  ‖ +---------------------+ ‖           ‖ +---------------------+ ‖           ‖ +---------------------+ ‖
-  ‖ | #1                  | ‖           ‖ | #1                  | ‖           ‖ | #1                  | ‖
-  ‖ |                     | ‖           ‖ |                     | ‖           ‖ |                     | ‖
-  ‖ |                     | ‖           ‖ |                     | ‖           ‖ |                     | ‖
-  ‖ +---------------------+ ‖           ‖ +---------------------+ ‖           ‖ +---------------------+ ‖
-  ‖ | #2                  | ‖           ‖ | #2                  | ‖           ‖ | #2                  | ‖
-  ‖ |                     | ‖           ‖ |                     | ‖           ‖ |                     | ‖
-  ‖ |                     | ‖           ‖ |                     | ‖           ‖ |                     | ‖
-  ‖ +---------------------+ ‖           ‖ +---------------------+ ‖           ‖ +---------------------+ ‖
-  ‖ | #3                  | ‖           ‖ | #3                  | ‖           ‖ | #3                  | ‖
-  *=========================*           *=========================*           ‖ |                     | ‖
-    |                     |       0       |                     |       2     ‖ |                     | ‖
-    +---------------------+      <==      +---------------------+      <==    *=========================*
-    | #4                  |   no change   | #4                  |               | #4                  |
-    |                     |               |                     |               |                     |
-    |                     |               |                     |               |                     |
-    +---------------------+               +---------------------+               +---------------------+
-    | #5                  |               | #5                  |               | #5                  |
-    |                     |               |                     |               |                     |
-    |                     |               |                     |               |                     |
-    +---------------------+               +---------------------+               +---------------------+
-    | #6                  |               | #6                  |               | #6                  |
-    |                     |               |                     |               |                     |
-    |                     |               |                     |               |                     |
-    +---------------------+               +---------------------+               +---------------------+
-    | #7                  |               | #7                  |               | #7                  |
-    |                     |               |                     |               |                     |
-    |                     |               |                     |               |                     |
-    +---------------------+               +---------------------+               +---------------------+
+  *=========================*             +---------------------+               +---------------------+
+  ‖ | #0                  | ‖             | #0                  |               | #0                  |
+  ‖ |                     | ‖           *=========================*             |                     |
+  ‖ |                     | ‖           ‖ |                     | ‖             |                     |
+  ‖ +---------------------+ ‖           ‖ +---------------------+ ‖             +---------------------+
+  ‖ | #1                  | ‖           ‖ | #1                  | ‖             | #1                  |
+  ‖ |                     | ‖           ‖ |                     | ‖             |                     |
+  ‖ |                     | ‖           ‖ |                     | ‖             |                     |
+  ‖ +---------------------+ ‖           ‖ +---------------------+ ‖             +---------------------+
+  ‖ | #2                  | ‖           ‖ | #2                  | ‖             | #2                  |
+  ‖ |                     | ‖           ‖ |                     | ‖             |                     |
+  ‖ |                     | ‖           ‖ |                     | ‖             |                     |
+  ‖ +---------------------+ ‖           ‖ +---------------------+ ‖             +---------------------+
+  ‖ | #3                  | ‖           ‖ | #3                  | ‖             | #3                  |
+  *=========================*           ‖ |                     | ‖             |                     |
+    |                     |       2     ‖ |                     | ‖     3       |                     |
+    +---------------------+      <==    *=========================*    <==      +---------------------+
+    | #4                  |               | #4                  |               | #4                  |
+    |                     |               |                     |             *=========================*
+    |                     |               |                     |             ‖ |                     | ‖
+    +---------------------+               +---------------------+             ‖ +---------------------+ ‖
+    | #5                  |               | #5                  |             ‖ | #5                  | ‖
+    |                     |               |                     |             ‖ |                     | ‖
+    |                     |               |                     |             ‖ |                     | ‖
+    +---------------------+               +---------------------+             ‖ +---------------------+ ‖
+    | #6                  |               | #6                  |             ‖ | #6                  | ‖
+    |                     |               |                     |             ‖ |                     | ‖
+    |                     |               |                     |             ‖ |                     | ‖
+    +---------------------+               +---------------------+             ‖ +---------------------+ ‖
+    | #7                  |               | #7                  |             ‖ | #7                  | ‖
+    |                     |               |                     |             ‖ |                     | ‖
+    |                     |               |                     |             ‖ |                     | ‖
+    +---------------------+               +---------------------+             *=========================*
 ```
 
   </blockquote>
