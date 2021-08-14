@@ -1,20 +1,16 @@
+## `useWindowedList`
+
 ```ts
 <E extends HTMLElement>(options: UseWindowedListOptions) => UseWindowedListResult<E>
 ```
 
-The custom `useWindowedList` hook calculates a visible range of items in a given viewport. By rendering only part of large data sets, it might 1) speed up the initial render and 2) reduce memory allocation of not visible DOM nodes.
-
-The hook creates zero additional DOM nodes, meaning that it provides unlimited customization freedom for both style preferenes and tags structure.
-
-## Motivation
-
-## How does it work?
+The custom `useWindowedList` hook calculates a visible range of items in a given viewport. The hook creates zero additional DOM nodes, meaning that it provides unlimited customization freedom for both style preferenes and tags structure.
 
 Under the hood the hook calculates range of visible items based on 3 variables:
 
 1. scroll position
-2. container size
-3. items size
+1. container size
+1. items size
 
 ```
       ----- +---------------------+           +---------------------+           +---------------------+
@@ -53,9 +49,10 @@ Under the hood the hook calculates range of visible items based on 3 variables:
 
 ```
 
-This is a bare minimum to determine both first and last visible items. With the border indexes it's pretty straightforward to calculate space required to reserve for invisible items on both sides. By following this strategy you can replace huge amount of complex item componets by a single placeholder node at each end.
+This is a bare minimum to determine both first and last visible items. With the indexes known it's pretty straightforward to calculate spaces required to reserve before the first and after the last visible items. Following this strategy you can replace huge amount of complex item componets by a single placeholder node at each side and
 
-If any of the 3 variables changes the hook updates resulting values and this is where invisible becomes visible 💫 (and another way around).
+1. speed up the initial render
+1. reduce memory allocation of not visible DOM nodes
 
 ### `interface UseWindowedListOptions`
 
@@ -217,7 +214,7 @@ __________________|                  .              |_______________|         . 
   </blockquote>
 </details>
 
-#### `UseWindowedListOptions.onItemsRendered?: (renderedRange: ListRenderedRange) => void`
+#### `UseWindowedListOptions.onItemsRendered?: (renderedRange:`[`ListRenderedRange`][todo]`) => void`
 
 A callback to call when either visible or overscan ranges change. See [`ListRenderedRange`][todo] for more details about the ranges.
 
@@ -256,7 +253,7 @@ The `range` indicates that elements with indexes `[16, 17, 18, 19]` are visible 
 
 ### `interface UseWindowedListResult`
 
-The result of the hook call containing all needed information about windowed items and a piece of helpful additional properties and methods.
+The result of the hook call containing all needed information about windowed items and a piece of helpful additional properties and functions.
 
 ```ts
 export interface UseWindowedListResult<E extends HTMLElement>
@@ -528,7 +525,7 @@ A set of available values defining a target element when scrolling via [`UseWind
     +---------------------+       |     ‖ +---------------------+ ‖             +---------------------+
     | #6                  |       |     ‖ | #6                  | ‖             | #6                  |
     |                     |       |     ‖ |                     | ‖     11      |                     |
-    |                     |       v     ‖ |                     | ‖    ===>     |                     |
+    |                     |       ▼     ‖ |                     | ‖    ===>     |                     |
     +---------------------+       ----- *=========================* -----       +---------------------+
     | #7                  |               | #7                  |       |       | #7                  |
     |                     |               |                     |       |       |                     |
@@ -548,7 +545,7 @@ A set of available values defining a target element when scrolling via [`UseWind
     +---------------------+               +---------------------+       *     ‖ +---------------------+ ‖
     | #11                 |               | #11                 |       *     ‖ | #11                 | ‖
     |                     |               |                     |       *     ‖ |                     | ‖
-    |                     |               |                     |       v     ‖ |                     | ‖
+    |                     |               |                     |       ▼     ‖ |                     | ‖
     +---------------------+               +---------------------+       ----- ‖ +---------------------+ ‖
     | #12                 |               | #12                 |             ‖ | #12                 | ‖
     |                     |               |                     |             ‖ |                     | ‖
@@ -564,7 +561,7 @@ A set of available values defining a target element when scrolling via [`UseWind
 5. scrolling to 0th that is clother than one viewport - scroll as little as possible        v
 
   *=========================* ------      +---------------------+               +---------------------+
-  ‖ | #0                  | ‖      ^      | #0                  |               | #0                  |
+  ‖ | #0                  | ‖      ▲      | #0                  |               | #0                  |
   ‖ |                     | ‖      |      |                     |               |                     |
   ‖ |                     | ‖      |      |                     |               |                     |
   ‖ +---------------------+ ‖      |      +---------------------+               +---------------------+
@@ -576,7 +573,7 @@ A set of available values defining a target element when scrolling via [`UseWind
   ‖ |                     | ‖           ‖ |                     | ‖     3       |                     |
   ‖ |                     | ‖           ‖ |                     | ‖    <==      |                     |
   ‖ +---------------------+ ‖           ‖ +---------------------+ ‖ -----       +---------------------+
-  ‖ | #3                  | ‖           ‖ | #3                  | ‖     ^       | #3                  |
+  ‖ | #3                  | ‖           ‖ | #3                  | ‖     ▲       | #3                  |
   *=========================*           ‖ |                     | ‖     *       |                     |
     |                     |             ‖ |                     | ‖     *       |                     |
     +---------------------+             ‖ +---------------------+ ‖     *       +---------------------+
