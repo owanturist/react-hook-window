@@ -1,4 +1,4 @@
-```ts static
+```ts
 <E extends HTMLElement>(options: UseWindowedListOptions) => UseWindowedListResult<E>
 ```
 
@@ -61,7 +61,7 @@ If any of the 3 variables changes the hook updates resulting values and this is 
 
 A collection of options to configure the windowed list.
 
-```ts static
+```ts
 interface UseWindowedListOptions {
   containerSize: number
   itemSize: ItemSize
@@ -162,7 +162,7 @@ The number of items to render outside of the visible area. The hook will update 
 
 > tip: setting the value too high will degrade performance but keeping the value reasonably low could improve UX by pre-rendering not yet visible items.
 
-#### `UseWindowedListOptions.layout?: `[`ListLayout`][todo]` = 'vertical'`
+#### `UseWindowedListOptions.layout?:`[`ListLayout`][todo]`= 'vertical'`
 
 The option determines in which direction a list's content will be windowed. By knowing the layout the hook can correctly extract current scrolling position and calculate desired ones on [`UseWindowedListResult.scrollTo`][todo] and [`UseWindowedListResult.scrollToItem`][todo] calls.
 
@@ -170,9 +170,11 @@ The option determines in which direction a list's content will be windowed. By k
 
 Scrolling position of a windowed list in pixels for an initial render only. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
 
-#### `UseWindowedListOptions.initialScroll?: { index: number; position?: `[`ScrollPosition`][todo]` }`
+#### `UseWindowedListOptions.initialScroll?: { index: number; position?:`[`ScrollPosition`][todo]`}`
 
 Scrolling position of a windowed list based on element index for an initial render only. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
+
+_Parameters_
 
 - `index: number` - defines an element's index to be scroll to on initial render.
 - `position?: `[`ScrollPosition`][todo] - defines a strategy to use for scrolling to a desired element.
@@ -220,6 +222,92 @@ __________________|                  .              |_______________|         . 
 A callback to call when either visible or overscan ranges change. See [`ListRenderedRange`][todo] for more details about the ranges.
 
 > tip: it's important to memoize the callback, otherwise it will be called not only on the ranges change but on the callback value change as well.
+
+### `interface ListRenderedRange`
+
+A collection of values describing two half-open intervals.
+
+```ts
+export interface ListRenderedRange {
+  overscanStart: number
+  overscanStop: number
+  visibleStart: number
+  visibleStop: number
+}
+```
+
+1. visible items ∈ `[visibleStart, visibleStop)` partially or entirelly visible on the current scroll position
+1. overscan items ∈ `[overscanStart, overscanStop)` includes visible items and some additional non visible defined via [UseWindowedListOptions.overscanCount][todo] value.
+
+Both intervals include the start indexes and exclude end onces, so the resulting index ranges might be iterated by `for (let i = start; i < stop; i++)`, for instance:
+
+```ts
+const range: ListRenderedRange = {
+  overscanStart: 15,
+  overscanStop: 21,
+  visibleStart: 16,
+  visibleStop: 20
+}:
+```
+
+The `range` indicates that elements with indexes `[16, 17, 18, 19]` are visible and `[15, 16, 17, 18, 19, 20]` are overscan.
+
+> why: you might thing that the ranges should be defined as closed interval. For example visible items ∈ `[visibleStart, visibleStop]` so indexes might be iterated via `for (let i = start; i <= stop; i++)`. It works fine until it defines non empty ranges. If for some reason a range is empty it should be defined like `[1, 0]` or `[16, 0]`, because `[1, 1]` and `[16, 16]` define single item ranges. It is confusing. Instead, it excludes stop index, so it the empty ranges converts to `[1, 1)` and `[16, 16)`.
+
+### `interface UseWindowedListResult`
+
+The result of the hook call containing all needed information about windowed items and a piece of helpful additional properties and methods.
+
+```ts
+export interface UseWindowedListResult<E extends HTMLElement>
+  extends ListRenderedRange {
+  startSpace: number
+  endSpace: number
+  indexes: ReadonlyArray<number>
+  isScrolling: boolean
+  container: null | E
+  setRef: (node: null | E) => void
+  scrollTo: (px: number) => void
+  scrollToItem: (index: number, position?: ScrollPosition) => void
+}
+```
+
+#### `UseWindowedListResult.startSpace: number`
+
+A space in pixels before the first rendered item required to reserve instead of rendering items outisde of a visible area. It represents either top space for vertical or left space for horizontal [layouts][todo]. Take a look at an illustration in the ["How does it work"][todo] section.
+
+#### `UseWindowedListResult.endSpace: number`
+
+A space in pixels after the last rendered item required to reserve instead of rendering items outisde of a visible area. It represents either bottom space for vertical or right space for horizontal [layouts][todo]. Take a look at an illustration in the ["How does it work"][todo] section.
+
+#### `UseWindowedListResult.indexes: ReadonlyArray<number>`
+
+An array of the list items' indexes. The range starts from `ListRenderedRange.overscanStart` and ends before `ListRenderedRange.overscanStop` so it's easy to use `indexes.map` method to map the indexes to items' data.
+
+#### `UseWindowedListResult.isScrolling: boolean`
+
+A flag indicating whenever the container is scrolling. See the relevant [`UseWindowedListOptions.containerIsScrollingDebounceInterval`][todo] option for changing it's behaviour.
+
+#### `UseWindowedListResult.container: null | E`
+
+The container node `E extends HTMLElement` assigned by [`UseWindowedListResult.setRef`][todo].
+
+#### `UseWindowedListResult.setRef: (node: null | E) => void`
+
+A function to set a container of a windowed list. Each call of `setRef` enqueues a re-render of the component so the hook always calculates an output with an actual container. The value is accessable via [`UseWindowedListResult.container`][todo].
+
+#### `UseWindowedListResult.scrollTo: (px: number) => void`
+
+A function to scroll a windowed list to a position in pixels. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
+
+#### `UseWindowedListResult.scrollToItem: (index: number, position?:`[`ScrollPosition`][todo]`) => void`
+
+A function to scroll a windowed list to a position of element index. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
+
+_Parameters_
+
+- `index: number` - defines an element's index to be scroll to.
+- `position?: `[`ScrollPosition`][todo] - defines a strategy to use for scrolling to a desired element.
 
 ### `type ListLayout`
 
@@ -794,37 +882,6 @@ A set of available values defining a target element when scrolling via [`UseWind
 
   </blockquote>
 </details>
-
-### `interface ListRenderedRange`
-
-A collection of values describing two half-open intervals.
-
-```ts
-export interface ListRenderedRange {
-  overscanStart: number
-  overscanStop: number
-  visibleStart: number
-  visibleStop: number
-}
-```
-
-1. visible items ∈ `[visibleStart, visibleStop)` partially or entirelly visible on the current scroll position
-1. overscan items ∈ `[overscanStart, overscanStop)` includes visible items and some additional non visible defined via [UseWindowedListOptions.overscanCount][todo] value.
-
-Both intervals include the start indexes and exclude end onces, so the resulting index ranges might be iterated by `for (let i = start; i < stop; i++)`, for instance:
-
-```ts
-const range: ListRenderedRange = {
-  overscanStart: 15,
-  overscanStop: 21,
-  visibleStart: 16,
-  visibleStop: 20
-}:
-```
-
-The `range` indicates that elements with indexes `[16, 17, 18, 19]` are visible and `[15, 16, 17, 18, 19, 20]` are overscan.
-
-> why: you might thing that the ranges should be defined as closed interval. For example visible items ∈ `[visibleStart, visibleStop]` so indexes might be iterated via `for (let i = start; i <= stop; i++)`. It works fine until it defines non empty ranges. If for some reason a range is empty it should be defined like `[1, 0]` or `[16, 0]`, because `[1, 1]` and `[16, 16]` define single item ranges. It is confusing. Instead, it excludes stop index, so it the empty ranges converts to `[1, 1)` and `[16, 16)`.
 
 <!-- --------------------------------------------- -->
 
