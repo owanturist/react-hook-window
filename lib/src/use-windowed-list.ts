@@ -126,11 +126,11 @@ export interface UseWindowedListOptions {
 
 export interface UseWindowedListResult<E extends HTMLElement>
   extends ListRenderedRange {
-  container: null | E
   startSpace: number
   endSpace: number
-  indexes: Array<number>
+  indexes: ReadonlyArray<number>
   isScrolling: boolean
+  container: null | E
   setRef(node: null | E): void
   scrollTo(px: number): void
   scrollToItem(index: number, position?: ScrollPosition): void
