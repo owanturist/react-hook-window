@@ -72,7 +72,11 @@ interface UseWindowedListOptions {
 }
 ```
 
-### `UseWindowedListOptions.containerSize: number`
+### `UseWindowedListOptions.containerSize` _required_
+
+```ts
+containerSize: number
+```
 
 A size of the container in pixels which determine the number of items visible at any given time. Represents either hight for vertical or width for horizontal layout.
 
@@ -82,19 +86,21 @@ A size of the container in pixels which determine the number of items visible at
 
 > pro tip: it's recommended to use debouncing/throttline of the container size in case of high frequent changes to gain better performance. See the example of throttling the size value (@TODO add links to the example).
 
-### `UseWindowedListOptions.itemSize: number`
+### `UseWindowedListOptions.itemSize` _required_
 
-A size of every item in pixels. Represents either items' height for vertical or width for horisontal layout.
+A size of an item in pixels. Represents either items' height for vertical or width for horisontal layout.
 
-It is an ideal option in cases when all items have the same size. In cases when items have different or unknown sizes, you can define the `itemSize` as a function (@TODO add cross-link to the doc).
+In cases when all items have the same size it can define it as a constant number:
 
-> note: The hook does not read items size from DOM nodes properties so the value must represent actual size of the given items.
+```ts
+itemSize: number
+```
 
-### `UseWindowedListOptions.itemSize: (index: number) => number`
+But if items have unknown or different sizes it could be defined as a function, returning an item's height by its index:
 
-A function that determines an item's size in pixels by its index. Represents either items' height for vertical or width for horisontal layout.
-
-This is the only option to define a windowed list with variable items size. In cases when items have same known size, you can define the `itemSize` value as a number (@TODO add cross-link to the doc).
+```ts
+itemSize: (index: number) => number
+```
 
 > note: The hook does not read items size from DOM nodes properties so the value must represent actual size of the given items.
 
@@ -106,7 +112,9 @@ This is the only option to define a windowed list with variable items size. In c
 > const itemSize = (index: number): number => ITEMS_SIZE_ARRAY[index] || 0
 > ```
 
-> important: in order to reduce amount of constructions of the `itemEndPositions` array the `itemSize` function should change as less often as possible. You can achieve that by using memoization technics. See the example of using React memoization tools (@TODO add links to the example). Click on the "How dynamic item size works" section right below the notice to understand why the memoizatin is imporant.
+TODO rearrange that 👇
+
+> important: in order to reduce amount of constructions of the `itemsEndPositions` array the `itemSize` function should change as less often as possible. You can achieve that by using memoization technics. See the example of using React memoization tools (@TODO add links to the example). Click on the "How dynamic item size works" section right below the notice to understand why the memoizatin is imporant.
 
 <details>
   <summary>
@@ -147,11 +155,19 @@ The first downside could be overcome by assuming that real applications search f
 
 </blockquote></details>
 
-### `UseWindowedListOptions.itemCount: number`
+### `UseWindowedListOptions.itemCount` _required_
 
-The number of items. That's simple. The hook will re-calculate the output on each value update so don't be afraid to change it on fly.
+```ts
+itemCount: number
+```
 
-### `UseWindowedListOptions.overscanCount?: number = 1`
+The number of items. The hook will re-calculate the output on each value update.
+
+### `UseWindowedListOptions.overscanCount` _optional_
+
+```ts
+overscanCount?: number = 1
+```
 
 The number of items to render outside of the visible area. The hook will update the output on each value update.
 
@@ -159,28 +175,46 @@ The number of items to render outside of the visible area. The hook will update 
 
 > tip: setting the value too high will degrade performance but keeping the value reasonably low could improve UX by pre-rendering not yet visible items.
 
-### `UseWindowedListOptions.layout?:`[`ListLayout`][todo]`= 'vertical'`
+### `UseWindowedListOptions.layout` _optional_
+
+```ts
+layout?: ListLayout = 'vertical'
+```
 
 The option determines in which direction a list's content will be windowed. By knowing the layout the hook can correctly extract current scrolling position and calculate desired ones on [`UseWindowedListResult.scrollTo`][todo] and [`UseWindowedListResult.scrollToItem`][todo] calls.
 
-### `UseWindowedListOptions.initialScroll?: number = 0`
+### `UseWindowedListOptions.initialScroll` _optional_
 
-Scrolling position of a windowed list in pixels for an initial render only. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
+Scrolling position of a windowed list for an initial render only. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
 
-### `UseWindowedListOptions.initialScroll?: { index: number; position?:`[`ScrollPosition`][todo]`}`
+It might be defined as amount of pixels with `0` by default:
 
-Scrolling position of a windowed list based on element index for an initial render only. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
+```ts
+initialScroll?: number = 0
+```
 
-_Parameters_
+or as an item's index:
 
-- `index: number` - defines an element's index to be scroll to on initial render.
-- `position?: `[`ScrollPosition`][todo] - defines a strategy to use for scrolling to a desired element.
+```ts
+initialScroll?: {
+  index: number
+  position?: ScrollPosition
+}
+```
 
-### `UseWindowedListOptions.containerOnScrollThrottleInterval?: number = 16`
+### `UseWindowedListOptions.containerOnScrollThrottleInterval` _optional_
+
+```ts
+containerOnScrollThrottleInterval?: number = 16
+```
 
 The value defining a throttle interval of a container scroll listener in milliseconds. High value makes UI response faster but degrade performance and another way around. The default value limits the listener on ~60 calls per second.
 
-### `UseWindowedListOptions.containerIsScrollingDebounceInterval?: number = 150`
+### `UseWindowedListOptions.containerIsScrollingDebounceInterval` _optional_
+
+```ts
+containerIsScrollingDebounceInterval?: number = 150
+```
 
 The value defining an interval in milliseconds to determine the [`isScrolling`][todo] flag. The flag becomes `true` on the first onScroll listener call and turns `false` after the debounce interval time passed from the last call of the listener. The default value is an empiric based interval to provide natural feeling of the flag behaviour.
 
@@ -214,15 +248,20 @@ The value defining an interval in milliseconds to determine the [`isScrolling`][
   </blockquote>
 </details>
 
-### `UseWindowedListOptions.onItemsRendered?: (renderedRange:`[`ListRenderedRange`][todo]`) => void`
+### `UseWindowedListOptions.onItemsRendered` _optional_
+
+```ts
+/**
+ * renderedRange - a collection of visile and overscan items' indexes
+ */
+onItemsRendered?: (renderedRange: ListRenderedRange) => void
+```
 
 A callback to call when either visible or overscan ranges change. See [`ListRenderedRange`][todo] for more details about the ranges.
 
 > tip: it's important to memoize the callback, otherwise it will be called not only on the ranges change but on the callback value change as well.
 
 ## `interface ListRenderedRange`
-
-A collection of values describing two half-open intervals.
 
 ```ts
 export interface ListRenderedRange {
@@ -233,8 +272,12 @@ export interface ListRenderedRange {
 }
 ```
 
+A collection of values describing two half-open intervals:
+
 1. visible items ∈ `[visibleStart, visibleStop)` partially or entirelly visible on the current scroll position
 1. overscan items ∈ `[overscanStart, overscanStop)` includes visible items and some additional non visible defined via [UseWindowedListOptions.overscanCount][todo] value.
+
+TODO put below content to collapsable with something like "Read why it is like this" name.
 
 Both intervals include the start indexes and exclude end onces, so the resulting index ranges might be iterated by `for (let i = start; i < stop; i++)`, for instance:
 
@@ -269,31 +312,65 @@ export interface UseWindowedListResult<E extends HTMLElement>
 }
 ```
 
-### `UseWindowedListResult.startSpace: number`
+### `UseWindowedListResult.startSpace`
+
+```ts
+startSpace: number
+```
 
 A space in pixels before the first rendered item required to reserve instead of rendering items outisde of a visible area. It represents either top space for vertical or left space for horizontal [layouts][todo]. Take a look at an illustration in the ["How does it work"][todo] section.
 
-### `UseWindowedListResult.endSpace: number`
+### `UseWindowedListResult.endSpace`
+
+```ts
+endSpace: number
+```
 
 A space in pixels after the last rendered item required to reserve instead of rendering items outisde of a visible area. It represents either bottom space for vertical or right space for horizontal [layouts][todo]. Take a look at an illustration in the ["How does it work"][todo] section.
 
-### `UseWindowedListResult.indexes: ReadonlyArray<number>`
+### `UseWindowedListResult.indexes`
+
+```ts
+indexes: ReadonlyArray<number>
+```
 
 An array of the list items' indexes. The range starts from `ListRenderedRange.overscanStart` and ends before `ListRenderedRange.overscanStop` so it's easy to use `indexes.map` method to map the indexes to items' data.
 
-### `UseWindowedListResult.isScrolling: boolean`
+### `UseWindowedListResult.isScrolling`
+
+```ts
+isScrolling: boolean
+```
 
 A flag indicating whenever the container is scrolling. See the relevant [`UseWindowedListOptions.containerIsScrollingDebounceInterval`][todo] option for changing it's behaviour.
 
-### `UseWindowedListResult.container: null | E`
+### `UseWindowedListResult.container`
 
-The container node `E extends HTMLElement` assigned by [`UseWindowedListResult.setRef`][todo].
+```ts
+container: null | E
+```
 
-### `UseWindowedListResult.setRef: (node: null | E) => void`
+Either a container's node extending `HTMLElement` or `null` assigned by [`UseWindowedListResult.setRef`][todo].
+
+### `UseWindowedListResult.setRef`
+
+```ts
+/**
+ * node - either a container's DOM node exteinding HTMLElement or null
+ */
+setRef: (node: null | E) => void
+```
 
 A function to set a container of a windowed list. Each call of `setRef` enqueues a re-render of the component so the hook always calculates an output with an actual container. The value is accessable via [`UseWindowedListResult.container`][todo].
 
-### `UseWindowedListResult.scrollTo: (px: number) => void`
+### `UseWindowedListResult.scrollTo`
+
+```ts
+/**
+ * px - a scrolling position of a container to be scrolling to
+ */
+scrollTo: (px: number) => void
+```
 
 A function to scroll a windowed list to a position in pixels. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
 
@@ -301,10 +378,10 @@ A function to scroll a windowed list to a position in pixels. It affect either `
 
 ```ts
 /**
- * index - defines an element's index to be scroll to
- * position = 'auto' - defines a strategy to use for scrolling to a desired element
+ * index - an element's index to be scrolling to
+ * position = 'auto' - a strategy to use for scrolling to a desired element
  */
-const scrollToItem: (index: number, position?: ScrollPosition) => void
+scrollToItem: (index: number, position?: ScrollPosition) => void
 ```
 
 A function to scroll a windowed list to a position of element index. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
