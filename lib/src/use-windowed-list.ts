@@ -131,6 +131,7 @@ export interface UseWindowedListResult<E extends HTMLElement>
   indexes: ReadonlyArray<number>
   isScrolling: boolean
   container: null | E
+  // @TODO rename to setContainerRef
   setRef(node: null | E): void
   scrollTo(px: number): void
   scrollToItem(index: number, position?: ScrollPosition): void
