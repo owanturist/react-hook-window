@@ -297,14 +297,19 @@ A function to set a container of a windowed list. Each call of `setRef` enqueues
 
 A function to scroll a windowed list to a position in pixels. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
 
-#### `UseWindowedListResult.scrollToItem: (index: number, position?:`[`ScrollPosition`][todo]`) => void`
+#### `UseWindowedListResult.scrollToItem`
+
+```ts
+/**
+ * index - defines an element's index to be scroll to
+ * position = 'auto' - defines a strategy to use for scrolling to a desired element
+ */
+(index: number, position?: ScrollPosition) => void
+```
 
 A function to scroll a windowed list to a position of element index. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
 
 _Parameters_
-
-- `index: number` - defines an element's index to be scroll to.
-- `position?: `[`ScrollPosition`][todo] - defines a strategy to use for scrolling to a desired element.
 
 ### `type ListLayout`
 
