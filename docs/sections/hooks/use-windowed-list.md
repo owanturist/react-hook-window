@@ -304,12 +304,10 @@ A function to scroll a windowed list to a position in pixels. It affect either `
  * index - defines an element's index to be scroll to
  * position = 'auto' - defines a strategy to use for scrolling to a desired element
  */
-scrollToItem: (index: number, position?: ScrollPosition) => void
+const scrollToItem: (index: number, position?: ScrollPosition) => void
 ```
 
 A function to scroll a windowed list to a position of element index. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
-
-_Parameters_
 
 ### `type ListLayout`
 
