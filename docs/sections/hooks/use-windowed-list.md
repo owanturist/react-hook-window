@@ -1,4 +1,106 @@
-# `useWindowedList`
+# Getting Started
+
+If you are using Yarn here is how you install it:
+
+```bash
+yarn add react-hook-window
+```
+
+And for a NPM oriented audience here is what you would run:
+
+```bash
+npm install react-hook-window
+```
+
+# Usage
+
+Consider a friends list component:
+
+```tsx
+import React from 'react'
+
+const FRIENDS_CONTAINER_HEIGHT = 500
+const FRIENDS_ITEM_HEIGHT = 60
+
+export interface Friend {
+  id: string
+  name: string
+}
+
+export const FriendsList: React.VFC<{
+  friends: Array<Friend>
+}> = ({ friends }) => {
+  return (
+    <div
+      className="container"
+      style={{
+        overflow: 'auto',
+        height: FRIENDS_CONTAINER_HEIGHT
+      }}
+    >
+      {friends.map(friend => (
+        <div
+          key={friend.id}
+          className="box"
+          style={{ height: FRIENDS_ITEM_HEIGHT }}
+        >
+          {friend.name}
+        </div>
+      ))}
+    </div>
+  )
+}
+```
+
+Let's convert it to a windowed feed component via four steps:
+
+```tsx
+export const FriendsList: React.VFC<{
+  friends: Array<Friend>
+}> = ({ friends }) => {
+  // 1. Call the hook
+  const { setRef, startSpace, endSpace, indexes } = useWindowedList({
+    containerSize: FRIENDS_CONTAINER_HEIGHT,
+    itemSize: FRIENDS_ITEM_HEIGHT,
+    itemCount: friends.length
+  })
+
+  return (
+    <div
+      // 2. Set the container ref
+      ref={setRef}
+      className="container"
+      style={{
+        overflow: 'auto',
+        height: FRIENDS_CONTAINER_HEIGHT
+      }}
+    >
+      {/* 3.1. Add the start spacer */}
+      <div style={{ height: startSpace }} />
+
+      {indexes
+        // 4. Map indexes to items
+        .map(index => friends[index])
+        .map(friend => (
+          <div
+            key={friend.id}
+            className="box"
+            style={{ height: FRIENDS_ITEM_HEIGHT }}
+          >
+            {friend.name}
+          </div>
+        ))}
+
+      {/* 3.2. Add the end spacer */}
+      <div style={{ height: endSpace }} />
+    </div>
+  )
+}
+```
+
+This is the most basic usage example. See API documentation and Examples for more insights.
+
+## `useWindowedList`
 
 ```ts
 <E extends HTMLElement>(options: UseWindowedListOptions) => UseWindowedListResult<E>
@@ -72,7 +174,7 @@ interface UseWindowedListOptions {
 }
 ```
 
-### `UseWindowedListOptions.containerSize` _required_
+### `UseWindowedListOptions.containerSize`
 
 ```ts
 containerSize: number
@@ -86,7 +188,7 @@ A size of the container in pixels which determine the number of items visible at
 
 > pro tip: it's recommended to use debouncing/throttline of the container size in case of high frequent changes to gain better performance. See the example of throttling the size value (@TODO add links to the example).
 
-### `UseWindowedListOptions.itemSize` _required_
+### `UseWindowedListOptions.itemSize`
 
 A size of an item in pixels. Represents either items' height for vertical or width for horisontal layout.
 
@@ -155,7 +257,7 @@ The first downside could be overcome by assuming that real applications search f
 
 </blockquote></details>
 
-### `UseWindowedListOptions.itemCount` _required_
+### `UseWindowedListOptions.itemCount`
 
 ```ts
 itemCount: number
@@ -163,7 +265,7 @@ itemCount: number
 
 The number of items. The hook will re-calculate the output on each value update.
 
-### `UseWindowedListOptions.overscanCount` _optional_
+### `UseWindowedListOptions.overscanCount`
 
 ```ts
 overscanCount?: number = 1
@@ -175,7 +277,7 @@ The number of items to render outside of the visible area. The hook will update 
 
 > tip: setting the value too high will degrade performance but keeping the value reasonably low could improve UX by pre-rendering not yet visible items.
 
-### `UseWindowedListOptions.layout` _optional_
+### `UseWindowedListOptions.layout`
 
 ```ts
 layout?: ListLayout = 'vertical'
@@ -183,7 +285,7 @@ layout?: ListLayout = 'vertical'
 
 The option determines in which direction a list's content will be windowed. By knowing the layout the hook can correctly extract current scrolling position and calculate desired ones on [`UseWindowedListResult.scrollTo`][todo] and [`UseWindowedListResult.scrollToItem`][todo] calls.
 
-### `UseWindowedListOptions.initialScroll` _optional_
+### `UseWindowedListOptions.initialScroll`
 
 Scrolling position of a windowed list for an initial render only. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
 
@@ -202,7 +304,7 @@ initialScroll?: {
 }
 ```
 
-### `UseWindowedListOptions.containerOnScrollThrottleInterval` _optional_
+### `UseWindowedListOptions.containerOnScrollThrottleInterval`
 
 ```ts
 containerOnScrollThrottleInterval?: number = 16
@@ -210,7 +312,7 @@ containerOnScrollThrottleInterval?: number = 16
 
 The value defining a throttle interval of a container scroll listener in milliseconds. High value makes UI response faster but degrade performance and another way around. The default value limits the listener on ~60 calls per second.
 
-### `UseWindowedListOptions.containerIsScrollingDebounceInterval` _optional_
+### `UseWindowedListOptions.containerIsScrollingDebounceInterval`
 
 ```ts
 containerIsScrollingDebounceInterval?: number = 150
@@ -248,7 +350,7 @@ The value defining an interval in milliseconds to determine the [`isScrolling`][
   </blockquote>
 </details>
 
-### `UseWindowedListOptions.onItemsRendered` _optional_
+### `UseWindowedListOptions.onItemsRendered`
 
 ```ts
 /**
