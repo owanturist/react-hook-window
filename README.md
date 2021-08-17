@@ -287,15 +287,13 @@ The option determines in which direction a list's content will be windowed. By k
 
 ### `UseWindowedListOptions.initialScroll`
 
-Scrolling position of a windowed list for an initial render only. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
-
-It might be defined as amount of pixels with `0` by default:
-
 ```ts
 initialScroll?: number = 0
 ```
 
-or as an item's index:
+Scrolling position of a windowed list for an initial render only. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
+
+The `number` value represents the scrolling position in pixels. If it's nesessary to scroll to an exact item the value might be defined as an object with the item's `index` and optional [scrolling `strategy`][todo]:
 
 ```ts
 initialScroll?: {
@@ -322,9 +320,9 @@ The value defining an interval in milliseconds to determine the [`isScrolling`][
 
 <details>
   <summary>
-    <code>[click to see how it works]</code>
+    Show an illustration
   </summary>
-  </br>
+
   <blockquote>
 
 ```
