@@ -52,7 +52,7 @@ export const FriendsList: React.VFC<{
 }
 ```
 
-Let's convert it to a windowed feed component via four steps:
+Let's convert it to a windowed frields list component via four steps:
 
 ```tsx
 export const FriendsList: React.VFC<{
@@ -110,9 +110,9 @@ The custom `useWindowedList` hook calculates a visible range of items in a given
 
 Under the hood the hook calculates range of visible items based on 3 variables:
 
-1. scroll position
-1. container size
-1. items size
+1. Scrolling position - the container's `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely, extractd from a container's node passing via [`UseWindowedListOptions.setRef`][todo].
+1. Container size - the container's height or width for vertical or horizontal [layouts][todo] respectevely, defined via [`UseWindowedListOptions.containerSize`][todo].
+1. Items size - the items' height or width for vertical or horizontal [layouts][todo] respectevely, defined via [`UseWindowedListOptions.itemSize`][todo].
 
 ```
     ---- ┌─────────────────┐           ┌─────────────────┐           ┌─────────────────┐
@@ -151,14 +151,12 @@ Under the hood the hook calculates range of visible items based on 3 variables:
 
 ```
 
-This is a bare minimum to determine both first and last visible items. With the indexes known it's pretty straightforward to calculate spaces required to reserve before the first and after the last visible items. Following this strategy you can replace huge amount of complex item componets by a single placeholder node at each side and
+This is a bare minimum to determine both first and last visible items. With the indexes known it's pretty straightforward to calculate spaces required to reserve before the first and after the last visible items. Following this strategy you can replace huge amount of complex item componets by a single placeholder node at each side. This helps address some common performance bottlenecks:
 
-1. speed up the initial render
-1. reduce memory allocation of not visible DOM nodes
+1. It reduces the amount of work (and time) required to render the initial view and to process updates.
+2. It reduces the memory footprint by avoiding over-allocation of DOM nodes.
 
 ## `interface UseWindowedListOptions`
-
-A collection of options to configure the windowed list.
 
 ```ts
 interface UseWindowedListOptions {
@@ -174,23 +172,25 @@ interface UseWindowedListOptions {
 }
 ```
 
+A collection of options to configure the windowed list.
+
 ### `UseWindowedListOptions.containerSize`
 
 ```ts
 containerSize: number
 ```
 
-A size of the container in pixels which determine the number of items visible at any given time. Represents either hight for vertical or width for horizontal layout.
+A size of the container in pixels which determine the number of items visible at any given time. Represents either hight for vertical or width for horizontal [layouts][todo].
 
-> note: The hook does not read container size from a DOM node properties so the value must represent actual size of the given container.
+> ❕ The hook does not read container size from a DOM node properties so the value must represent actual size of the given container.
 
-> tip: you can use any kind of approaches ([search for `use size react`](https://www.npmjs.com/search?q=use%20size%20react)) to determine size of a container in case it's unkown or changes dynamicly - the hook re-calculates output when the value changes. See the example of unknown and dynamic container sizes (@TODO add links to the examples).
+> ❗ you can use any kind of approaches ([search for `use size react`](https://www.npmjs.com/search?q=use%20size%20react)) to determine size of a container in case it's unkown or changes dynamicly - the hook re-calculates output when the value changes. See the example of unknown and dynamic container sizes (@TODO add links to the examples).
 
-> pro tip: it's recommended to use debouncing/throttline of the container size in case of high frequent changes to gain better performance. See the example of throttling the size value (@TODO add links to the example).
+> 💯 it's recommended to use debouncing/throttline of the container size in case of high frequent changes to gain better performance. See the example of throttling the size value (@TODO add links to the example).
 
 ### `UseWindowedListOptions.itemSize`
 
-A size of an item in pixels. Represents either items' height for vertical or width for horisontal layout.
+A size of an item in pixels. Represents either items' height for vertical or width for horisontal [layouts][todo].
 
 In cases when all items have the same size it can define it as a constant number:
 
