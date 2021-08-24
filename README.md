@@ -55,6 +55,8 @@ export const FriendsList: React.VFC<{
 Let's convert it to a windowed friends list component via four steps:
 
 ```tsx
+import { useWindowedList } from 'react-hook-window'
+
 export const FriendsList: React.VFC<{
   friends: Array<Friend>
 }> = ({ friends }) => {
@@ -100,11 +102,17 @@ export const FriendsList: React.VFC<{
 
 This is the most basic usage example. See API documentation and Examples for more insights.
 
+---
+
 ## `useWindowedList`
 
 ```ts
 <E extends HTMLElement>(options: UseWindowedListOptions) => UseWindowedListResult<E>
 ```
+
+> ```ts
+> import { useWindowedList } from 'react-hook-window'
+> ```
 
 The custom `useWindowedList` hook calculates a visible range of items in a given viewport. The hook creates zero additional DOM nodes, meaning that it provides unlimited customization freedom for both style preferenes and tags structure.
 
@@ -156,6 +164,8 @@ This is a bare minimum to determine both first and last visible items. With the 
 1. It reduces the amount of work (and time) required to render the initial view and to process updates.
 2. It reduces the memory footprint by avoiding over-allocation of DOM nodes.
 
+---
+
 ## `interface UseWindowedListOptions`
 
 ```ts
@@ -182,11 +192,11 @@ containerSize: number
 
 A size of the container in pixels which determine the number of items visible at any given time. Represents either hight for vertical or width for horizontal [layouts][todo].
 
-> 📝 The hook does not read container size from a DOM node properties so the value must represent actual size of the given container.
+> 💬 The hook does not read container size from a DOM node properties so the value must represent actual size of the given container.
 
 > 💡 You can use any kind of approaches ([search for `use size react`](https://www.npmjs.com/search?q=use%20size%20react)) to determine size of a container in case it's unkown or changes dynamicly - the hook re-calculates output when the value changes. See the example of unknown and dynamic container sizes (@TODO add links to the examples).
 
-> 🧠 it's recommended to use debouncing/throttline of the container size in case of high frequent changes to gain better performance. See the example of throttling the size value (@TODO add links to the example).
+> 💡 it's recommended to use debouncing/throttline of the container size in case of high frequent changes to gain better performance. See the example of throttling the size value (@TODO add links to the example).
 
 ### `UseWindowedListOptions.itemSize`
 
@@ -204,56 +214,56 @@ But if items have unknown or different sizes it could be defined as a function, 
 itemSize: (index: number) => number
 ```
 
-It is important to memoize the `itemSize` function to reduce the amount of work required to calculate items' positions table.
-
-<details>
-  <summary>
-    Show how the items' positions table is calculated.
-  </summary>
-<blockquote>
-
-Each time when `itemCount` or `itemSize` function values change the hook calculates an array of the items' end positions by accumulating items' sizes. Consider this example:
-
-```ts
-const ITEM_SIZE_ARRAY = [30, 10, 40, 50, 20]
-
-// the hooks attributes
-const itemCount = ITEM_SIZE_ARRAY.length
-const itemSize = (index: number): number => ITEMS_SIZE_ARRAY[index]
-
-// the hook INTERNAL array with each item end positions
-const itemsEndPositions = [
-  // each value is a sum of two numbers:
-  // - left number is end position of previous item (or 0 for the first one)
-  // - right number is size of the item
-  30, // 0 + 30
-  40, // 30 + 10
-  80, // 40 + 40
-  130, // 80 + 50
-  150 // 130 + 20
-]
-```
-
-Each time when the hook should calculate first or last visible items for the current scroll position it performs binary search in the `itemsEndPosition` array. The binary search spends only `O(log n)` (where `n` is `itemCount`), wihch means that it takes maximum 10 steps to find a value in 1.000 items or maximum 20 steps in 1.000.000 items. For comparasing, linear search wich takes `O(n)` time and will find a value for maximum 1.000 steps in 1.000 items, or maximum 1.000.000 steps 1.000.000 items.
-
-There are two downsides of the binary search approach:
-
-1. It takes `O(n)` time for constructing the `itemsEndPositions` array
-2. It takes `O(n)` extra space for keeping the `itemsEndPositions` array in memory
-
-The first downside could be overcome by assuming that real applications search for items positions much more often than it changes items size. The speed gain in performance easily defeats the second downside.
-
-</blockquote></details>
-
-> 📝 The hook does not read items size from DOM nodes properties so the value must represent actual size of the given items.
+> 💬 The hook does not read items size from DOM nodes properties so the value must represent actual size of the given items.
 
 > 💡 You can use any kind of approaches ([search for `use size react`](https://www.npmjs.com/search?q=use%20size%20react)) to determine size of a items in case it's unkown or changes dynamicly - the hook re-calculates output when the `itemSize` value changes. See the example of unknown and dynamic items sizes (@TODO add links to the examples).
 
-> 🧠 Make sure the function always returns a `number` value for cases when a value is uknown or out of range:
+> 💡 Make sure the `itemSize` function always returns a `number` value for cases when a value is uknown or out of range:
 >
 > ```ts
 > const itemSize = (index: number): number => ITEMS_SIZE_ARRAY[index] || 0
 > ```
+
+> 💡 Make sure the `itemSize` function is memoized to reduce amount of work required to re-calculate items' positions table.
+>
+>  <details>
+>
+>    <summary>
+>      Show how the items' positions table is calculated.
+>    </summary>
+>
+> Each time when `itemCount` or `itemSize` function change the hook calculates an array of the items' end positions by accumulating items' sizes. Consider this example:
+>
+> ```ts
+> const ITEM_SIZE_ARRAY = [30, 10, 40, 50, 20]
+>
+> // the hooks attributes
+> const itemCount = ITEM_SIZE_ARRAY.length
+> const itemSize = (index: number): number => ITEMS_SIZE_ARRAY[index]
+>
+> // the hook INTERNAL array with each item end positions
+> const itemsEndPositions = [
+>   // each value is a sum of two numbers:
+>   // - left number is end position of previous item (or 0 for the first one)
+>   // - right number is size of the item
+>   30, // 0 + 30
+>   40, // 30 + 10
+>   80, // 40 + 40
+>   130, // 80 + 50
+>   150 // 130 + 20
+> ]
+> ```
+>
+> Each time when the hook should calculate first or last visible items for the current scroll position it performs binary search in the `itemsEndPosition` array. The binary search spends only `O(log n)` (where `n` is `itemCount`), wihch means that it takes maximum 10 steps to find a value in 1.000 items or maximum 20 steps in 1.000.000 items. For comparasing, linear search wich takes `O(n)` time and will find > a value for maximum 1.000 steps in 1.000 items, or maximum 1.000.000 steps 1.000.000 items.
+>
+> There are two downsides of the binary search approach:
+>
+> 1. It takes `O(n)` time for constructing the `itemsEndPositions` array
+> 2. It takes `O(n)` extra space for keeping the `itemsEndPositions` array in memory
+>
+> The first downside could be overcome by assuming that real applications search for items positions much more often than it changes items > size. The speed gain in performance easily defeats the second downside.
+>
+> </details>
 
 ### `UseWindowedListOptions.itemCount`
 
@@ -261,7 +271,7 @@ The first downside could be overcome by assuming that real applications search f
 itemCount: number
 ```
 
-The number of items. The hook will re-calculate the output on each value update.
+The number of items.
 
 ### `UseWindowedListOptions.overscanCount`
 
@@ -269,11 +279,11 @@ The number of items. The hook will re-calculate the output on each value update.
 overscanCount?: number = 1
 ```
 
-The number of items to render outside of the visible area. The hook will update the output on each value update.
+The number of items to render outside of the visible area.
 
-> tip: it's important to set the value to a number greater than 0 to make it possible to focus via tab button on the next or previous not yet visible items.
+> 💡 It's important to set the value to a number greater than 0 to make it possible to focus via tab button on the next or previous not yet visible items.
 
-> tip: setting the value too high will degrade performance but keeping the value reasonably low could improve UX by pre-rendering not yet visible items.
+> 💡 Setting the value too high will degrade performance but keeping the value reasonably low could improve UX by pre-rendering not yet visible items.
 
 ### `UseWindowedListOptions.layout`
 
@@ -281,7 +291,7 @@ The number of items to render outside of the visible area. The hook will update 
 layout?: ListLayout = 'vertical'
 ```
 
-The option determines in which direction a list's content will be windowed. By knowing the layout the hook can correctly extract current scrolling position and calculate desired ones on [`UseWindowedListResult.scrollTo`][todo] and [`UseWindowedListResult.scrollToItem`][todo] calls.
+The option determines in which direction a list's content will be windowed. By knowing the layout the hook can correctly extract current scrolling position and calculate desired ones on [`UseWindowedListResult.scrollTo`][todo] and [`UseWindowedListResult.scrollToItem`][todo] calls. See [`ListLayout`][todo] for more details.
 
 ### `UseWindowedListOptions.initialScroll`
 
@@ -291,7 +301,7 @@ initialScroll?: number = 0
 
 Scrolling position of a windowed list for an initial render only. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
 
-The `number` value represents the scrolling position in pixels. If it's nesessary to scroll to an exact item the value might be defined as an object with the item's `index` and optional [scrolling `strategy`][todo]:
+The `number` value represents the scrolling position in pixels. If it's nesessary to scroll to an exact item the value might be defined as an object with the item's `index` and optional [scrolling `position`][todo]:
 
 ```ts
 initialScroll?: {
@@ -306,7 +316,7 @@ initialScroll?: {
 containerOnScrollThrottleInterval?: number = 16
 ```
 
-The value defining a throttle interval of a container scroll listener in milliseconds. High value makes UI response faster but degrade performance and another way around. The default value limits the listener on ~60 calls per second.
+The value defining a throttle interval of a container scroll listener in milliseconds. High value makes UI response faster but degrades performance and another way around. The default value limits the listener on `1000ms / 16ms = ~60` calls per second.
 
 ### `UseWindowedListOptions.containerIsScrollingDebounceInterval`
 
@@ -351,15 +361,14 @@ is scrolling                  ┊                             ┊         ┊
 ### `UseWindowedListOptions.onItemsRendered`
 
 ```ts
-/**
- * renderedRange - a collection of visile and overscan items' indexes
- */
 onItemsRendered?: (renderedRange: ListRenderedRange) => void
 ```
 
 A callback to call when either visible or overscan ranges change. See [`ListRenderedRange`][todo] for more details about the ranges.
 
-> tip: it's important to memoize the callback, otherwise it will be called not only on the ranges change but on the callback value change as well.
+> 💡 Make sure to memoize the callback, otherwise it will be called not only on the ranges change but on the callback value change as well.
+
+---
 
 ## `interface ListRenderedRange`
 
@@ -377,26 +386,22 @@ A collection of values describing two half-open intervals:
 1. visible items ∈ `[visibleStart, visibleStop)` partially or entirelly visible on the current scroll position
 1. overscan items ∈ `[overscanStart, overscanStop)` includes visible items and some additional non visible defined via [UseWindowedListOptions.overscanCount][todo] value.
 
-TODO put below content to collapsable with something like "Read why it is like this" name.
+> 💬 Both intervals include the start indexes and exclude end onces, so the resulting index ranges might be iterated by `for (let i = start; i < stop; i++)`, for instance:
+>
+> ```ts
+> const range: ListRenderedRange = {
+>   overscanStart: 15,
+>   overscanStop: 21,
+>   visibleStart: 16,
+>   visibleStop: 20
+> }:
+> ```
+>
+> The `range` indicates that elements with indexes `[16, 17, 18, 19]` are visible and `[15, 16, 17, 18, 19, 20]` are overscan.
 
-Both intervals include the start indexes and exclude end onces, so the resulting index ranges might be iterated by `for (let i = start; i < stop; i++)`, for instance:
-
-```ts
-const range: ListRenderedRange = {
-  overscanStart: 15,
-  overscanStop: 21,
-  visibleStart: 16,
-  visibleStop: 20
-}:
-```
-
-The `range` indicates that elements with indexes `[16, 17, 18, 19]` are visible and `[15, 16, 17, 18, 19, 20]` are overscan.
-
-> why: you might thing that the ranges should be defined as closed interval. For example visible items ∈ `[visibleStart, visibleStop]` so indexes might be iterated via `for (let i = start; i <= stop; i++)`. It works fine until it defines non empty ranges. If for some reason a range is empty it should be defined like `[1, 0]` or `[16, 0]`, because `[1, 1]` and `[16, 16]` define single item ranges. It is confusing. Instead, it excludes stop index, so it the empty ranges converts to `[1, 1)` and `[16, 16)`.
+---
 
 ## `interface UseWindowedListResult`
-
-The result of the hook call containing all needed information about windowed items and a piece of helpful additional properties and functions.
 
 ```ts
 export interface UseWindowedListResult<E extends HTMLElement>
@@ -411,6 +416,8 @@ export interface UseWindowedListResult<E extends HTMLElement>
   scrollToItem: (index: number, position?: ScrollPosition) => void
 }
 ```
+
+The result of the hook call containing all needed information about windowed items with helpful properties and functions.
 
 ### `UseWindowedListResult.startSpace`
 
@@ -434,7 +441,7 @@ A space in pixels after the last rendered item required to reserve instead of re
 indexes: ReadonlyArray<number>
 ```
 
-An array of the list items' indexes. The range starts from `ListRenderedRange.overscanStart` and ends before `ListRenderedRange.overscanStop` so it's easy to use `indexes.map` method to map the indexes to items' data.
+An array of the list items' indexes. The range starts from `ListRenderedRange.overscanStart` and ends before `ListRenderedRange.overscanStop` so it's easy to use `indexes.map` method to map the indexes to items' data like in the [Usage example][todo].
 
 ### `UseWindowedListResult.isScrolling`
 
@@ -455,20 +462,14 @@ Either a container's node extending `HTMLElement` or `null` assigned by [`UseWin
 ### `UseWindowedListResult.setRef`
 
 ```ts
-/**
- * node - either a container's DOM node exteinding HTMLElement or null
- */
 setRef: (node: null | E) => void
 ```
 
-A function to set a container of a windowed list. Each call of `setRef` enqueues a re-render of the component so the hook always calculates an output with an actual container. The value is accessable via [`UseWindowedListResult.container`][todo].
+A function to set a container `node` of a windowed list. Each call of `setRef` enqueues a re-render of the component so the hook always calculates an output with an actual container. The value is accessable via [`UseWindowedListResult.container`][todo].
 
 ### `UseWindowedListResult.scrollTo`
 
 ```ts
-/**
- * px - a scrolling position of a container to be scrolling to
- */
 scrollTo: (px: number) => void
 ```
 
@@ -477,14 +478,12 @@ A function to scroll a windowed list to a position in pixels. It affect either `
 ### `UseWindowedListResult.scrollToItem`
 
 ```ts
-/**
- * index - an element's index to be scrolling to
- * position = 'auto' - a strategy to use for scrolling to a desired element
- */
-scrollToItem: (index: number, position?: ScrollPosition) => void
+scrollToItem: (index: number, position?: ScrollPosition = 'auto') => void
 ```
 
-A function to scroll a windowed list to a position of element index. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
+A function to scroll a windowed list to a `position` of element by `index`. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
+
+---
 
 ## `type ListLayout`
 
@@ -493,7 +492,9 @@ A set of availale values of [`UseWindowedListOptions.layout`][todo] option:
 - `'vertical'` - the default value, indicates up/down scrolling.
 - `'horizontal'` - indicates left/right scrolling. See horizontal layout windowed list [example][todo].
 - `'horizontal-rtl'` - indicates right/left scrolling. See horizontal right-to-left layout windowed list [example][todo].
-  > why: the layout **does not** set any style properties but due to [inconsistent right-to-left browser scrolling position][rtl-scroll-inconsistency] implementation it's required for correct desired position calculations for [`UseWindowedListResult.scrollTo`][todo] and [`UseWindowedListResult.scrollToItem`][todo] calls.
+  > 💬 The layout **does not** set any style properties but due to [inconsistent right-to-left browser scrolling position][rtl-scroll-inconsistency] implementation it's required for correct desired position calculations for [`UseWindowedListResult.scrollTo`][todo] and [`UseWindowedListResult.scrollToItem`][todo] calls.
+
+---
 
 ## `type ScrollPosition`
 
@@ -1058,7 +1059,7 @@ A set of available values defining a target element when scrolling via [`UseWind
     </blockquote>
   </details>
 
-<!-- --------------------------------------------- -->
+<!-- L I N K S -->
 
 [todo]: https://to.do
 [rtl-scroll-inconsistency]: https://stackoverflow.com/q/24276619/4582383
