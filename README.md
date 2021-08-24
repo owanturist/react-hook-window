@@ -1,12 +1,12 @@
 # Getting Started
 
-If you are using Yarn here is how you install it:
+Install with Yarn:
 
 ```bash
 yarn add react-hook-window
 ```
 
-And for a NPM oriented audience here is what you would run:
+Install with NPM:
 
 ```bash
 npm install react-hook-window
@@ -52,7 +52,7 @@ export const FriendsList: React.VFC<{
 }
 ```
 
-Let's convert it to a windowed frields list component via four steps:
+Let's convert it to a windowed friends list component via four steps:
 
 ```tsx
 export const FriendsList: React.VFC<{
@@ -110,9 +110,9 @@ The custom `useWindowedList` hook calculates a visible range of items in a given
 
 Under the hood the hook calculates range of visible items based on 3 variables:
 
-1. Scrolling position - the container's `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely, extractd from a container's node passing via [`UseWindowedListOptions.setRef`][todo].
-1. Container size - the container's height or width for vertical or horizontal [layouts][todo] respectevely, defined via [`UseWindowedListOptions.containerSize`][todo].
-1. Items size - the items' height or width for vertical or horizontal [layouts][todo] respectevely, defined via [`UseWindowedListOptions.itemSize`][todo].
+1. **Scrolling position** - the container's `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely, extractd from a container's node passed via [`UseWindowedListOptions.setRef`][todo].
+1. **Container size** - the container's height or width for vertical or horizontal [layouts][todo] respectevely, defined via [`UseWindowedListOptions.containerSize`][todo].
+1. **Items size** - the items' height or width for vertical or horizontal [layouts][todo] respectevely, defined via [`UseWindowedListOptions.itemSize`][todo].
 
 ```
     ---- ┌─────────────────┐           ┌─────────────────┐           ┌─────────────────┐
@@ -182,11 +182,11 @@ containerSize: number
 
 A size of the container in pixels which determine the number of items visible at any given time. Represents either hight for vertical or width for horizontal [layouts][todo].
 
-> ❕ The hook does not read container size from a DOM node properties so the value must represent actual size of the given container.
+> 📝 The hook does not read container size from a DOM node properties so the value must represent actual size of the given container.
 
-> ❗ you can use any kind of approaches ([search for `use size react`](https://www.npmjs.com/search?q=use%20size%20react)) to determine size of a container in case it's unkown or changes dynamicly - the hook re-calculates output when the value changes. See the example of unknown and dynamic container sizes (@TODO add links to the examples).
+> 💡 You can use any kind of approaches ([search for `use size react`](https://www.npmjs.com/search?q=use%20size%20react)) to determine size of a container in case it's unkown or changes dynamicly - the hook re-calculates output when the value changes. See the example of unknown and dynamic container sizes (@TODO add links to the examples).
 
-> 💯 it's recommended to use debouncing/throttline of the container size in case of high frequent changes to gain better performance. See the example of throttling the size value (@TODO add links to the example).
+> 🧠 it's recommended to use debouncing/throttline of the container size in case of high frequent changes to gain better performance. See the example of throttling the size value (@TODO add links to the example).
 
 ### `UseWindowedListOptions.itemSize`
 
@@ -204,27 +204,15 @@ But if items have unknown or different sizes it could be defined as a function, 
 itemSize: (index: number) => number
 ```
 
-> note: The hook does not read items size from DOM nodes properties so the value must represent actual size of the given items.
-
-> tip: you can use any kind of approaches ([search for `use size react`](https://www.npmjs.com/search?q=use%20size%20react)) to determine size of a items in case it's unkown or changes dynamicly - the hook re-calculates output when the function value changes. See the example of unknown and dynamic items sizes (@TODO add links to the examples).
-
-> tip: make sure the function always returns a `number` value for cases when a value is uknown or out of range:
->
-> ```ts
-> const itemSize = (index: number): number => ITEMS_SIZE_ARRAY[index] || 0
-> ```
-
-TODO rearrange that 👇
-
-> important: in order to reduce amount of constructions of the `itemsEndPositions` array the `itemSize` function should change as less often as possible. You can achieve that by using memoization technics. See the example of using React memoization tools (@TODO add links to the example). Click on the "How dynamic item size works" section right below the notice to understand why the memoizatin is imporant.
+It is important to memoize the `itemSize` function to reduce the amount of work required to calculate items' positions table.
 
 <details>
   <summary>
-    How dynamic item size works?
+    Show how the items' positions table is calculated.
   </summary>
 <blockquote>
 
-Each time when `itemCount` or `itemSize` values change the hook calculates an array of the items' end positions by accumulating items' sizes. Consider this example:
+Each time when `itemCount` or `itemSize` function values change the hook calculates an array of the items' end positions by accumulating items' sizes. Consider this example:
 
 ```ts
 const ITEM_SIZE_ARRAY = [30, 10, 40, 50, 20]
@@ -256,6 +244,16 @@ There are two downsides of the binary search approach:
 The first downside could be overcome by assuming that real applications search for items positions much more often than it changes items size. The speed gain in performance easily defeats the second downside.
 
 </blockquote></details>
+
+> 📝 The hook does not read items size from DOM nodes properties so the value must represent actual size of the given items.
+
+> 💡 You can use any kind of approaches ([search for `use size react`](https://www.npmjs.com/search?q=use%20size%20react)) to determine size of a items in case it's unkown or changes dynamicly - the hook re-calculates output when the `itemSize` value changes. See the example of unknown and dynamic items sizes (@TODO add links to the examples).
+
+> 🧠 Make sure the function always returns a `number` value for cases when a value is uknown or out of range:
+>
+> ```ts
+> const itemSize = (index: number): number => ITEMS_SIZE_ARRAY[index] || 0
+> ```
 
 ### `UseWindowedListOptions.itemCount`
 
