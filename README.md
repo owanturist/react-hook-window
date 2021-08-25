@@ -9,7 +9,7 @@ yarn add react-hook-window
 Install with NPM:
 
 ```bash
-npm install react-hook-window
+npm install react-hook-window --save
 ```
 
 # Usage
@@ -100,7 +100,7 @@ export const FriendsList: React.VFC<{
 }
 ```
 
-This is the most basic usage example. See API documentation and Examples for more insights.
+That is the most basic usage example. See API documentation and Examples for more insights.
 
 ---
 
@@ -110,17 +110,13 @@ This is the most basic usage example. See API documentation and Examples for mor
 <E extends HTMLElement>(options: UseWindowedListOptions) => UseWindowedListResult<E>
 ```
 
-> ```ts
-> import { useWindowedList } from 'react-hook-window'
-> ```
+The custom `useWindowedList` hook calculates a visible range of items in a given viewport. It creates zero additional DOM nodes, meaning that it provides unlimited customization freedom for both style preferences and tags structure.
 
-The custom `useWindowedList` hook calculates a visible range of items in a given viewport. The hook creates zero additional DOM nodes, meaning that it provides unlimited customization freedom for both style preferenes and tags structure.
+Under the hood, the hook calculates a range of visible items based on three variables:
 
-Under the hood the hook calculates range of visible items based on 3 variables:
-
-1. **Scrolling position** - the container's `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely, extractd from a container's node passed via [`UseWindowedListOptions.setRef`][todo].
-1. **Container size** - the container's height or width for vertical or horizontal [layouts][todo] respectevely, defined via [`UseWindowedListOptions.containerSize`][todo].
-1. **Items size** - the items' height or width for vertical or horizontal [layouts][todo] respectevely, defined via [`UseWindowedListOptions.itemSize`][todo].
+1. **Scrolling position** - the container's `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectively, extracted from a container's node passed via [`UseWindowedListOptions.setRef`][todo].
+2. **Container size** - the container's height or width for vertical or horizontal [layouts][todo] respectively, defined via [`UseWindowedListOptions.containerSize`][todo].
+3. **Items size** - the items' height or width for vertical or horizontal [layouts][todo] respectively defined via [`UseWindowedListOptions.itemSize`][todo].
 
 ```
     ---- ┌─────────────────┐           ┌─────────────────┐           ┌─────────────────┐
@@ -159,10 +155,10 @@ Under the hood the hook calculates range of visible items based on 3 variables:
 
 ```
 
-This is a bare minimum to determine both first and last visible items. With the indexes known it's pretty straightforward to calculate spaces required to reserve before the first and after the last visible items. Following this strategy you can replace huge amount of complex item componets by a single placeholder node at each side. This helps address some common performance bottlenecks:
+That is a bare minimum to determine both the first and last visible items. With the indexes known, it's pretty straightforward to calculate spaces required to reserve before the first and after the last visible items. Following this strategy, you can replace a potentially huge amount of complex item components with a single placeholder node on each side. It helps address some common performance bottlenecks:
 
 1. It reduces the amount of work (and time) required to render the initial view and to process updates.
-2. It reduces the memory footprint by avoiding over-allocation of DOM nodes.
+2. It reduces the memory footprint by avoiding the over-allocation of DOM nodes.
 
 ---
 
@@ -182,7 +178,7 @@ interface UseWindowedListOptions {
 }
 ```
 
-A collection of options to configure the windowed list.
+That is a collection of options to configure the windowed list.
 
 ### `UseWindowedListOptions.containerSize`
 
@@ -190,62 +186,63 @@ A collection of options to configure the windowed list.
 containerSize: number
 ```
 
-A size of the container in pixels which determine the number of items visible at any given time. Represents either hight for vertical or width for horizontal [layouts][todo].
+It defines a size of a container in pixels determines the number of items visible at any given time. The value represents either height for vertical or width for horizontal [layouts][todo].
 
-> 💬 The hook does not read container size from a DOM node properties so the value must represent actual size of the given container.
+> 💬 The hook does not read container size from DOM node properties, so the value must represent the actual size of the given container.
 
-> 💡 You can use any kind of approaches ([search for `use size react`](https://www.npmjs.com/search?q=use%20size%20react)) to determine size of a container in case it's unkown or changes dynamicly - the hook re-calculates output when the value changes. See the example of unknown and dynamic container sizes (@TODO add links to the examples).
+> 💡 You can use any approach ([search for `use size react`][npm:use-size-react]) to determine the size of a container in case it's unknown or changes dynamically - the hook re-calculates output when the value changes. See the example of unknown and dynamic container sizes (@TODO add links to the examples).
 
-> 💡 it's recommended to use debouncing/throttline of the container size in case of high frequent changes to gain better performance. See the example of throttling the size value (@TODO add links to the example).
+> 💡 it's recommended to use debouncing/throttling of the container size in case of high-frequency changes to gain better performance. See the example of throttling the size value (@TODO add links to the example).
 
 ### `UseWindowedListOptions.itemSize`
 
-A size of an item in pixels. Represents either items' height for vertical or width for horisontal [layouts][todo].
+It defines a size of an item in pixels. The value represents either items' height for vertical or width for horizontal [layouts][todo].
 
-In cases when all items have the same size it can define it as a constant number:
+In cases when all items have the same size, it can define it as a constant number:
 
 ```ts
 itemSize: number
 ```
 
-But if items have unknown or different sizes it could be defined as a function, returning an item's height by its index:
+But if items have unknown or different sizes, it could be defined as a function, returning an item's height by its index:
 
 ```ts
 itemSize: (index: number) => number
 ```
 
-> 💬 The hook does not read items size from DOM nodes properties so the value must represent actual size of the given items.
+> 💬 The hook does not read items size from DOM nodes properties, so the value must represent the actual size of the given items.
 
-> 💡 You can use any kind of approaches ([search for `use size react`](https://www.npmjs.com/search?q=use%20size%20react)) to determine size of a items in case it's unkown or changes dynamicly - the hook re-calculates output when the `itemSize` value changes. See the example of unknown and dynamic items sizes (@TODO add links to the examples).
+> 💡 You can use any approach ([search for `use size react`][npm:use-size-react]) to determine the size of a container in case it's unknown or changes dynamically - the hook re-calculates output when the value changes. See the example of unknown and dynamic container sizes (@TODO add links to the examples).
 
-> 💡 Make sure the `itemSize` function always returns a `number` value for cases when a value is uknown or out of range:
+> 💡 The `itemSize` function should always return a `number` for cases when the value is unknown or out of range.
 >
 > ```ts
 > const itemSize = (index: number): number => ITEMS_SIZE_ARRAY[index] || 0
 > ```
 
-> 💡 Make sure the `itemSize` function is memoized to reduce amount of work required to re-calculate items' positions table.
+> 💡 The `itemSize` function should be memoized to avoid unnecessary recalculations of the items' positions table.
 >
 >  <details>
 >
 >    <summary>
 >      Show how the items' positions table is calculated.
 >    </summary>
+>    <br/>
 >
-> Each time when `itemCount` or `itemSize` function change the hook calculates an array of the items' end positions by accumulating items' sizes. Consider this example:
+> Each time when `itemCount` or `itemSize` function changes the hook calculates an array of the items' end positions by accumulating items' sizes. Consider this example:
 >
 > ```ts
 > const ITEM_SIZE_ARRAY = [30, 10, 40, 50, 20]
 >
-> // the hooks attributes
+> // the hook's attributes
 > const itemCount = ITEM_SIZE_ARRAY.length
 > const itemSize = (index: number): number => ITEMS_SIZE_ARRAY[index]
 >
-> // the hook INTERNAL array with each item end positions
+> // the hook's INTERNAL array with each item end positions
 > const itemsEndPositions = [
 >   // each value is a sum of two numbers:
->   // - left number is end position of previous item (or 0 for the first one)
->   // - right number is size of the item
+>   // - the number on left is the end position of a previous item (0 for the first one)
+>   // - the number on right is the size of an item
 >   30, // 0 + 30
 >   40, // 30 + 10
 >   80, // 40 + 40
@@ -254,14 +251,14 @@ itemSize: (index: number) => number
 > ]
 > ```
 >
-> Each time when the hook should calculate first or last visible items for the current scroll position it performs binary search in the `itemsEndPosition` array. The binary search spends only `O(log n)` (where `n` is `itemCount`), wihch means that it takes maximum 10 steps to find a value in 1.000 items or maximum 20 steps in 1.000.000 items. For comparasing, linear search wich takes `O(n)` time and will find > a value for maximum 1.000 steps in 1.000 items, or maximum 1.000.000 steps 1.000.000 items.
+> The hook calculates the first and last visible items for the current scroll position by performing a binary search in the `itemsEndPosition` array. The binary search spends only `O(log n)` (where `n` is `itemCount`), which means that it takes a maximum of 10 steps to find a value among 1.000 items or 20 among 1.000.000 respectively. For comparing a linear search which takes `O(n)` time and will find a value for a maximum of 1.000 steps among 1.000 items, or 1.000.000 among 1.000.000 respectively.
 >
 > There are two downsides of the binary search approach:
 >
-> 1. It takes `O(n)` time for constructing the `itemsEndPositions` array
-> 2. It takes `O(n)` extra space for keeping the `itemsEndPositions` array in memory
+> 1. It takes `O(n)` time for constructing the `itemsEndPositions` array.
+> 2. It takes `O(n)` extra space for keeping the `itemsEndPositions` array in memory.
 >
-> The first downside could be overcome by assuming that real applications search for items positions much more often than it changes items > size. The speed gain in performance easily defeats the second downside.
+> The first downside overcomes by assuming that real applications search for items positions much more often than it changes items' size. The speed gain in performance easily defeats the second downside.
 >
 > </details>
 
@@ -271,7 +268,7 @@ itemSize: (index: number) => number
 itemCount: number
 ```
 
-The number of items.
+It defines the number of a list's items.
 
 ### `UseWindowedListOptions.overscanCount`
 
@@ -299,7 +296,7 @@ The option determines in which direction a list's content will be windowed. By k
 initialScroll?: number = 0
 ```
 
-Scrolling position of a windowed list for an initial render only. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
+Scrolling position of a windowed list for an initial render only. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectively.
 
 The `number` value represents the scrolling position in pixels. If it's nesessary to scroll to an exact item the value might be defined as an object with the item's `index` and optional [scrolling `position`][todo]:
 
@@ -473,7 +470,7 @@ A function to set a container `node` of a windowed list. Each call of `setRef` e
 scrollTo: (px: number) => void
 ```
 
-A function to scroll a windowed list to a position in pixels. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
+A function to scroll a windowed list to a position in pixels. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectively.
 
 ### `UseWindowedListResult.scrollToItem`
 
@@ -481,7 +478,7 @@ A function to scroll a windowed list to a position in pixels. It affect either `
 scrollToItem: (index: number, position?: ScrollPosition = 'auto') => void
 ```
 
-A function to scroll a windowed list to a `position` of element by `index`. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectevely.
+A function to scroll a windowed list to a `position` of element by `index`. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectively.
 
 ---
 
@@ -1063,3 +1060,4 @@ A set of available values defining a target element when scrolling via [`UseWind
 
 [todo]: https://to.do
 [rtl-scroll-inconsistency]: https://stackoverflow.com/q/24276619/4582383
+[npm:use-size-react]: https://www.npmjs.com/search?q=use%20size%20react
