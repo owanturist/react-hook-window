@@ -276,11 +276,11 @@ It defines the number of a list's items.
 overscanCount?: number = 1
 ```
 
-The number of items to render outside of the visible area.
+It defines the number of items to render outside of the visible area.
 
-> 💡 It's important to set the value to a number greater than 0 to make it possible to focus via tab button on the next or previous not yet visible items.
+> 💡 It might be reasonable to set the value to a number greater than 0 to make it possible to focus via the tab button on the next or previous not yet visible items.
 
-> 💡 Setting the value too high will degrade performance but keeping the value reasonably low could improve UX by pre-rendering not yet visible items.
+> 💡 Setting the value too high will degrade performance, but keeping the value number reasonably low could improve UX by pre-rendering not yet visible items.
 
 ### `UseWindowedListOptions.layout`
 
@@ -288,7 +288,7 @@ The number of items to render outside of the visible area.
 layout?: ListLayout = 'vertical'
 ```
 
-The option determines in which direction a list's content will be windowed. By knowing the layout the hook can correctly extract current scrolling position and calculate desired ones on [`UseWindowedListResult.scrollTo`][todo] and [`UseWindowedListResult.scrollToItem`][todo] calls. See [`ListLayout`][todo] for more details.
+The option determines in which direction a list's content will be windowed. By knowing the layout, the hook can correctly extract the current scrolling position and calculate desired ones on [`UseWindowedListResult.scrollTo`][todo] and [`UseWindowedListResult.scrollToItem`][todo] calls. See [`ListLayout`][todo] for more details.
 
 ### `UseWindowedListOptions.initialScroll`
 
@@ -298,7 +298,7 @@ initialScroll?: number = 0
 
 Scrolling position of a windowed list for an initial render only. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectively.
 
-The `number` value represents the scrolling position in pixels. If it's nesessary to scroll to an exact item the value might be defined as an object with the item's `index` and optional [scrolling `position`][todo]:
+The `number` value represents the scrolling position in pixels. If it's necessary to scroll to an exact item, the value might be an object with the item's `index` and optional [scrolling `position`][todo]:
 
 ```ts
 initialScroll?: {
@@ -313,7 +313,7 @@ initialScroll?: {
 containerOnScrollThrottleInterval?: number = 16
 ```
 
-The value defining a throttle interval of a container scroll listener in milliseconds. High value makes UI response faster but degrades performance and another way around. The default value limits the listener on `1000ms / 16ms = ~60` calls per second.
+It defines the throttle interval of a container scroll listener in milliseconds. High value makes UI response faster but degrades performance and another way around. The default value limits the listener on `1000ms / 16ms = ~60` calls per second.
 
 ### `UseWindowedListOptions.containerIsScrollingDebounceInterval`
 
@@ -321,7 +321,7 @@ The value defining a throttle interval of a container scroll listener in millise
 containerIsScrollingDebounceInterval?: number = 150
 ```
 
-The value defining an interval in milliseconds to determine the [`isScrolling`][todo] flag. The flag becomes `true` on the first onScroll listener call and turns `false` after the debounce interval time passed from the last call of the listener. The default value is an empiric based interval to provide natural feeling of the flag behaviour.
+It defines an interval in milliseconds to determine the [`isScrolling`][todo] flag. The flag becomes `true` on the first onScroll listener call and turns `false` after the debounce interval time passed from the last call of the listener. The default value is an empiric-based interval to provide a natural feeling of the flag behavior.
 
 <details>
   <summary>
@@ -363,7 +363,7 @@ onItemsRendered?: (renderedRange: ListRenderedRange) => void
 
 A callback to call when either visible or overscan ranges change. See [`ListRenderedRange`][todo] for more details about the ranges.
 
-> 💡 Make sure to memoize the callback, otherwise it will be called not only on the ranges change but on the callback value change as well.
+> 💡 Make sure to memorize the callback otherwise, it will be called not only on the ranges change but on the callback value change as well.
 
 ---
 
@@ -380,10 +380,10 @@ export interface ListRenderedRange {
 
 A collection of values describing two half-open intervals:
 
-1. visible items ∈ `[visibleStart, visibleStop)` partially or entirelly visible on the current scroll position
-1. overscan items ∈ `[overscanStart, overscanStop)` includes visible items and some additional non visible defined via [UseWindowedListOptions.overscanCount][todo] value.
+1. visible items ∈ `[visibleStart, visibleStop)` partially or entirely visible on the current scroll position
+1. overscan items ∈ `[overscanStart, overscanStop)` includes visible items and some additional non-visible defined via [UseWindowedListOptions.overscanCount][todo] value.
 
-> 💬 Both intervals include the start indexes and exclude end onces, so the resulting index ranges might be iterated by `for (let i = start; i < stop; i++)`, for instance:
+> 💬 Both intervals include the start indexes and exclude end ones, so the resulting index ranges might be iterated by `for (let i = start; i < stop; i++)`, for instance:
 >
 > ```ts
 > const range: ListRenderedRange = {
@@ -414,7 +414,7 @@ export interface UseWindowedListResult<E extends HTMLElement>
 }
 ```
 
-The result of the hook call containing all needed information about windowed items with helpful properties and functions.
+The result of the hook call contains necessary information and methods about windowed items.
 
 ### `UseWindowedListResult.startSpace`
 
@@ -422,7 +422,7 @@ The result of the hook call containing all needed information about windowed ite
 startSpace: number
 ```
 
-A space in pixels before the first rendered item required to reserve instead of rendering items outisde of a visible area. It represents either top space for vertical or left space for horizontal [layouts][todo]. Take a look at an illustration in the ["How does it work"][todo] section.
+Space in pixels before the first rendered item. It represents either top space for vertical or left space for horizontal [layouts][todo]. Take a look at an illustration in the ["Usage"][todo] section.
 
 ### `UseWindowedListResult.endSpace`
 
@@ -430,7 +430,7 @@ A space in pixels before the first rendered item required to reserve instead of 
 endSpace: number
 ```
 
-A space in pixels after the last rendered item required to reserve instead of rendering items outisde of a visible area. It represents either bottom space for vertical or right space for horizontal [layouts][todo]. Take a look at an illustration in the ["How does it work"][todo] section.
+Space in pixels after the last rendered item. It represents either bottom space for vertical or right space for horizontal [layouts][todo]. Take a look at an illustration in the ["Usage"][todo] section.
 
 ### `UseWindowedListResult.indexes`
 
@@ -438,7 +438,7 @@ A space in pixels after the last rendered item required to reserve instead of re
 indexes: ReadonlyArray<number>
 ```
 
-An array of the list items' indexes. The range starts from `ListRenderedRange.overscanStart` and ends before `ListRenderedRange.overscanStop` so it's easy to use `indexes.map` method to map the indexes to items' data like in the [Usage example][todo].
+An array of the list items' indexes. The range starts from `ListRenderedRange.overscanStart` and ends before `ListRenderedRange.overscanStop`. It's easy to use the `indexes.map` method to map the indexes to items' data like in the ["Usage"][todo] example.
 
 ### `UseWindowedListResult.isScrolling`
 
@@ -446,7 +446,7 @@ An array of the list items' indexes. The range starts from `ListRenderedRange.ov
 isScrolling: boolean
 ```
 
-A flag indicating whenever the container is scrolling. See the relevant [`UseWindowedListOptions.containerIsScrollingDebounceInterval`][todo] option for changing it's behaviour.
+A flag indicates whenever the container is scrolling. See the relevant [`UseWindowedListOptions.containerIsScrollingDebounceInterval`][todo] option for changing its behavior.
 
 ### `UseWindowedListResult.container`
 
@@ -454,7 +454,7 @@ A flag indicating whenever the container is scrolling. See the relevant [`UseWin
 container: null | E
 ```
 
-Either a container's node extending `HTMLElement` or `null` assigned by [`UseWindowedListResult.setRef`][todo].
+Either a container's node extending `HTMLElement` or `null`. The value gets assigned by the [`UseWindowedListResult.setRef`][todo] function.
 
 ### `UseWindowedListResult.setRef`
 
@@ -462,7 +462,7 @@ Either a container's node extending `HTMLElement` or `null` assigned by [`UseWin
 setRef: (node: null | E) => void
 ```
 
-A function to set a container `node` of a windowed list. Each call of `setRef` enqueues a re-render of the component so the hook always calculates an output with an actual container. The value is accessable via [`UseWindowedListResult.container`][todo].
+A function to set a container `node` of a windowed list. Each call of `setRef` enqueues a re-render of the component. Because of that, the hook always calculates an output with an actual container. The value is accessible via the [`UseWindowedListResult.container`][todo] property.
 
 ### `UseWindowedListResult.scrollTo`
 
@@ -470,7 +470,7 @@ A function to set a container `node` of a windowed list. Each call of `setRef` e
 scrollTo: (px: number) => void
 ```
 
-A function to scroll a windowed list to a position in pixels. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectively.
+A function to scroll a windowed list to a position in pixels. It affects either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo], respectively.
 
 ### `UseWindowedListResult.scrollToItem`
 
@@ -478,18 +478,21 @@ A function to scroll a windowed list to a position in pixels. It affect either `
 scrollToItem: (index: number, position?: ScrollPosition = 'auto') => void
 ```
 
-A function to scroll a windowed list to a `position` of element by `index`. It affect either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo] respectively.
+A function to scroll a windowed list to a `position` of an element by `index`. It affects either `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][todo], respectively.
 
 ---
 
 ## `type ListLayout`
 
-A set of availale values of [`UseWindowedListOptions.layout`][todo] option:
+A set of available values of [`UseWindowedListOptions.layout`][todo] option:
 
-- `'vertical'` - the default value, indicates up/down scrolling.
+- `'vertical'` - the default value indicates up/down scrolling.
 - `'horizontal'` - indicates left/right scrolling. See horizontal layout windowed list [example][todo].
 - `'horizontal-rtl'` - indicates right/left scrolling. See horizontal right-to-left layout windowed list [example][todo].
-  > 💬 The layout **does not** set any style properties but due to [inconsistent right-to-left browser scrolling position][rtl-scroll-inconsistency] implementation it's required for correct desired position calculations for [`UseWindowedListResult.scrollTo`][todo] and [`UseWindowedListResult.scrollToItem`][todo] calls.
+
+> 💡 The layout **does not** set any style properties.
+
+> 💬 The horizontal variant is required for correct desired position calculations for [`UseWindowedListResult.scrollTo`][todo] and [`UseWindowedListResult.scrollToItem`][todo] calls due to an [inconsistent right-to-left browser scrolling position][rtl-scroll-inconsistency] implementation.
 
 ---
 
@@ -662,7 +665,7 @@ A set of available values defining a target element when scrolling via [`UseWind
     </blockquote>
   </details>
 
-- `smart` - if the item is already visible, don't scroll at all. If it is less than one viewport away, scroll as little as possible so that it becomes visible (acting the same as `auto`). If it is more than one viewport away, scroll so that it is centered within the list (acting the same as `center`).
+- `smart` - if the item is already visible, don't scroll at all. If it is less than one viewport away, scroll as little as possible that it becomes visible (the same as `auto`). If it is more than one viewport away, scroll until it is in the center within the list (the same as `center`).
   <details>
     <summary>
         Show an illustration
@@ -671,7 +674,7 @@ A set of available values defining a target element when scrolling via [`UseWind
     <blockquote>
 
   ```
-  1. scrolling to 6th that is clother than one viewport - scroll as little as possible
+  1. scrolling to 6th that is closer than one viewport - scroll as little as possible
   2. scrolling to 11th that is father than one viewport - scroll to center the 11th item
 
   ┏┯━━━━━━━━━━━━━━━━━┯┓          ┌─────────────────┐           ┌─────────────────┐
@@ -735,9 +738,9 @@ A set of available values defining a target element when scrolling via [`UseWind
                                                                         ‖
                                                                     12 ‖ no change
                                                                         v
-  3. scrolling to 12th that is already visible = no scroll needed
+  3. scrolling to 12th that is already visible - no scroll needed
   4. scrolling to 3th that is farther than one viewport - scroll to center the 3rd item
-  5. scrolling to 0th that is clother than one viewport - scroll as little as possible
+  5. scrolling to 0th that is closer than one viewport - scroll as little as possible
 
   ┏┯━━━━━━━━━━━━━━━━━┯┓ -----    ┌─────────────────┐           ┌─────────────────┐
   ┃│ #0              │┃     ▲    │ #0              │           │ #0              │
