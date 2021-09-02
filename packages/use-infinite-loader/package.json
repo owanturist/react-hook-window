@@ -1,0 +1,30 @@
+{
+  "name": "@react-hook-window/use-infinite-loader",
+  "version": "0.1.0",
+  "repository": "git@github.com:owanturist/react-hook-window.git",
+  "author": "Anton Ovechkin <owanturist@gmail.com>",
+  "license": "BSD-3-Clause",
+  "sideEffects": false,
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "import": "./dist/index.mjs",
+    "require": "./dist/index.cjs",
+    "browser": "./dist/index.js",
+    "default": "./dist/index.cjs"
+  },
+  "scripts": {
+    "clean": "rm -rf ./dist",
+    "prebuild": "yarn run clean",
+    "build": "rollup --config",
+    "postpublish": "PACKAGE_VERSION=$(cat package.json | grep 'version' | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag v$PACKAGE_VERSION && git push --tags",
+    "typecheck": "tsc -p ./tsconfig.json --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.3"
+  }
+}
