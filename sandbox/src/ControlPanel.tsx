@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { UseWindowedListOptions } from 'react-hook-window'
+import { UseWindowedListOptions } from '@react-hook-window/use-windowed-list'
 import { ScrollControl } from './ScrollControl'
 
 export interface ControlPanelOptions extends UseWindowedListOptions {

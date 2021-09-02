@@ -55,7 +55,7 @@ export const FriendsList: React.VFC<{
 Let’s convert it to a windowed friends list component via four steps:
 
 ```tsx
-import { useWindowedList } from 'react-hook-window'
+import { useWindowedList } from '@react-hook-window/use-windowed-list'
 
 export const FriendsList: React.VFC<{
   friends: Array<Friend>

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useWindowedList } from 'react-hook-window'
+import { useWindowedList } from '@react-hook-window/use-windowed-list'
 
 import createStore from 'zustand'
 import shallowEqual from 'zustand/shallow'

@@ -1,5 +1,5 @@
 {
-  "name": "react-hook-window",
+  "name": "@react-hook-window/use-windowed-list",
   "version": "0.1.0",
   "repository": "git@github.com:owanturist/react-hook-window.git",
   "author": "Anton Ovechkin <owanturist@gmail.com>",
@@ -27,7 +27,7 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit"
   },
   "peerDependencies": {
-    "react": "^16.8.3 || ^17 || ^18"
+    "react": ">=16.8.3"
   },
   "dependencies": {
     "lodash.debounce": "^4.0.8",

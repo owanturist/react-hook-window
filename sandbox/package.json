@@ -6,13 +6,14 @@
     "clean": "rm -rf dist",
     "typecheck": "tsc -p ./tsconfig.json --noEmit",
     "dev": "parcel ./public/index.html",
-    "build": "parcel build ./public/index.html --no-cache && cp ./dist/index.html ./dist/200.html",
-    "prebuild": "yarn run clean"
+    "prebuild": "yarn run clean",
+    "build": "parcel build ./public/index.html --no-cache",
+    "postbuild": "cp ./dist/index.html ./dist/200.html"
   },
   "dependencies": {
+    "@react-hook-window/use-windowed-list": "*",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-hook-window": "*",
     "react-router-dom": "^5.2.0",
     "zustand": "^3.5.5"
   },

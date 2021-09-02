@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "yarn workspace react-hook-window build",
+    "build": "yarn workspace @react-hook-window/use-windowed-list build",
     "test": "jest ./tests",
     "test:watch": "yarn test -- --watch",
     "cy:open": "yarn workspace e2e cy:open",
