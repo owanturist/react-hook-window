@@ -492,7 +492,7 @@ A set of available values of [`UseWindowedListOptions.layout`][use-windowed-l
 
 > 💡 The layout **does not** set any style properties.
 
-> 💬 The horizontal variant is required for correct desired position calculations for [`UseWindowedListResult.scrollTo`][use-windowed-list-result.scroll-to] and [`UseWindowedListResult.scrollToItem`][use-windowed-list-result.scroll-to-item] calls due to an [inconsistent right-to-left browser scrolling position][rtl-scroll-inconsistency] implementation.
+> 💬 The `'horizontal-rtl'` variant is required for correct desired position calculations for [`UseWindowedListResult.scrollTo`][use-windowed-list-result.scroll-to] and [`UseWindowedListResult.scrollToItem`][use-windowed-list-result.scroll-to-item] calls due to an [inconsistent right-to-left browser scrolling position][rtl-scroll-inconsistency] implementation.
 
 ---
 
