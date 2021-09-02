@@ -209,14 +209,6 @@
       },
       "extends": ["plugin:cypress/recommended"],
       "plugins": ["cypress"]
-    },
-    {
-      "files": ["**/*.md.tsx"],
-      "rules": {
-        "no-unused-vars": "off",
-        "react-hooks/rules-of-hooks": "off",
-        "import/no-unresolved": "off"
-      }
     }
   ]
 }

@@ -4,8 +4,7 @@
   "workspaces": [
     "e2e",
     "sandbox",
-    "lib",
-    "docs"
+    "lib"
   ],
   "scripts": {
     "build": "yarn workspace react-hook-window build",
@@ -13,13 +12,11 @@
     "test:watch": "yarn test -- --watch",
     "cy:open": "yarn workspace e2e cy:open",
     "cy:run": "yarn workspace e2e cy:run",
-    "lint": "eslint . --config=.eslintrc.prod.json --ext=js,jsx,ts,tsx,md,mdx",
+    "lint": "eslint . --config=.eslintrc.prod.json --ext=js,jsx,ts,tsx,md",
     "prettify": "prettier . --write",
     "typecheck": "yarn workspaces run typecheck",
     "sandbox:dev": "yarn workspace sandbox dev",
-    "sandbox:build": "yarn workspace sandbox build",
-    "docs:dev": "yarn workspace docs dev",
-    "docs:build": "yarn workspace docs build"
+    "sandbox:build": "yarn workspace sandbox build"
   },
   "husky": {
     "hooks": {
@@ -28,10 +25,10 @@
     }
   },
   "lint-staged": {
-    "**/*.{js,jsx,ts,tsx,json,md,mdx}": [
+    "**/*.{js,jsx,ts,tsx,json,md}": [
       "prettier --write"
     ],
-    "**/*.{js,jsx,ts,tsx,md,mdx}": [
+    "**/*.{js,jsx,ts,tsx,md}": [
       "eslint --config=.eslintrc.prod.json --fix"
     ]
   },
