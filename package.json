@@ -4,7 +4,7 @@
   "workspaces": [
     "e2e",
     "sandbox",
-    "lib"
+    "packages/*"
   ],
   "scripts": {
     "build": "yarn workspace react-hook-window build",

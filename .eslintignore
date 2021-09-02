@@ -1,6 +1,5 @@
 # production
-sandbox/dist
-lib/dist
+dist
 
 *.d.ts
 *.md
