@@ -7,7 +7,9 @@
     "packages/*"
   ],
   "scripts": {
-    "clean": "yarn workspaces run clean",
+    "clean:use-windowed-list": "yarn workspace @react-hook-window/use-windowed-list clean",
+    "clean:use-infinite-loader": "yarn workspace @react-hook-window/use-infinite-loader clean",
+    "clean": "yarn clean:use-windowed-list && yarn clean:use-infinite-loader",
     "prebuild": "yarn run clean",
     "build": "rollup --config",
     "test": "jest ./tests",

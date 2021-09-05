@@ -23,6 +23,6 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit"
   },
   "peerDependencies": {
-    "react": ">=16.8.3"
+    "react": "^16.8.0 || ^17"
   }
 }

@@ -3,7 +3,6 @@
   "name": "e2e",
   "version": "1.0.0",
   "scripts": {
-    "clean": "# nothing to clean",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
     "typecheck": "tsc -p ./tsconfig.json --noEmit"

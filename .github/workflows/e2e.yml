@@ -16,3 +16,4 @@ jobs:
           install-command: yarn --frozen-lockfile --silent
           build: yarn build
           start: yarn sandbox:dev
+          working-directory: e2e
