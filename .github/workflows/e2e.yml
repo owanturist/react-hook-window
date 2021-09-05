@@ -1,6 +1,6 @@
 name: E2E Tests with Cypress
 
-on: [push]
+on: push
 
 jobs:
   cypress-run:
@@ -8,12 +8,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      # Install NPM dependencies, cache them correctly
-      # and run all Cypress tests
+
+      - name: Install Deps
+        uses: borales/actions-yarn@v2.3.0
+        with:
+          cmd: install --frozen-lockfile --silent
+
+      - name: Build Packages
+        uses: borales/actions-yarn@v2.3.0
+        with:
+          cmd: build
+
+      - name: Run Sandbox
+        uses: borales/actions-yarn@v2.3.0
+        with:
+          cmd: sandbox:dev
+
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
-          install-command: yarn --frozen-lockfile --silent
-          build: yarn build
-          start: yarn sandbox:dev
+          install: false
           working-directory: e2e
+          wait-on: 'http://localhost:1234'
+          browser: chrome
