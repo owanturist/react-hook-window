@@ -387,7 +387,7 @@ A collection of values describing two half-open intervals:
 1. visible items ∈ `[visibleStart, visibleStop)` partially or entirely visible on the current scroll position
 1. overscan items ∈ `[overscanStart, overscanStop)` includes visible items and some additional non-visible defined via [UseWindowedListOptions.overscanCount][use-windowed-list-options.overscan-count] value.
 
-> 💬 Both intervals include the start indexes and exclude end ones, so the resulting index ranges might be iterated by `for (let i = start; i < stop; i++)`, for instance:
+> 💬 Both intervals include the start indexes and exclude end ones, so the resulting index ranges might be iterated by <code>for (let i = start; i < stop; i++)</code>, for instance:
 >
 > ```ts
 > const range: ListRenderedRange = {
