@@ -18,7 +18,6 @@ jobs:
           install: false
           start: yarn workspace sandbox dev
           working-directory: e2e
-          parallel: true
           browser: chrome
           wait-on: 'http://localhost:1234'
           wait-on-timeout: 120
