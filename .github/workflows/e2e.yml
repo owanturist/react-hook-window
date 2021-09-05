@@ -16,9 +16,9 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           install: false
-          start: yarn sandbox:dev
+          start: cd .. && yarn sandbox:dev
           working-directory: e2e
           parallel: true
+          browser: chrome
           wait-on: 'http://localhost:1234'
           wait-on-timeout: 120
-          browser: chrome
