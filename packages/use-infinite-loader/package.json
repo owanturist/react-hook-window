@@ -19,8 +19,6 @@
   },
   "scripts": {
     "clean": "rm -rf ./dist",
-    "prebuild": "yarn run clean",
-    "build": "rollup --config",
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep 'version' | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag v$PACKAGE_VERSION && git push --tags",
     "typecheck": "tsc -p ./tsconfig.json --noEmit"
   },
