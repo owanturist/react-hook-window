@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { useWindowedList, useInfiniteLoader } from 'react-hook-window'
+import { useWindowedList } from '@react-hook-window/use-windowed-list'
+import { useInfiniteLoader } from '@react-hook-window/use-infinite-loader'
 
 const loadRange = (
   start: number,
@@ -22,7 +23,7 @@ const ItemsList = React.forwardRef<
     itemSize: number
     startSpace: number
     endSpace: number
-    indexes: Array<number>
+    indexes: ReadonlyArray<number>
     getItemData(index: number): null | string
   }
 >(

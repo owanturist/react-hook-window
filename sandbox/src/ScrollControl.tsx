@@ -1,5 +1,8 @@
 import * as React from 'react'
-import { InitialListScroll, ScrollPosition } from 'react-hook-window'
+import {
+  InitialListScroll,
+  ScrollPosition
+} from '@react-hook-window/use-windowed-list'
 
 const SCROLL_POSITIONS: ReadonlyArray<ScrollPosition> = [
   'auto',

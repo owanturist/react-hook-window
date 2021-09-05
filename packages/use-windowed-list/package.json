@@ -1,0 +1,38 @@
+{
+  "name": "@react-hook-window/use-windowed-list",
+  "version": "0.0.1",
+  "repository": "git@github.com:owanturist/react-hook-window.git",
+  "author": "Anton Ovechkin <owanturist@gmail.com>",
+  "license": "BSD-3-Clause",
+  "sideEffects": false,
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "import": "./dist/index.mjs",
+    "require": "./dist/index.cjs",
+    "browser": "./dist/index.js",
+    "default": "./dist/index.cjs"
+  },
+  "scripts": {
+    "clean": "rm -rf ./dist",
+    "postpublish": "PACKAGE_VERSION=$(cat package.json | grep 'version' | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag v$PACKAGE_VERSION && git push --tags",
+    "typecheck": "tsc -p ./tsconfig.json --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.3"
+  },
+  "dependencies": {
+    "lodash.debounce": "^4.0.8",
+    "lodash.throttle": "^4.1.1",
+    "normalize-scroll-left": "^0.2.1"
+  },
+  "devDependencies": {
+    "@types/lodash.debounce": "^4.0.6",
+    "@types/lodash.throttle": "^4.1.6",
+    "@types/react": "^17.0.13"
+  }
+}

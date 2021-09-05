@@ -11,6 +11,3 @@ export type {
   UseWindowedListResult
 } from './use-windowed-list'
 export { useWindowedList } from './use-windowed-list'
-
-export type { UseInfiniteLoaderOptions } from './use-infinite-loader'
-export { useInfiniteLoader } from './use-infinite-loader'

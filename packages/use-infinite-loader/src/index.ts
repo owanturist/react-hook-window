@@ -32,6 +32,7 @@ const calcUnloadedRanges = (
   return ranges
 }
 
+// @TODO rename with ListRenderedRange renaming
 export interface LoadMoreItemsOptions {
   startIndex: number
   stopIndex: number
