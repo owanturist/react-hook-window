@@ -9,25 +9,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install Deps
-        uses: borales/actions-yarn@v2.3.0
-        with:
-          cmd: install --frozen-lockfile --silent
-
-      - name: Build Packages
-        uses: borales/actions-yarn@v2.3.0
-        with:
-          cmd: build
-
-      - name: Run Sandbox
-        uses: borales/actions-yarn@v2.3.0
-        with:
-          cmd: sandbox:dev
+      - run: yarn --frozen-lockfile --silent
+      - run: yarn build
 
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
           install: false
+          start: yarn sandbox:dev
           working-directory: e2e
+          parallel: true
           wait-on: 'http://localhost:1234'
+          wait-on-timeout: 120
           browser: chrome
