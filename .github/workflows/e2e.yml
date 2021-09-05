@@ -16,7 +16,7 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           install: false
-          start: cd .. && yarn sandbox:dev
+          start: yarn workspace sandbox dev
           working-directory: e2e
           parallel: true
           browser: chrome
