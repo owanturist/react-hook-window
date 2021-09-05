@@ -3,13 +3,13 @@
 Install with Yarn:
 
 ```bash
-yarn add react-hook-window
+yarn add @react-hook-window/use-windowed-list
 ```
 
 Install with NPM:
 
 ```bash
-npm install react-hook-window --save
+npm install @react-hook-window/use-windowed-list --save
 ```
 
 # Usage
