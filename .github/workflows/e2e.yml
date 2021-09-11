@@ -3,37 +3,65 @@ name: E2E Tests with Cypress
 on: push
 
 jobs:
-  build-packages:
+  install:
     runs-on: ubuntu-latest
-    container: cypress/browsers:node12.18.3-chrome87-ff82
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: yarn --frozen-lockfile --silent
+      - run: yarn --frozen-lockfile --silent
+
+      - name: Save node_modules
+        uses: actions/upload-artifact@v2
+        with:
+          if-no-files-found: error
+          name: node_modules
+          path: '**/node_modules'
+
+  # ---
+
+  build-packages:
+    runs-on: ubuntu-latest
+    needs: install
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: node_modules
 
       - name: Build packages
         run: yarn build
 
-      - name: Save build folder
+      - name: Save packages artifacts
         uses: actions/upload-artifact@v2
         with:
           if-no-files-found: error
+          name: packages
           path: packages/*/dist
+
+  # ---
 
   cypress-run:
     runs-on: ubuntu-latest
     container: cypress/browsers:node12.18.3-chrome87-ff82
     needs: build-packages
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Download the build folders
+      - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
-          path: packages/*/dist
+          name: node_modules
+      - uses: actions/download-artifact@v2
+        with:
+          name: packages
 
       - name: Build Sandbox
         run: yarn sandbox:build
