@@ -35,6 +35,9 @@ jobs:
         with:
           path: packages/*/dist
 
+      - name: Build Sandbox
+        run: yarn sandbox:build
+
       - name: 'UI Tests - Chrome'
         uses: cypress-io/github-action@v2
         with:
