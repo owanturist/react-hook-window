@@ -11,14 +11,13 @@ jobs:
         uses: actions/checkout@v2
 
       - run: yarn --frozen-lockfile --silent
-      - run: yarn build
-      - run: yarn sandbox:build
 
       - name: Cypress install
         uses: cypress-io/github-action@v2
         with:
           # Disable running of tests within install job
           runTests: false
+          build: yarn build && yarn sandbox:build
 
       - name: Save build folder
         uses: actions/upload-artifact@v2
