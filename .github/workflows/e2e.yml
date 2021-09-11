@@ -12,19 +12,19 @@ jobs:
 
       - run: yarn --frozen-lockfile --silent
 
-      - name: Save build folder
-        uses: actions/upload-artifact@v2
-        with:
-          name: sandbox
-          if-no-files-found: error
-          path: sandbox/dist
-
       - name: Cypress install
         uses: cypress-io/github-action@v2
         with:
           # Disable running of tests within install job
           runTests: false
           build: yarn build && yarn sandbox:build
+
+      - name: Save build folder
+        uses: actions/upload-artifact@v2
+        with:
+          name: sandbox
+          if-no-files-found: error
+          path: sandbox/dist
 
   cypress-run:
     runs-on: ubuntu-latest
