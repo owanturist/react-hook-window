@@ -16,8 +16,8 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
-          start: npx serve -s ../sandbox/dist -p 3000
+          start: npx serve -s ../sandbox/dist -p 1234
           working-directory: e2e
           browser: chrome
-          wait-on: 'http://localhost:3000'
+          wait-on: 'http://localhost:1234'
           wait-on-timeout: 30
