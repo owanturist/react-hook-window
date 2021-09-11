@@ -11,13 +11,14 @@ jobs:
 
       - run: yarn --frozen-lockfile --silent
       - run: yarn build
+      - run: yarn sandbox:build
 
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
           install: false
-          start: yarn workspace sandbox dev
+          start: npx serve -s ../sandbox/dist -p 3000 --yes
           working-directory: e2e
           browser: chrome
-          wait-on: 'http://localhost:1234'
+          wait-on: 'http://localhost:3000'
           wait-on-timeout: 120
