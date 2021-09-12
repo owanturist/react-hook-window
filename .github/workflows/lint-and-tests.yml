@@ -1,0 +1,41 @@
+name: Lint source code and run tests
+
+on: push
+
+jobs:
+  lint-and-tests:
+    runs-on: ubuntu-latest
+    container: cypress/browsers:node12.18.3-chrome87-ff82
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'yarn'
+      - run: yarn install --frozen-lockfile
+
+      - name: Build packages
+        run: yarn build
+
+      - name: Run lint
+        run: yarn lint
+
+      - name: Run typecheck
+        run: yarn typecheck
+
+      - name: Build Sandbox
+        run: yarn sandbox:build
+
+      - name: Run e2e
+        uses: cypress-io/github-action@v2
+        with:
+          install: false
+          working-directory: e2e
+          start: npx serve -s ../sandbox/dist -p 1234
+          wait-on: 'http://localhost:1234'
+          wait-on-timeout: 20
+          browser: chrome
