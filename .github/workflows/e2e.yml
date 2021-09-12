@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: '14'
           cache: 'yarn'
-      - run: yarn install --frozen-lockfile --silent
+      - run: yarn install --frozen-lockfile
 
       - name: Build packages
         run: yarn build
@@ -48,7 +48,7 @@ jobs:
         with:
           node-version: '14'
           cache: 'yarn'
-      - run: yarn install --frozen-lockfile --silent
+      - run: yarn install
 
       - run: yarn lint
 
@@ -73,7 +73,7 @@ jobs:
         with:
           node-version: '14'
           cache: 'yarn'
-      - run: yarn install --frozen-lockfile --silent
+      - run: yarn install
 
       - run: yarn typecheck
 
@@ -99,7 +99,7 @@ jobs:
         with:
           node-version: '14'
           cache: 'yarn'
-      - run: yarn install --frozen-lockfile --silent
+      - run: yarn install
 
       - name: Build Sandbox
         run: yarn sandbox:build
