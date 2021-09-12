@@ -3,6 +3,41 @@ name: E2E Tests with Cypress
 on: push
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          cache: 'yarn'
+      - run: yarn install --frozen-lockfile --silent
+
+      - run: yarn lint
+
+  # ---
+
+  typecheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          cache: 'yarn'
+      - run: yarn install --frozen-lockfile --silent
+
+      - run: yarn typecheck
+  # ---
+
   build-packages:
     runs-on: ubuntu-latest
 
@@ -15,7 +50,7 @@ jobs:
         with:
           node-version: '14'
           cache: 'yarn'
-      - run: yarn --frozen-lockfile --silent
+      - run: yarn install --frozen-lockfile --silent
 
       - name: Build packages
         run: yarn build
@@ -43,7 +78,7 @@ jobs:
         with:
           node-version: '14'
           cache: 'yarn'
-      - run: yarn --frozen-lockfile --silent
+      - run: yarn install --frozen-lockfile --silent
 
       - name: Download artifacts
         uses: actions/download-artifact@v2
