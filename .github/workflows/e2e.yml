@@ -48,7 +48,7 @@ jobs:
         with:
           node-version: '14'
           cache: 'yarn'
-      # - run: yarn install --frozen-lockfile --silent
+      - run: yarn install --frozen-lockfile --silent
 
       - run: yarn lint
 
@@ -73,7 +73,7 @@ jobs:
         with:
           node-version: '14'
           cache: 'yarn'
-      # - run: yarn install --frozen-lockfile --silent
+      - run: yarn install --frozen-lockfile --silent
 
       - run: yarn typecheck
 
@@ -83,6 +83,10 @@ jobs:
     runs-on: ubuntu-latest
     container: cypress/browsers:node12.18.3-chrome87-ff82
     needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        containers: [1, 2, 3, 4, 5]
 
     steps:
       - name: Checkout
@@ -99,7 +103,7 @@ jobs:
         with:
           node-version: '14'
           cache: 'yarn'
-      # - run: yarn install --frozen-lockfile --silent
+      - run: yarn install --frozen-lockfile --silent
 
       - name: Build Sandbox
         run: yarn sandbox:build
@@ -107,9 +111,15 @@ jobs:
       - name: 'Run e2e - Chrome'
         uses: cypress-io/github-action@v2
         with:
+          install: false
           working-directory: e2e
           start: npx serve -s ../sandbox/dist -p 1234
           wait-on: 'http://localhost:1234'
           wait-on-timeout: 120
           browser: chrome
           group: 'UI - Chrome'
+          record: true
+          parallel: true
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
