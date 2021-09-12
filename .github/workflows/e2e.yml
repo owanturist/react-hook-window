@@ -42,14 +42,13 @@ jobs:
         with:
           name: packages
           path: packages
-      - run: ls -R
 
       - name: Install dependencies
         uses: actions/setup-node@v2
         with:
           node-version: '14'
           cache: 'yarn'
-      - run: yarn install --frozen-lockfile --silent
+      # - run: yarn install --frozen-lockfile --silent
 
       - run: yarn lint
 
@@ -74,7 +73,7 @@ jobs:
         with:
           node-version: '14'
           cache: 'yarn'
-      - run: yarn install --frozen-lockfile --silent
+      # - run: yarn install --frozen-lockfile --silent
 
       - run: yarn typecheck
 
@@ -100,7 +99,7 @@ jobs:
         with:
           node-version: '14'
           cache: 'yarn'
-      - run: yarn install --frozen-lockfile --silent
+      # - run: yarn install --frozen-lockfile --silent
 
       - name: Build Sandbox
         run: yarn sandbox:build
