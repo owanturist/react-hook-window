@@ -586,8 +586,6 @@ A set of available values defining a target element when scrolling via [`UseW
    └─────────────────┘           └─────────────────┘           └─────────────────┘
   ```
 
-  @TODO fix it in the behaviour
-
   ```
     containerSize < target itemSize
 

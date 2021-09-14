@@ -23,11 +23,24 @@ const calcShortestPosition = (
   endPosition: number,
   currentPosition: number
 ): number => {
-  if (currentPosition > startPosition) {
+  // itemSize < containerSize
+  if (endPosition < startPosition) {
+    if (currentPosition > startPosition) {
+      return startPosition
+    }
+
+    if (currentPosition < endPosition) {
+      return endPosition
+    }
+
+    return currentPosition
+  }
+
+  if (currentPosition < startPosition) {
     return startPosition
   }
 
-  if (currentPosition < endPosition) {
+  if (currentPosition > endPosition) {
     return endPosition
   }
 
