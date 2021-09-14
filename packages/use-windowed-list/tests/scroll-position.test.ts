@@ -39,6 +39,13 @@ test('calcAutoPosition', () => {
 
   expect(calcAuto(1500, 100, 150, 1300)).toBe(1450) // 1 viewport from end
   expect(calcAuto(1500, 100, 150, 1299)).toBe(1450) // > 1 viewport from end
+
+  expect(calcAuto(50, 200, 150, 49)).toBe(50) // scroll a to start for big item to become visible
+  expect(calcAuto(50, 200, 150, 50)).toBe(50) // big item is already visible from beginning
+  expect(calcAuto(50, 200, 150, 60)).toBe(60) // big item is already visible in middle
+  expect(calcAuto(50, 200, 150, 75)).toBe(75) // big item is already visible in the end
+  expect(calcAuto(50, 200, 150, 100)).toBe(100) // big item is already visible in the end
+  expect(calcAuto(50, 200, 150, 101)).toBe(100) // scroll a to end for big item to become visible
 })
 
 test('calcSmartPosition', () => {
@@ -56,4 +63,8 @@ test('calcSmartPosition', () => {
 
   expect(calcSmart(1500, 100, 150, 1300)).toBe(1450) // 1 viewport from end
   expect(calcSmart(1500, 100, 150, 1299)).toBe(1475) // > 1 viewport from end
+
+  // expect(calcSmart(0, 200, 150, 0)).toBe(0) // big item is already visible from beginning
+  // expect(calcSmart(0, 200, 150, 10)).toBe(10) // big item is already visible in middle
+  // expect(calcSmart(0, 200, 150, 50)).toBe(50) // big item is already visible in the end
 })
