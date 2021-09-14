@@ -76,8 +76,8 @@ const InfiniteRangeLoaderDemo = React.memo(() => {
     endSpace,
     indexes,
     isScrolling,
-    overscanStart,
-    overscanStop
+    overscanFromIndex,
+    overscanBeforeIndex
   } = useWindowedList({
     containerSize,
     itemSize,
@@ -86,8 +86,8 @@ const InfiniteRangeLoaderDemo = React.memo(() => {
 
   useInfiniteLoader({
     isScrolling,
-    overscanStart,
-    overscanStop,
+    overscanFromIndex,
+    overscanBeforeIndex,
     isItemLoaded,
     loadMoreItems: React.useCallback(({ startIndex, count }) => {
       const accLoading: Record<number, boolean> = {}
@@ -136,8 +136,8 @@ const InfinitePagedLoaderDemo = React.memo(() => {
     endSpace,
     indexes,
     isScrolling,
-    overscanStart,
-    overscanStop
+    overscanFromIndex,
+    overscanBeforeIndex
   } = useWindowedList({
     containerSize,
     itemSize,
@@ -146,8 +146,8 @@ const InfinitePagedLoaderDemo = React.memo(() => {
 
   useInfiniteLoader({
     isScrolling,
-    overscanStart,
-    overscanStop,
+    overscanFromIndex,
+    overscanBeforeIndex,
     isItemLoaded,
     loadMoreItems: React.useCallback(() => {
       loadRange(items.length, pageSize, 200).then(data => {
@@ -182,8 +182,8 @@ const UndefinitePagedLoaderDemo = React.memo(() => {
     endSpace,
     indexes,
     isScrolling,
-    overscanStart,
-    overscanStop
+    overscanFromIndex,
+    overscanBeforeIndex
   } = useWindowedList({
     containerSize,
     itemSize,
@@ -192,8 +192,8 @@ const UndefinitePagedLoaderDemo = React.memo(() => {
 
   useInfiniteLoader({
     isScrolling,
-    overscanStart,
-    overscanStop,
+    overscanFromIndex,
+    overscanBeforeIndex,
     isItemLoaded,
     loadMoreItems: React.useCallback(() => {
       loadRange(items.length, pageSize, 200).then(data => {

@@ -2,15 +2,15 @@ import { useEffect } from 'react'
 
 const calcUnloadedRanges = (
   isLoaded: (index: number) => boolean,
-  overscanStart: number,
-  overscanStop: number
+  overscanFromIndex: number,
+  overscanBeforeIndex: number
 ): ReadonlyArray<[number, number]> => {
   const ranges = new Array<[number, number]>(0)
 
-  for (let index = overscanStart; index < overscanStop; index++) {
+  for (let index = overscanFromIndex; index < overscanBeforeIndex; index++) {
     // skip loaded
     while (isLoaded(index)) {
-      if (++index >= overscanStop) {
+      if (++index >= overscanBeforeIndex) {
         return ranges
       }
     }
@@ -19,8 +19,8 @@ const calcUnloadedRanges = (
 
     // skip unloaded
     while (!isLoaded(index)) {
-      if (++index >= overscanStop) {
-        ranges.push([start, overscanStop])
+      if (++index >= overscanBeforeIndex) {
+        ranges.push([start, overscanBeforeIndex])
 
         return ranges
       }
@@ -41,16 +41,16 @@ export interface LoadMoreItemsOptions {
 
 export interface UseInfiniteLoaderOptions {
   isScrolling: boolean
-  overscanStart: number
-  overscanStop: number
+  overscanFromIndex: number
+  overscanBeforeIndex: number
   isItemLoaded(index: number): boolean
   loadMoreItems(options: LoadMoreItemsOptions): void
 }
 
 export const useInfiniteLoader = ({
   isScrolling,
-  overscanStart,
-  overscanStop,
+  overscanFromIndex,
+  overscanBeforeIndex,
   isItemLoaded,
   loadMoreItems
 }: UseInfiniteLoaderOptions): void => {
@@ -59,7 +59,11 @@ export const useInfiniteLoader = ({
       return
     }
 
-    const ranges = calcUnloadedRanges(isItemLoaded, overscanStart, overscanStop)
+    const ranges = calcUnloadedRanges(
+      isItemLoaded,
+      overscanFromIndex,
+      overscanBeforeIndex
+    )
 
     for (const [startIndex, stopIndex] of ranges) {
       loadMoreItems({
@@ -68,5 +72,11 @@ export const useInfiniteLoader = ({
         count: stopIndex - startIndex
       })
     }
-  }, [isScrolling, overscanStart, overscanStop, isItemLoaded, loadMoreItems])
+  }, [
+    isScrolling,
+    overscanFromIndex,
+    overscanBeforeIndex,
+    isItemLoaded,
+    loadMoreItems
+  ])
 }

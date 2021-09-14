@@ -87,14 +87,11 @@ const useBoundaries = (
   ]
 }
 
-// @TODO rename *Start to *StartingWithIndex, and *Stop to *EndingBeforeIndex
-
-// , and stop to untilIndex, range to intervals
 export interface ListRenderedRange {
-  overscanStart: number
-  overscanStop: number
-  visibleStart: number
-  visibleStop: number
+  overscanFromIndex: number
+  overscanBeforeIndex: number
+  visibleFromIndex: number
+  visibleBeforeIndex: number
 }
 
 export type ItemDynamicSize = (index: number) => number
@@ -175,10 +172,10 @@ export const useWindowedList = <E extends HTMLElement>({
   useEffect(() => {
     if (container != null) {
       onItemsRendered?.({
-        overscanStart: start,
-        overscanStop: stop,
-        visibleStart: boundaries.start,
-        visibleStop: boundaries.stop
+        overscanFromIndex: start,
+        overscanBeforeIndex: stop,
+        visibleFromIndex: boundaries.start,
+        visibleBeforeIndex: boundaries.stop
       })
     }
   }, [
@@ -280,10 +277,10 @@ export const useWindowedList = <E extends HTMLElement>({
     isScrolling,
     setRef: setContainer,
 
-    overscanStart: start,
-    overscanStop: stop,
-    visibleStart: boundaries.start,
-    visibleStop: boundaries.stop,
+    overscanFromIndex: start,
+    overscanBeforeIndex: stop,
+    visibleFromIndex: boundaries.start,
+    visibleBeforeIndex: boundaries.stop,
 
     startSpace: useMemo(
       () => viewport.getSpaceBefore(start),

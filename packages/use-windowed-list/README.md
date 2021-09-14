@@ -375,26 +375,26 @@ A callback to call when either visible or overscan ranges change. See [`ListR
 
 ```ts
 export interface ListRenderedRange {
-  overscanStart: number
-  overscanStop: number
-  visibleStart: number
-  visibleStop: number
+  overscanFromIndex: number
+  overscanBeforeIndex: number
+  visibleFromIndex: number
+  visibleBeforeIndex: number
 }
 ```
 
 A collection of values describing two half-open intervals:
 
-1. visible items ∈ `[visibleStart, visibleStop)` partially or entirely visible on the current scroll position
-1. overscan items ∈ `[overscanStart, overscanStop)` includes visible items and some additional non-visible defined via [UseWindowedListOptions.overscanCount][use-windowed-list-options.overscan-count] value.
+1. visible items ∈ `[visibleFromIndex, visibleBeforeIndex)` partially or entirely visible on the current scroll position
+1. overscan items ∈ `[overscanFromIndex, overscanBeforeIndex)` includes visible items and some additional non-visible defined via [UseWindowedListOptions.overscanCount][use-windowed-list-options.overscan-count] value.
 
-> 💬 Both intervals include the start indexes and exclude end ones, so the resulting index ranges might be iterated by <code>for (let i = start; i < stop; i++)</code>, for instance:
+> 💬 Both intervals include the “from” indexe and exclude “before”. It’s pretty straightforward to know the number of items in a range by subtracting `beforeIndex - fromIndex` or iterate it by <code>for (let i = fromIndex; i < beforeIndex; i++)</code>, for instance:
 >
 > ```ts
 > const range: ListRenderedRange = {
->   overscanStart: 15,
->   overscanStop: 21,
->   visibleStart: 16,
->   visibleStop: 20
+>   overscanFromIndex: 15,
+>   overscanBeforeIndex: 21,
+>   visibleFromIndex: 16,
+>   visibleBeforeIndex: 20
 > }:
 > ```
 >
@@ -442,7 +442,7 @@ Space in pixels after the last rendered item. It represents either bottom spac
 indexes: ReadonlyArray<number>
 ```
 
-An array of the list items’ indexes. The range starts from `ListRenderedRange.overscanStart` and ends before `ListRenderedRange.overscanStop`. It’s easy to use the `indexes.map` method to map the indexes to items’ data like in the [“Usage"][usage] example.
+An array of the list items’ indexes. The range starts from `ListRenderedRange.overscanFromIndex` and ends before `ListRenderedRange.overscanBeforeIndex`. It’s easy to use the `indexes.map` method to map the indexes to items’ data like in the [“Usage"][usage] example.
 
 #### `UseWindowedListResult.isScrolling`
 
