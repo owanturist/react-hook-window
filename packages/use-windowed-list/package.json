@@ -1,6 +1,6 @@
 {
   "name": "@react-hook-window/use-windowed-list",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "repository": "git@github.com:owanturist/react-hook-window.git",
   "author": "Anton Ovechkin <owanturist@gmail.com>",
   "license": "BSD-3-Clause",
