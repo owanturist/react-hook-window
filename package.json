@@ -7,9 +7,9 @@
     "packages/*"
   ],
   "scripts": {
+    "c": "cz",
     "prebootstrap": "yarn build",
     "bootstrap": "yarn lerna bootstrap",
-    "preinstall": "git config core.hooksPath hooks",
     "clean:use-windowed-list": "yarn workspace @react-hook-window/use-windowed-list clean",
     "clean:use-infinite-loader": "yarn workspace @react-hook-window/use-infinite-loader clean",
     "clean": "yarn clean:use-windowed-list && yarn clean:use-infinite-loader",
