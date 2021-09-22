@@ -5,7 +5,10 @@
   "command": {
     "publish": {
       "ignoreChanges": ["*.md"],
-      "message": "chore(release): publish"
+      "message": "chore(release): publish %s"
+    },
+    "version": {
+      "message": "chore(release): %s"
     },
     "bootstrap": {
       "npmClientArgs": ["--frozen-lockfile"]
