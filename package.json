@@ -25,20 +25,6 @@
     "sandbox:dev": "yarn workspace sandbox dev",
     "sandbox:build": "yarn workspace sandbox build"
   },
-  "husky": {
-    "hooks": {
-      "prepare-commit-msg": "./scripts/git-commit-message.sh $HUSKY_GIT_PARAMS",
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "**/*.{js,jsx,ts,tsx,json,md}": [
-      "prettier --write"
-    ],
-    "**/*.{js,jsx,ts,tsx,md}": [
-      "eslint --config=.eslintrc.prod.json --fix"
-    ]
-  },
   "devDependencies": {
     "@babel/core": "^7.14.6",
     "@babel/preset-env": "^7.14.7",
@@ -59,10 +45,8 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.2.0",
-    "husky": "^4.3.7",
     "jest": "^27.0.6",
     "lerna": "3.22.1",
-    "lint-staged": "^11.0.0",
     "prettier": "^2.3.2",
     "rollup": "^2.52.7",
     "rollup-plugin-commonjs": "^10.1.0",
