@@ -1,6 +1,6 @@
 {
   "name": "@react-hook-window/use-infinite-loader",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "repository": "git@github.com:owanturist/react-hook-window.git",
   "author": "Anton Ovechkin <owanturist@gmail.com>",
   "license": "BSD-3-Clause",
@@ -19,7 +19,6 @@
   },
   "scripts": {
     "clean": "rm -rf ./dist",
-    "postpublish": "PACKAGE_VERSION=$(cat package.json | grep 'version' | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag v$PACKAGE_VERSION && git push --tags",
     "typecheck": "tsc -p ./tsconfig.json --noEmit"
   },
   "peerDependencies": {

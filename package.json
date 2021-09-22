@@ -7,6 +7,9 @@
     "packages/*"
   ],
   "scripts": {
+    "c": "cz",
+    "prebootstrap": "yarn build",
+    "bootstrap": "yarn lerna bootstrap",
     "clean:use-windowed-list": "yarn workspace @react-hook-window/use-windowed-list clean",
     "clean:use-infinite-loader": "yarn workspace @react-hook-window/use-infinite-loader clean",
     "clean": "yarn clean:use-windowed-list && yarn clean:use-infinite-loader",
@@ -22,20 +25,6 @@
     "sandbox:dev": "yarn workspace sandbox dev",
     "sandbox:build": "yarn workspace sandbox build"
   },
-  "husky": {
-    "hooks": {
-      "prepare-commit-msg": "./scripts/git-commit-message.sh $HUSKY_GIT_PARAMS",
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "**/*.{js,jsx,ts,tsx,json,md}": [
-      "prettier --write"
-    ],
-    "**/*.{js,jsx,ts,tsx,md}": [
-      "eslint --config=.eslintrc.prod.json --fix"
-    ]
-  },
   "devDependencies": {
     "@babel/core": "^7.14.6",
     "@babel/preset-env": "^7.14.7",
@@ -46,6 +35,8 @@
     "@typescript-eslint/eslint-plugin": "^4.28.3",
     "@typescript-eslint/parser": "^4.28.3",
     "babel-jest": "^27.0.6",
+    "commitizen": "^4.2.4",
+    "cz-lerna-changelog": "2.0.3",
     "eslint": "^7.30.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-cypress": "^2.11.3",
@@ -54,9 +45,8 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.2.0",
-    "husky": "^4.3.7",
     "jest": "^27.0.6",
-    "lint-staged": "^11.0.0",
+    "lerna": "3.22.1",
     "prettier": "^2.3.2",
     "rollup": "^2.52.7",
     "rollup-plugin-commonjs": "^10.1.0",
@@ -64,5 +54,10 @@
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.30.0",
     "typescript": "^4.3.5"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-lerna-changelog"
+    }
   }
 }

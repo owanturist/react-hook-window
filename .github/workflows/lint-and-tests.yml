@@ -18,8 +18,8 @@ jobs:
           cache: 'yarn'
       - run: yarn install --frozen-lockfile
 
-      - name: Build packages
-        run: yarn build
+      - name: Bootstrap packages
+        run: yarn bootstrap
 
       - name: Run lint
         run: yarn lint
