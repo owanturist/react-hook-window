@@ -4,11 +4,11 @@
   "useWorkspaces": true,
   "command": {
     "publish": {
-      "ignoreChanges": ["*.md"],
-      "message": "chore(release): publish %s"
+      "ignoreChanges": ["*.md", "sandbox/**", "e2e/**", "**/tests/**"],
+      "message": "chore(release): publish"
     },
     "version": {
-      "message": "chore(release): %s"
+      "allowBranch": "master"
     },
     "bootstrap": {
       "npmClientArgs": ["--frozen-lockfile"]
