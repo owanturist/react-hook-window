@@ -3,11 +3,11 @@ export const calcUnloadedRanges = (
   overscanFromIndex: number,
   overscanBeforeIndex: number
 ): ReadonlyArray<[number, number]> => {
-  const ranges = new Array<[number, number]>(0)
+  const ranges: Array<[number, number]> = []
 
   for (let index = overscanFromIndex; index < overscanBeforeIndex; index++) {
     // skip loaded
-    while (shouldLoad(index)) {
+    while (!shouldLoad(index)) {
       if (++index >= overscanBeforeIndex) {
         return ranges
       }
@@ -16,7 +16,7 @@ export const calcUnloadedRanges = (
     const start = index
 
     // skip unloaded
-    while (!shouldLoad(index)) {
+    while (shouldLoad(index)) {
       if (++index >= overscanBeforeIndex) {
         ranges.push([start, overscanBeforeIndex])
 
