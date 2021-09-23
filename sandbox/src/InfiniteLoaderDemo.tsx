@@ -68,7 +68,10 @@ const InfiniteRangeLoaderDemo = React.memo(() => {
   const itemSize = 50
   const [items, setItems] = React.useState<Partial<Record<number, string>>>({})
   const [loading, setLoading] = React.useState<Record<number, boolean>>({})
-  const isItemLoaded = React.useCallback(index => index in loading, [loading])
+  const shouldLoadItem = React.useCallback(
+    index => !(index in loading),
+    [loading]
+  )
 
   const {
     setRef,
@@ -88,21 +91,21 @@ const InfiniteRangeLoaderDemo = React.memo(() => {
     isScrolling,
     overscanFromIndex,
     overscanBeforeIndex,
-    isItemLoaded,
-    loadMoreItems: React.useCallback(({ startIndex, count }) => {
+    shouldLoadItem,
+    loadItemsRange: React.useCallback(({ loadFromIndex, loadCount }) => {
       const accLoading: Record<number, boolean> = {}
 
-      for (let index = 0; index < count; index++) {
-        accLoading[startIndex + index] = true
+      for (let index = 0; index < loadCount; index++) {
+        accLoading[loadFromIndex + index] = true
       }
 
       setLoading(current => ({ ...current, ...accLoading }))
 
-      loadRange(startIndex, count, 200).then(data => {
+      loadRange(loadFromIndex, loadCount, 200).then(data => {
         const accItems: Record<number, string> = {}
 
         for (let index = 0; index < data.length; index++) {
-          accItems[startIndex + index] = data[index]
+          accItems[loadFromIndex + index] = data[index]
         }
 
         setItems(current => ({ ...current, ...accItems }))
@@ -128,7 +131,10 @@ const InfinitePagedLoaderDemo = React.memo(() => {
   const itemSize = 30
   const pageSize = 10
   const [items, setItems] = React.useState<ReadonlyArray<string>>([])
-  const isItemLoaded = React.useCallback(index => index < items.length, [items])
+  const shouldLoadItem = React.useCallback(
+    (index: number) => index >= items.length,
+    [items]
+  )
 
   const {
     setRef,
@@ -148,8 +154,8 @@ const InfinitePagedLoaderDemo = React.memo(() => {
     isScrolling,
     overscanFromIndex,
     overscanBeforeIndex,
-    isItemLoaded,
-    loadMoreItems: React.useCallback(() => {
+    shouldLoadItem,
+    loadItemsRange: React.useCallback(() => {
       loadRange(items.length, pageSize, 200).then(data => {
         setItems(current => [...current, ...data])
       })
@@ -174,7 +180,10 @@ const UndefinitePagedLoaderDemo = React.memo(() => {
   const itemSize = 30
   const pageSize = 10
   const [items, setItems] = React.useState<ReadonlyArray<string>>([])
-  const isItemLoaded = React.useCallback(index => index < items.length, [items])
+  const shouldLoadItem = React.useCallback(
+    (index: number) => index >= items.length,
+    [items]
+  )
 
   const {
     setRef,
@@ -194,8 +203,8 @@ const UndefinitePagedLoaderDemo = React.memo(() => {
     isScrolling,
     overscanFromIndex,
     overscanBeforeIndex,
-    isItemLoaded,
-    loadMoreItems: React.useCallback(() => {
+    shouldLoadItem,
+    loadItemsRange: React.useCallback(() => {
       loadRange(items.length, pageSize, 200).then(data => {
         setItems(current => [...current, ...data])
       })
