@@ -1,36 +1,5 @@
 import { useEffect } from 'react'
-
-const calcUnloadedRanges = (
-  isLoaded: (index: number) => boolean,
-  overscanFromIndex: number,
-  overscanBeforeIndex: number
-): ReadonlyArray<[number, number]> => {
-  const ranges = new Array<[number, number]>(0)
-
-  for (let index = overscanFromIndex; index < overscanBeforeIndex; index++) {
-    // skip loaded
-    while (isLoaded(index)) {
-      if (++index >= overscanBeforeIndex) {
-        return ranges
-      }
-    }
-
-    const start = index
-
-    // skip unloaded
-    while (!isLoaded(index)) {
-      if (++index >= overscanBeforeIndex) {
-        ranges.push([start, overscanBeforeIndex])
-
-        return ranges
-      }
-    }
-
-    ranges.push([start, index])
-  }
-
-  return ranges
-}
+import { calcUnloadedRanges } from './calc-unloaded-ranges'
 
 export interface LoadRange {
   loadFromIndex: number
