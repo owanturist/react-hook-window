@@ -18,8 +18,8 @@ jobs:
           cache: 'yarn'
       - run: yarn install --frozen-lockfile
 
-      - name: Bootstrap packages
-        run: yarn bootstrap
+      - name: Build packages
+        run: yarn build
 
       - name: Run lint
         run: yarn lint
@@ -27,10 +27,13 @@ jobs:
       - name: Run typecheck
         run: yarn typecheck
 
+      - name: Run unit tests
+        run: yarn test --silent
+
       - name: Build Sandbox
         run: yarn sandbox:build
 
-      - name: Run e2e
+      - name: Run e2e tests
         uses: cypress-io/github-action@v2
         with:
           install: false

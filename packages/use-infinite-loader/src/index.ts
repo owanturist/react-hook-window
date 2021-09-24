@@ -1,58 +1,26 @@
 import { useEffect } from 'react'
+import { calcUnloadedRanges } from './calc-unloaded-ranges'
 
-const calcUnloadedRanges = (
-  isLoaded: (index: number) => boolean,
-  overscanFromIndex: number,
-  overscanBeforeIndex: number
-): ReadonlyArray<[number, number]> => {
-  const ranges = new Array<[number, number]>(0)
-
-  for (let index = overscanFromIndex; index < overscanBeforeIndex; index++) {
-    // skip loaded
-    while (isLoaded(index)) {
-      if (++index >= overscanBeforeIndex) {
-        return ranges
-      }
-    }
-
-    const start = index
-
-    // skip unloaded
-    while (!isLoaded(index)) {
-      if (++index >= overscanBeforeIndex) {
-        ranges.push([start, overscanBeforeIndex])
-
-        return ranges
-      }
-    }
-
-    ranges.push([start, index])
-  }
-
-  return ranges
-}
-
-// @TODO rename with ListRenderedRange renaming
-export interface LoadMoreItemsOptions {
-  startIndex: number
-  stopIndex: number
-  count: number
+export interface LoadingItemsRange {
+  loadFromIndex: number
+  loadBeforeIndex: number
+  loadCount: number
 }
 
 export interface UseInfiniteLoaderOptions {
   isScrolling: boolean
   overscanFromIndex: number
   overscanBeforeIndex: number
-  isItemLoaded(index: number): boolean
-  loadMoreItems(options: LoadMoreItemsOptions): void
+  shouldLoadItem(index: number): boolean
+  loadItemsRange(range: LoadingItemsRange): void
 }
 
 export const useInfiniteLoader = ({
   isScrolling,
   overscanFromIndex,
   overscanBeforeIndex,
-  isItemLoaded,
-  loadMoreItems
+  shouldLoadItem,
+  loadItemsRange
 }: UseInfiniteLoaderOptions): void => {
   useEffect(() => {
     if (isScrolling) {
@@ -60,23 +28,23 @@ export const useInfiniteLoader = ({
     }
 
     const ranges = calcUnloadedRanges(
-      isItemLoaded,
+      shouldLoadItem,
       overscanFromIndex,
       overscanBeforeIndex
     )
 
-    for (const [startIndex, stopIndex] of ranges) {
-      loadMoreItems({
-        startIndex,
-        stopIndex,
-        count: stopIndex - startIndex
+    for (const [loadFromIndex, loadBeforeIndex] of ranges) {
+      loadItemsRange({
+        loadFromIndex,
+        loadBeforeIndex,
+        loadCount: loadBeforeIndex - loadFromIndex
       })
     }
   }, [
     isScrolling,
     overscanFromIndex,
     overscanBeforeIndex,
-    isItemLoaded,
-    loadMoreItems
+    shouldLoadItem,
+    loadItemsRange
   ])
 }
