@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { calcUnloadedRanges } from './calc-unloaded-ranges'
 
-export interface LoadRange {
+export interface LoadingItemsRange {
   loadFromIndex: number
   loadBeforeIndex: number
   loadCount: number
@@ -12,7 +12,7 @@ export interface UseInfiniteLoaderOptions {
   overscanFromIndex: number
   overscanBeforeIndex: number
   shouldLoadItem(index: number): boolean
-  loadItemsRange(range: LoadRange): void
+  loadItemsRange(range: LoadingItemsRange): void
 }
 
 export const useInfiniteLoader = ({
