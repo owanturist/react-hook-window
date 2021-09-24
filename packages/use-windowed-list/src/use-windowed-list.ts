@@ -107,8 +107,6 @@ export type InitialListElementScroll = {
 
 export type InitialListScroll = number | InitialListElementScroll
 
-// @TODO add containerRef as an option
-// @TODO add offset to set a scroll position from which first item starts
 export interface UseWindowedListOptions {
   containerSize: number
   itemSize: ItemSize
@@ -128,8 +126,7 @@ export interface UseWindowedListResult<E extends HTMLElement>
   indexes: ReadonlyArray<number>
   isScrolling: boolean
   container: null | E
-  // @TODO rename to setContainerRef
-  setRef(node: null | E): void
+  setContainerRef(node: null | E): void
   scrollTo(px: number): void
   scrollToItem(index: number, position?: ScrollPosition): void
 }
@@ -275,7 +272,7 @@ export const useWindowedList = <E extends HTMLElement>({
   return {
     container,
     isScrolling,
-    setRef: setContainer,
+    setContainerRef: setContainer,
 
     overscanFromIndex: start,
     overscanBeforeIndex: stop,

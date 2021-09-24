@@ -65,7 +65,7 @@ export const FriendsList: React.VFC<{
   friends: Array<Friend>
 }> = ({ friends }) => {
   // 1. Call the hook
-  const { setRef, startSpace, endSpace, indexes } = useWindowedList({
+  const { setContainerRef, startSpace, endSpace, indexes } = useWindowedList({
     containerSize: FRIENDS_CONTAINER_HEIGHT,
     itemSize: FRIENDS_ITEM_HEIGHT,
     itemCount: friends.length
@@ -74,7 +74,7 @@ export const FriendsList: React.VFC<{
   return (
     <div
       // 2. Set the container ref
-      ref={setRef}
+      ref={setContainerRef}
       className="container"
       style={{
         overflow: 'auto',
@@ -118,7 +118,7 @@ The custom `useWindowedList` hook calculates a visible range of items in a g
 
 Under the hood, the hook calculates a range of visible items based on three variables:
 
-1. **Scrolling position** - the container’s `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][list-layout] respectively, extracted from a container’s node passed via [`UseWindowedListResult.setRef`][use-windowed-list-result.set-ref].
+1. **Scrolling position** - the container’s `scrollTop` or `scrollLeft` for vertical or horizontal [layouts][list-layout] respectively, extracted from a container’s node passed via [`UseWindowedListResult.setContainerRef`][use-windowed-list-result.set-container-ref].
 2. **Container size** - the container’s height or width for vertical or horizontal [layouts][list-layout] respectively, defined via [`UseWindowedListOptions.containerSize`][use-windowed-list-options.container-size].
 3. **Items size** - the items’ height or width for vertical or horizontal [layouts][list-layout] respectively defined via [`UseWindowedListOptions.itemSize`][use-windowed-list-options.item-size].
 
@@ -412,7 +412,7 @@ export interface UseWindowedListResult<E extends HTMLElement>
   indexes: ReadonlyArray<number>
   isScrolling: boolean
   container: null | E
-  setRef: (node: null | E) => void
+  setContainerRef: (node: null | E) => void
   scrollTo: (px: number) => void
   scrollToItem: (index: number, position?: ScrollPosition) => void
 }
@@ -458,15 +458,15 @@ A flag indicates whenever the container is scrolling. See the relevant [`UseWi
 container: null | E
 ```
 
-Either a container’s node extending `HTMLElement` or `null`. The value gets assigned by the [`UseWindowedListResult.setRef`][use-windowed-list-result.set-ref] function.
+Either a container’s node extending `HTMLElement` or `null`. The value gets assigned by the [`UseWindowedListResult.setContainerRef`][use-windowed-list-result.set-container-ref] function.
 
-#### `UseWindowedListResult.setRef`
+#### `UseWindowedListResult.setContainerRef`
 
 ```ts
-setRef: (node: null | E) => void
+setContainerRef: (node: null | E) => void
 ```
 
-A function to set a container `node` of a windowed list. Each call of `setRef` enqueues a re-render of the component. Because of that, the hook always calculates an output with an actual container. The value is accessible via the [`UseWindowedListResult.container`][use-windowed-list-result.container] property.
+A function to set a container `node` of a windowed list. Each call of `setContainerRef` enqueues a re-render of the component. Because of that, the hook always calculates an output with an actual container. The value is accessible via the [`UseWindowedListResult.container`][use-windowed-list-result.container] property.
 
 #### `UseWindowedListResult.scrollTo`
 
@@ -1062,7 +1062,7 @@ A set of available values defining a target element when scrolling via [`UseW
 [use-windowed-list-result.container]: #usewindowedlistresultcontainer
 [use-windowed-list-result.scroll-to]: #usewindowedlistresultscrollto
 [use-windowed-list-result.scroll-to-item]: #usewindowedlistresultscrolltoitem
-[use-windowed-list-result.set-ref]: #usewindowedlistresultsetref
+[use-windowed-list-result.set-container-ref]: #usewindowedlistresultsetcontainerref
 [use-windowed-list-result.is-scrolling]: #usewindowedlistresultisscrolling
 [list-layout]: #type-listlayout
 [scroll-position]: #type-scrollposition

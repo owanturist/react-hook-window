@@ -10,7 +10,7 @@ const WindowedList = React.memo<{
   options: ControlPanelOptions
 }>(({ options }) => {
   const {
-    setRef,
+    setContainerRef,
     startSpace,
     endSpace,
     indexes,
@@ -44,7 +44,7 @@ const WindowedList = React.memo<{
 
       <div
         data-testid="container"
-        ref={setRef}
+        ref={setContainerRef}
         style={{
           display: isVertical ? 'block' : 'flex',
           flexDirection: isVertical ? 'unset' : 'row',

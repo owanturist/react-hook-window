@@ -71,7 +71,7 @@ const InfiniteRangeLoaderDemo = React.memo(() => {
   const shouldLoadItem = React.useCallback(index => !loading[index], [loading])
 
   const {
-    setRef,
+    setContainerRef,
     startSpace,
     endSpace,
     indexes,
@@ -112,7 +112,7 @@ const InfiniteRangeLoaderDemo = React.memo(() => {
 
   return (
     <ItemsList
-      ref={setRef}
+      ref={setContainerRef}
       containerSize={containerSize}
       itemSize={itemSize}
       indexes={indexes}
@@ -134,7 +134,7 @@ const InfinitePagedLoaderDemo = React.memo(() => {
   )
 
   const {
-    setRef,
+    setContainerRef,
     startSpace,
     endSpace,
     indexes,
@@ -161,7 +161,7 @@ const InfinitePagedLoaderDemo = React.memo(() => {
 
   return (
     <ItemsList
-      ref={setRef}
+      ref={setContainerRef}
       containerSize={containerSize}
       itemSize={itemSize}
       indexes={indexes}
@@ -183,7 +183,7 @@ const UndefinitePagedLoaderDemo = React.memo(() => {
   )
 
   const {
-    setRef,
+    setContainerRef,
     startSpace,
     endSpace,
     indexes,
@@ -210,7 +210,7 @@ const UndefinitePagedLoaderDemo = React.memo(() => {
 
   return (
     <ItemsList
-      ref={setRef}
+      ref={setContainerRef}
       containerSize={containerSize}
       itemSize={itemSize}
       indexes={indexes}

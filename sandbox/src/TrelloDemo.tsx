@@ -459,13 +459,14 @@ const ViewWindowedColumn = React.memo<{
   const [getItemSize, setItemSize] = useItemsSize(column?.tickets)
   const [containerHeight, setContainerHeight] = React.useState(0)
 
-  const { container, setRef, indexes, startSpace, endSpace } = useWindowedList({
-    overscanCount: 3,
-    containerSize: containerHeight,
-    itemSize: getItemSize,
-    itemCount: column?.tickets.length ?? 0,
-    initialScroll
-  })
+  const { container, setContainerRef, indexes, startSpace, endSpace } =
+    useWindowedList({
+      overscanCount: 3,
+      containerSize: containerHeight,
+      itemSize: getItemSize,
+      itemCount: column?.tickets.length ?? 0,
+      initialScroll
+    })
 
   useResizeObserver(node => setContainerHeight(node.clientHeight), container)
 
@@ -487,7 +488,7 @@ const ViewWindowedColumn = React.memo<{
     <StyledColumn>
       <div>{column.title}</div>
 
-      <StyledTicketsScroller ref={setRef}>
+      <StyledTicketsScroller ref={setContainerRef}>
         <div style={{ height: startSpace }} />
 
         {indexes.map(index => (
@@ -686,12 +687,13 @@ const ViewWindowedTrello = React.memo<{
 }>(({ flow }) => {
   const [getScrollPosition, setScrollPosition] = useScrollPositions()
   const [containerWidth, setContainerWidth] = React.useState(0)
-  const { container, setRef, indexes, startSpace, endSpace } = useWindowedList({
-    containerSize: containerWidth,
-    itemSize: 300,
-    itemCount: flow.length,
-    layout: 'horizontal'
-  })
+  const { container, setContainerRef, indexes, startSpace, endSpace } =
+    useWindowedList({
+      containerSize: containerWidth,
+      itemSize: 300,
+      itemCount: flow.length,
+      layout: 'horizontal'
+    })
 
   useResizeObserver(
     React.useCallback(node => setContainerWidth(node.clientWidth), []),
@@ -699,7 +701,7 @@ const ViewWindowedTrello = React.memo<{
   )
 
   return (
-    <StyledColumnsScroller ref={setRef}>
+    <StyledColumnsScroller ref={setContainerRef}>
       <div style={{ display: 'inline-block', width: startSpace }} />
 
       {indexes.map(index => (
