@@ -4,12 +4,16 @@ test('ranges are empty for invalid overscan indexes', () => {
   expect(calcUnloadedRanges(() => true, 10, 0)).toEqual([])
 })
 
-test('ranges are empty for overscan indexes', () => {
+test('ranges are empty when overscan range is empty', () => {
   expect(calcUnloadedRanges(() => true, 0, 0)).toEqual([])
 })
 
 test('ranges are empty when all items are loaded', () => {
   expect(calcUnloadedRanges(() => false, 0, 10)).toEqual([])
+})
+
+test('ranges are empty when shouldLoad is out of range', () => {
+  expect(calcUnloadedRanges(i => i === 10, 0, 10)).toEqual([])
 })
 
 test('single range when all items are unloaded', () => {

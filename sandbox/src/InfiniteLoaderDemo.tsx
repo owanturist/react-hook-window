@@ -68,10 +68,7 @@ const InfiniteRangeLoaderDemo = React.memo(() => {
   const itemSize = 50
   const [items, setItems] = React.useState<Partial<Record<number, string>>>({})
   const [loading, setLoading] = React.useState<Record<number, boolean>>({})
-  const shouldLoadItem = React.useCallback(
-    index => !(index in loading),
-    [loading]
-  )
+  const shouldLoadItem = React.useCallback(index => !loading[index], [loading])
 
   const {
     setRef,
