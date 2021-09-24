@@ -387,7 +387,7 @@ A collection of values describing two half-open intervals:
 1. visible items ∈ `[visibleFromIndex, visibleBeforeIndex)` partially or entirely visible on the current scroll position
 1. overscan items ∈ `[overscanFromIndex, overscanBeforeIndex)` includes visible items and some additional non-visible defined via [UseWindowedListOptions.overscanCount][use-windowed-list-options.overscan-count] value.
 
-> 💬 Both intervals include the “from” indexe and exclude “before”. It’s pretty straightforward to know the number of items in a range by subtracting `beforeIndex - fromIndex` or iterate it by <code>for (let i = fromIndex; i < beforeIndex; i++)</code>, for instance:
+> 💬 Both intervals include the “from” indexes and exclude “before”. It’s pretty straightforward to know the number of items in a range by subtracting `beforeIndex - fromIndex` or iterate it by <code>for (let i = fromIndex; i < beforeIndex; i++)</code>, for instance:
 >
 > ```ts
 > const range: ListRenderedRange = {
