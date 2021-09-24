@@ -1,6 +1,6 @@
 # use-windowed-list
 
-React hook to render only the visible items in a container.
+React hook to render only visible items in a container.
 
 ## Getting Started
 
