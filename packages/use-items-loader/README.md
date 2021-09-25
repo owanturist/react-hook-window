@@ -44,7 +44,7 @@ Consider page size equal to 3 items.
                                  │   PLACEHOLDER    │           ┗┿━━━━━━━━━━━━━━━━━━┿┛
                                  └──────────────────┘            └──────────────────┘
 
-                                                                   load next page ▼
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌   load next page ▼
 
  ┌──────────────────┐            ┌──────────────────┐            ┌──────────────────┐
  │ #0               │            │ #0               │            │ #0               │
@@ -110,7 +110,7 @@ Compare it with the "infinite loading illustration" above to get more insights.
                                  │ placeholder.size │           ┗┿━━━━━━━━━━━━━━━━━━┿┛
                                  └──────────────────┘            └──────────────────┘
 
-                                                                   load next page ▼
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌   load next page ▼
 
  ┌──────────────────┐            ┌──────────────────┐            ┌──────────────────┐
  │ start space =    │            │ start space =    │            │ start space =    │

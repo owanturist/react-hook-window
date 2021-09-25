@@ -549,7 +549,7 @@ A set of available values defining a target element when scrolling via [`UseW
    │                 │           │                 │           │                 │
    └─────────────────┘           └─────────────────┘           └─────────────────┘
 
-                                                                      3 ▼ no change
+    ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌  3 ▼ no change
 
   ┏┯━━━━━━━━━━━━━━━━━┯┓          ┌─────────────────┐           ┌─────────────────┐
   ┃│ #0              │┃          │ #0              │           │ #0              │
@@ -623,7 +623,7 @@ A set of available values defining a target element when scrolling via [`UseW
    │                 │           │                 │           │                 │
    └─────────────────┘           └─────────────────┘           └─────────────────┘
 
-                                                                      3 ▼ no change
+    ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌  3 ▼ no change
 
    ┌─────────────────┐           ┌─────────────────┐           ┌─────────────────┐
    │ #0              │           │ #0              │           │ #0              │
@@ -733,7 +733,8 @@ A set of available values defining a target element when scrolling via [`UseW
    │                 │           │                 │           │                 │
    └─────────────────┘           └─────────────────┘           └─────────────────┘
 
-                                                                    12 ▼ no change
+   ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌  12 ▼ no change
+
   3. scrolling to 12th that is already visible - no scroll needed
   4. scrolling to 3th that is farther than one viewport - scroll to center the 3rd item
   5. scrolling to 0th that is closer than one viewport - scroll as little as possible
@@ -843,7 +844,7 @@ A set of available values defining a target element when scrolling via [`UseW
    │                 │           │                 │          ┃│                 │┃
    └─────────────────┘           └─────────────────┘          ┗┷━━━━━━━━━━━━━━━━━┷┛
 
-                                                                      3 ▼
+    ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌      3 ▼
 
   ┏┯━━━━━━━━━━━━━━━━━┯┓          ┌─────────────────┐           ┌─────────────────┐
   ┃│ #0              │┃          │ #0              │           │ #0              │
@@ -926,7 +927,7 @@ A set of available values defining a target element when scrolling via [`UseW
    │                 │           │                 │           │                 │
    └─────────────────┘           └─────────────────┘           └─────────────────┘
 
-                                                                      6 ▼
+    ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌     6 ▼
 
   ┏┯━━━━━━━━━━━━━━━━━┯┓          ┌─────────────────┐           ┌─────────────────┐
   ┃│ #0              │┃          │ #0              │           │ #0              │
@@ -1009,7 +1010,7 @@ A set of available values defining a target element when scrolling via [`UseW
    │                 │           │                 │           │                 │
    └─────────────────┘           └─────────────────┘           └─────────────────┘
 
-                                                                       7 ▼
+    ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌      7 ▼
 
   ┏┯━━━━━━━━━━━━━━━━━┯┓          ┌─────────────────┐           ┌─────────────────┐
   ┃│ #0              │┃          │ #0              │           │ #0              │
