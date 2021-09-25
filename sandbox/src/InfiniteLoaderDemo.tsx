@@ -85,7 +85,7 @@ const InfiniteRangeLoaderDemo = React.memo(() => {
   })
 
   useItemsLoader({
-    isScrolling,
+    skip: isScrolling,
     overscanFromIndex,
     overscanBeforeIndex,
     shouldLoadItem,
@@ -148,7 +148,7 @@ const InfinitePagedLoaderDemo = React.memo(() => {
   })
 
   useItemsLoader({
-    isScrolling,
+    skip: isScrolling,
     overscanFromIndex,
     overscanBeforeIndex,
     shouldLoadItem,
@@ -197,7 +197,7 @@ const UndefinitePagedLoaderDemo = React.memo(() => {
   })
 
   useItemsLoader({
-    isScrolling,
+    skip: isScrolling,
     overscanFromIndex,
     overscanBeforeIndex,
     shouldLoadItem,
