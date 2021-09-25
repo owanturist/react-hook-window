@@ -1,19 +1,19 @@
-# `use-infinite-loader`
+# `use-items-loader`
 
-React hook to manage infinite loading of a windowed list items.
+React hook to manage pagination or infinite loading of a windowed list items.
 
 ## Getting started
 
 Install with Yarn:
 
 ```bash
-yarn add @react-hook-window/use-infinite-loader
+yarn add @react-hook-window/use-items-loader
 ```
 
 Install with NPM:
 
 ```bash
-npm install @react-hook-window/use-infinite-loader --save
+npm install @react-hook-window/use-items-loader --save
 ```
 
 ## Usage

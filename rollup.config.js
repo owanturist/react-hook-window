@@ -136,7 +136,7 @@ export default [
     umdName: 'useWindowedList'
   }),
   ...makeConfig({
-    root: path.resolve(__dirname, 'packages/use-infinite-loader'),
+    root: path.resolve(__dirname, 'packages/use-items-loader'),
     umdName: 'useWindowedList'
   })
 ]

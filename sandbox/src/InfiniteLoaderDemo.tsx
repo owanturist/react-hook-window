@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useWindowedList } from '@react-hook-window/use-windowed-list'
-import { useInfiniteLoader } from '@react-hook-window/use-infinite-loader'
+import { useItemsLoader } from '@react-hook-window/use-items-loader'
 
 const loadRange = (
   start: number,
@@ -84,7 +84,7 @@ const InfiniteRangeLoaderDemo = React.memo(() => {
     itemCount: 1000
   })
 
-  useInfiniteLoader({
+  useItemsLoader({
     isScrolling,
     overscanFromIndex,
     overscanBeforeIndex,
@@ -147,7 +147,7 @@ const InfinitePagedLoaderDemo = React.memo(() => {
     itemCount: 1000
   })
 
-  useInfiniteLoader({
+  useItemsLoader({
     isScrolling,
     overscanFromIndex,
     overscanBeforeIndex,
@@ -196,7 +196,7 @@ const UndefinitePagedLoaderDemo = React.memo(() => {
     itemCount: items.length + 1
   })
 
-  useInfiniteLoader({
+  useItemsLoader({
     isScrolling,
     overscanFromIndex,
     overscanBeforeIndex,
