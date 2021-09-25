@@ -178,7 +178,7 @@ export const InfiniteFeed: React.VFC<{
     containerSize: FEED_CONTAINER_HEIGHT,
     itemSize: FEED_ITEM_HEIGHT,
     // 1. Reserve extra items for the loading placeholders.
-    // It might be reasonable to define the value equal to a page size.
+    // It might be reasonable to define the value equal to the loading page size.
     itemCount: feedItems.length + FEED_ITEM_LOADING_PLACEHOLDER_COUNT
   })
 
@@ -189,8 +189,7 @@ export const InfiniteFeed: React.VFC<{
     overscanBeforeIndex,
     shouldLoadItem: React.useCallback(
       (index: number) => {
-        // 3. Items further than feedItems are loading placeholders
-        // so they should be loaded.
+        // 3. Items further than feedItems are loading placeholders so they should be loaded.
         return index >= feedItems.length
       },
       [feedItems.length]
@@ -247,6 +246,10 @@ export const InfiniteFeed: React.VFC<{
   )
 }
 ```
+
+## Finite loading (aka pagination) usage
+
+Consider TODO example. That case is a finite loading list, where an application knows a total count of items but loads them page by page when a user scrolls to an unloaded area. The app might render loading placeholders instead of all unloaded items since the total count is known ahead.
 
 <!-- L I N K S -->
 
