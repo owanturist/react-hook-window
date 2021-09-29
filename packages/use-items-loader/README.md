@@ -405,7 +405,261 @@ Consider page size equal to 3 items with total count of 15 items.
   </blockquote>
 </details>
 
-Let's implement the `SearchingResult` windowed component with finite items loading. Here is a [live demo][todo] with [source code][todo].
+Let's implement the `SearchResult` windowed component with finite items loading. Here is a [live demo][todo] with [source code][todo].
+
+<details>
+  <summary>
+    Show a windowed finite loading illustration.
+  </summary>
+
+  <blockquote>
+
+Consider page size equal to 3 items with total count of 15 items and [`UseWindowedListOptions.overscanCount`][use-windowed-list-options.overscan-count] equals 0.
+
+Compare it with the "finite loading illustration" above to get more insights.
+
+```
+┏┯━━━━━━━━━━━━━━━━━━┯┓          ┏┯━━━━━━━━━━━━━━━━━━┯┓           ┌──────────────────┐
+┃│ #0    LOADING    │┃          ┃│ #0               │┃           │ start space =    │
+┃│   PLACEHOLDER    │┃   load   ┃│                  │┃           │ #0.size          │
+┃├──────────────────┤┃   first  ┃├──────────────────┤┃  scroll   ├──────────────────┤
+┃│ #1    LOADING    │┃   page   ┃│ #1               │┃  one      │ #1               │
+┃│   PLACEHOLDER    │┃          ┃│                  │┃  page    ┏┿━━━━━━━━━━━━━━━━━━┿┓
+┃├──────────────────┤┃     ▶    ┃├──────────────────┤┃  down    ┃├──────────────────┤┃
+┃│ #2    LOADING    │┃          ┃│ #2               │┃          ┃│ #2               │┃
+┗┿━━━━━━━━━━━━━━━━━━┿┛          ┗┿━━━━━━━━━━━━━━━━━━┿┛     ▶    ┃│                  │┃
+ ├──────────────────┤            ├──────────────────┤           ┃├──────────────────┤┃
+ │ end space =      │            │ end space =      │           ┃│ #3    LOADING    │┃
+ │ 12x              │            │ 12x              │           ┃│   PLACEHOLDER    │┃
+ │ placeholder.size │            │ placeholder.size │           ┃├──────────────────┤┃
+ │                  │            │                  │           ┗┿━━━━━━━━━━━━━━━━━━┿┛
+ │                  │            │                  │            │   PLACEHOLDER    │
+ │                  │            │                  │            ├──────────────────┤
+ │                  │            │                  │            │ end space =      │
+ │                  │            │                  │            │ 10x              │
+ │                  │            │                  │            │ placeholder.size │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ └──────────────────┘            └──────────────────┘            └──────────────────┘
+
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌  load second page ▼
+
+ ┌──────────────────┐            ┌──────────────────┐            ┌──────────────────┐
+ │ start space =    │            │ start space =    │            │ start space =    │
+ │ #0.size +        │            │ #0.size +        │            │ #0.size          │
+ │ #1.size +        │            │ #1.size +        │            ├──────────────────┤
+ │ #2.size +        │            │ #2.size +        │            │ #1               │
+ │ #3.size +        │            │ #3.size +        │           ┏┿━━━━━━━━━━━━━━━━━━┿┓
+ │ #4.size +        │            │ #4.size +        │           ┃├──────────────────┤┃
+ │ #5.size +        │            │ #5.size +        │           ┃│ #2               │┃
+ │ #6.size +        │            │ 3x               │           ┃│                  │┃
+ │ #7.size +        │            │ placeholder.size │           ┃├──────────────────┤┃
+ │ #8.size          │            │                  │           ┃│ #3               │┃
+ │                  │            │                  │           ┃│                  │┃
+ │                  │            │                  │           ┃├──────────────────┤┃
+ │                  │            │                  │           ┗┿━━━━━━━━━━━━━━━━━━┿┛
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            ├──────────────────┤
+ │                  │            │                  │            │ end space =      │
+ │                  │            │                  │            │ #5.size +        │
+ │                  │            │                  │            │ 9x               │
+ │                  │            │                  │   scroll   │ placeholder.size │
+ │                  │     load   │                  │      two   │                  │
+ │                  │    third   │                  │    pages   │                  │
+ │                  │     page   │                  │     down   │                  │
+ │                  │            │                  │            │                  │
+ │                  │      ◀     │                  │      ◀     │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+┏┿━━━━━━━━━━━━━━━━━━┿┓          ┏┿━━━━━━━━━━━━━━━━━━┿┓           │                  │
+┃│ #9    LOADING    │┃          ┃│ #9    LOADING    │┃           │                  │
+┃│   PLACEHOLDER    │┃          ┃│   PLACEHOLDER    │┃           │                  │
+┃├──────────────────┤┃          ┃├──────────────────┤┃           │                  │
+┃│ #10   LOADING    │┃          ┃│ #10   LOADING    │┃           │                  │
+┃│   PLACEHOLDER    │┃          ┃│   PLACEHOLDER    │┃           │                  │
+┃├──────────────────┤┃          ┃├──────────────────┤┃           │                  │
+┃│ #11   LOADING    │┃          ┃│ #11   LOADING    │┃           │                  │
+┗┿━━━━━━━━━━━━━━━━━━┿┛          ┗┿━━━━━━━━━━━━━━━━━━┿┛           │                  │
+ ├──────────────────┤            ├──────────────────┤            │                  │
+ │ end space =      │            │ end space =      │            │                  │
+ │ 3x               │            │ 3x               │            │                  │
+ │ placeholder.size │            │ placeholder.size │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ └──────────────────┘            └──────────────────┘            └──────────────────┘
+
+  load fourth page ▼ ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+
+ ┌──────────────────┐            ┌──────────────────┐            ┌──────────────────┐
+ │ start space =    │            │ start space =    │            │ start space =    │
+ │ #0.size +        │            │ #0.size +        │            │ #0.size +        │
+ │ #1.size +        │            │ #1.size +        │            │ #1.size +        │
+ │ #2.size +        │            │ #2.size +        │            │ #2.size +        │
+ │ #3.size +        │            │ #3.size +        │            │ #3.size +        │
+ │ #4.size +        │            │ #4.size +        │            │ #4.size +        │
+ │ #5.size +        │            │ #5.size +        │            │ #5.size +        │
+ │ #6.size +        │            │ #6.size +        │            │ #6.size +        │
+ │ #7.size +        │            │ #7.size +        │            │ #7.size +        │
+ │ #8.size          │            │ #8.size +        │            │ #8.size +        │
+ │                  │            │ #9.size +        │            │ #9.size +        │
+ │                  │            │ #10.size         │            │ #10.size         │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │            │                  │            │                  │
+ │                  │    scroll  │                  │            │                  │
+ │                  │    one     │                  │    load    │                  │
+ │                  │    page    │                  │    fifth   │                  │
+ │                  │    down    │                  │    page    │                  │
+┏┿━━━━━━━━━━━━━━━━━━┿┓           │                  │            │                  │
+┃│ #9               │┃     ▶     │                  │      ▶     │                  │
+┃│                  │┃           │                  │            │                  │
+┃├──────────────────┤┃           │                  │            │                  │
+┃│ #10              │┃           │                  │            │                  │
+┃│                  │┃           │                  │            │                  │
+┃├──────────────────┤┃          ┏┿━━━━━━━━━━━━━━━━━━┿┓          ┏┿━━━━━━━━━━━━━━━━━━┿┓
+┃│ #11              │┃          ┃│ #11              │┃          ┃│ #11              │┃
+┗┿━━━━━━━━━━━━━━━━━━┿┛          ┃│                  │┃          ┃│                  │┃
+ ├──────────────────┤           ┃├──────────────────┤┃          ┃├──────────────────┤┃
+ │ end space =      │           ┃│ #12   LOADING    │┃          ┃│ #12              │┃
+ │ 3x               │           ┃│   PLACEHOLDER    │┃          ┃│                  │┃
+ │ placeholder.size │           ┃├──────────────────┤┃          ┃├──────────────────┤┃
+ │                  │           ┃│ #13   LOADING    │┃          ┃│ #13              │┃
+ │                  │           ┗┿━━━━━━━━━━━━━━━━━━┿┛          ┗┿━━━━━━━━━━━━━━━━━━┿┛
+ │                  │            ├──────────────────┤            ├──────────────────┤
+ │                  │            │ end space =      │            │ end space =      │
+ │                  │            │ placeholder.size │            │ #14.size         │
+ └──────────────────┘            └──────────────────┘            └──────────────────┘
+```
+
+  </blockquote>
+</details>
+
+```tsx
+import { useWindowedList } from '@react-hook-window/use-windowed-list'
+import {
+  LoadingItemsRange,
+  useItemsLoader
+} from '@react-hook-window/use-items-loader'
+
+interface SearchItem {
+  id: string
+  content: string
+}
+
+export const SearchResult: React.VFC<{
+  searchItemsTotalCount: number
+  searchItems: Array<SearchItem>
+  loadNextPage(): void
+}> = ({ searchItemsTotalCount, searchItems, loadNextPage }) => {
+  const {
+    setContainerRef,
+    startSpace,
+    endSpace,
+    indexes,
+    isScrolling,
+    overscanFromIndex,
+    overscanBeforeIndex
+  } = useWindowedList({
+    containerSize: SEARCH_CONTAINER_HEIGHT,
+    itemSize: SEARCH_ITEM_HEIGHT,
+    // 1. Pass total count but not searchItems.length
+    itemCount: searchItemsTotalCount
+  })
+
+  useItemsLoader({
+    // 2. Skip the loading while isScrolling
+    skip: isScrolling,
+    overscanFromIndex,
+    overscanBeforeIndex,
+    shouldLoadItem: React.useCallback(
+      // 3. Items further than searchItems are loading placeholders so they should be loaded.
+      (index: number) => index >= searchItems.length,
+      [searchItems.length]
+    ),
+    loadItemsRange: React.useCallback(
+      // 4. Just load the next page ignoring loading items range.
+      (_range: LoadingItemsRange) => loadNextPage(),
+      [loadNextPage]
+    )
+  })
+
+  return (
+    <div
+      ref={setContainerRef}
+      className="container"
+      style={{
+        overflow: 'auto',
+        height: SEARCH_CONTAINER_HEIGHT
+      }}
+    >
+      <div style={{ height: startSpace }} />
+
+      {indexes.map(index => {
+        // 5. Render as many placeholders as needed.
+        if (index >= searchItems.length) {
+          return (
+            <div
+              key={`placeholder-${index}`}
+              className="box"
+              style={{ height: SEARCH_ITEM_HEIGHT }}
+            >
+              LOADING PLACEHOLDER
+            </div>
+          )
+        }
+
+        const searchItem = searchItems[index]
+
+        return (
+          <div
+            key={searchItem.id}
+            className="box"
+            style={{ height: FEED_ITEM_HEIGHT }}
+          >
+            {searchItem.content}
+          </div>
+        )
+      })}
+
+      <div style={{ height: endSpace }} />
+    </div>
+  )
+}
+```
 
 <!-- L I N K S -->
 
