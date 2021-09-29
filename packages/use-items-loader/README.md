@@ -35,7 +35,7 @@ Consider page size equal to 3 items.
 ┃│   PLACEHOLDER    │┃   load   ┃│                  │┃           │                  │
 ┃└──────────────────┘┃   first  ┃├──────────────────┤┃          ┏┿━━━━━━━━━━━━━━━━━━┿┓
 ┃                    ┃   page   ┃│ #1               │┃  scroll  ┃│ #1               │┃
-┃                    ┃          ┃│                  │┃   down   ┃│                  │┃
+┃                    ┃          ┃│                  │┃  down    ┃│                  │┃
 ┃                    ┃     ▶    ┃├──────────────────┤┃          ┃├──────────────────┤┃
 ┃                    ┃          ┃│ #2               │┃    ▶     ┃│ #2               │┃
 ┗━━━━━━━━━━━━━━━━━━━━┛          ┗┿━━━━━━━━━━━━━━━━━━┿┛          ┃│                  │┃
@@ -55,7 +55,7 @@ Consider page size equal to 3 items.
  ├──────────────────┤            ├──────────────────┤           ┃├──────────────────┤┃
  │ #2               │            │ #2               │           ┃│ #2               │┃
 ┏┿━━━━━━━━━━━━━━━━━━┿┓          ┏┿━━━━━━━━━━━━━━━━━━┿┓  scroll  ┃│                  │┃
-┃├──────────────────┤┃          ┃├──────────────────┤┃   down   ┃├──────────────────┤┃
+┃├──────────────────┤┃          ┃├──────────────────┤┃    down  ┃├──────────────────┤┃
 ┃│ #3               │┃          ┃│ #3               │┃          ┃│ #3               │┃
 ┃│                  │┃   load   ┃│                  │┃     ◀    ┃│                  │┃
 ┃├──────────────────┤┃   next   ┃├──────────────────┤┃          ┃├──────────────────┤┃
@@ -66,7 +66,7 @@ Consider page size equal to 3 items.
 ┃│                  │┃          ┃│                  │┃           │                  │
 ┃├──────────────────┤┃          ┃├──────────────────┤┃           ├──────────────────┤
 ┗┿━━━━━━━━━━━━━━━━━━┿┛          ┗┿━━━━━━━━━━━━━━━━━━┿┛           │     LOADING      │
- │ #6               │            │   PLACEHOLDER    │            │   PLACEHOLDER    │
+ │                  │            │   PLACEHOLDER    │            │   PLACEHOLDER    │
  ├──────────────────┤            └──────────────────┘            └──────────────────┘
  │ #7               │
  │                  │
@@ -101,7 +101,7 @@ Compare it with the "infinite loading illustration" above to get more insights.
 ┃│   PLACEHOLDER    │┃   load   ┃│                  │┃           │ #0.size          │
 ┃└──────────────────┘┃   first  ┃├──────────────────┤┃          ┏┿━━━━━━━━━━━━━━━━━━┿┓
 ┃                    ┃   page   ┃│ #1               │┃  scroll  ┃│ #1               │┃
-┃                    ┃          ┃│                  │┃   down   ┃│                  │┃
+┃                    ┃          ┃│                  │┃  down    ┃│                  │┃
 ┃                    ┃     ▶    ┃├──────────────────┤┃          ┃├──────────────────┤┃
 ┃                    ┃          ┃│ #2               │┃    ▶     ┃│ #2               │┃
 ┗━━━━━━━━━━━━━━━━━━━━┛          ┗┿━━━━━━━━━━━━━━━━━━┿┛          ┃│                  │┃
@@ -121,7 +121,7 @@ Compare it with the "infinite loading illustration" above to get more insights.
  ├──────────────────┤            ├──────────────────┤           ┃├──────────────────┤┃
  │ #2               │            │ #2               │           ┃│ #2               │┃
 ┏┿━━━━━━━━━━━━━━━━━━┿┓          ┏┿━━━━━━━━━━━━━━━━━━┿┓  scroll  ┃│                  │┃
-┃├──────────────────┤┃          ┃├──────────────────┤┃   down   ┃├──────────────────┤┃
+┃├──────────────────┤┃          ┃├──────────────────┤┃    down  ┃├──────────────────┤┃
 ┃│ #3               │┃          ┃│ #3               │┃          ┃│ #3               │┃
 ┃│                  │┃   load   ┃│                  │┃     ◀    ┃│                  │┃
 ┃├──────────────────┤┃   next   ┃├──────────────────┤┃          ┃├──────────────────┤┃
@@ -132,7 +132,7 @@ Compare it with the "infinite loading illustration" above to get more insights.
 ┃│                  │┃          ┃│                  │┃           │ #5.size +        │
 ┃├──────────────────┤┃          ┃├──────────────────┤┃           │ placeholder.size │
 ┗┿━━━━━━━━━━━━━━━━━━┿┛          ┗┿━━━━━━━━━━━━━━━━━━┿┛           │                  │
- │ #6               │            │   PLACEHOLDER    │            │                  │
+ │                  │            │   PLACEHOLDER    │            │                  │
  ├──────────────────┤            └──────────────────┘            └──────────────────┘
  │ end space =      │
  │ #7.size +        │
@@ -160,12 +160,11 @@ interface FeedItem {
   content: string
 }
 
-const FEED_ITEM_LOADING_PLACEHOLDER_COUNT = 1
-
 export const InfiniteFeed: React.VFC<{
+  feedItemsPlaceholderCount?: number
   feedItems: Array<FeedItem>
   loadNextPage(): void
-}> = ({ feedItems, loadNextPage }) => {
+}> = ({ feedItemsPlaceholderCount = 1, feedItems, loadNextPage }) => {
   const {
     setContainerRef,
     startSpace,
@@ -179,7 +178,7 @@ export const InfiniteFeed: React.VFC<{
     itemSize: FEED_ITEM_HEIGHT,
     // 1. Reserve extra items for the loading placeholders.
     // It might be reasonable to define the value equal to the loading page size.
-    itemCount: feedItems.length + FEED_ITEM_LOADING_PLACEHOLDER_COUNT
+    itemCount: feedItems.length + feedItemsPlaceholderCount
   })
 
   useItemsLoader({
@@ -188,17 +187,13 @@ export const InfiniteFeed: React.VFC<{
     overscanFromIndex,
     overscanBeforeIndex,
     shouldLoadItem: React.useCallback(
-      (index: number) => {
-        // 3. Items further than feedItems are loading placeholders so they should be loaded.
-        return index >= feedItems.length
-      },
+      // 3. Items further than feedItems are loading placeholders so they should be loaded.
+      (index: number) => index >= feedItems.length,
       [feedItems.length]
     ),
     loadItemsRange: React.useCallback(
-      (_range: LoadingItemsRange) => {
-        // 4. Just load the next page ignoring loading items range.
-        loadNextPage()
-      },
+      // 4. Just load the next page ignoring loading items range.
+      (_range: LoadingItemsRange) => loadNextPage(),
       [loadNextPage]
     )
   })
@@ -249,7 +244,168 @@ export const InfiniteFeed: React.VFC<{
 
 ## Finite loading (aka pagination) usage
 
-Consider TODO example. That case is a finite loading list, where an application knows a total count of items but loads them page by page when a user scrolls to an unloaded area. The app might render loading placeholders instead of all unloaded items since the total count is known ahead.
+Consider an Internet shop's searching page where resulting items split into pages. That case is a finite loading list, where an application knows a total count of items but loads them page by page when a user scrolls to an unloaded area. The app might render loading placeholders instead of all unloaded items since the total count is known ahead.
+
+<details>
+  <summary>
+    Show a finite loading illustration.
+  </summary>
+
+  <blockquote>
+
+Consider page size equal to 3 items with total count of 15 items.
+
+```
+┏┯━━━━━━━━━━━━━━━━━━┯┓          ┏┯━━━━━━━━━━━━━━━━━━┯┓           ┌──────────────────┐
+┃│ #0    LOADING    │┃          ┃│ #0               │┃           │ #0               │
+┃│   PLACEHOLDER    │┃   load   ┃│                  │┃           │                  │
+┃├──────────────────┤┃   first  ┃├──────────────────┤┃  scroll   ├──────────────────┤
+┃│ #1    LOADING    │┃   page   ┃│ #1               │┃  one      │ #1               │
+┃│   PLACEHOLDER    │┃          ┃│                  │┃  page    ┏┿━━━━━━━━━━━━━━━━━━┿┓
+┃├──────────────────┤┃     ▶    ┃├──────────────────┤┃  down    ┃├──────────────────┤┃
+┃│ #2    LOADING    │┃          ┃│ #2               │┃          ┃│ #2               │┃
+┗┿━━━━━━━━━━━━━━━━━━┿┛          ┗┿━━━━━━━━━━━━━━━━━━┿┛     ▶    ┃│                  │┃
+ ├──────────────────┤            ├──────────────────┤           ┃├──────────────────┤┃
+ │ #3    LOADING    │            │ #3    LOADING    │           ┃│ #3    LOADING    │┃
+ │   PLACEHOLDER    │            │   PLACEHOLDER    │           ┃│   PLACEHOLDER    │┃
+ ├──────────────────┤            ├──────────────────┤           ┃├──────────────────┤┃
+ │ #4    LOADING    │            │ #4    LOADING    │           ┗┿━━━━━━━━━━━━━━━━━━┿┛
+ │   PLACEHOLDER    │            │   PLACEHOLDER    │            │   PLACEHOLDER    │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #5    LOADING    │            │ #5    LOADING    │            │ #5    LOADING    │
+ │   PLACEHOLDER    │            │   PLACEHOLDER    │            │   PLACEHOLDER    │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #6    LOADING    │            │ #6    LOADING    │            │ #6    LOADING    │
+ │   PLACEHOLDER    │            │   PLACEHOLDER    │            │   PLACEHOLDER    │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #7    LOADING    │            │ #7    LOADING    │            │ #7    LOADING    │
+ │   PLACEHOLDER    │            │   PLACEHOLDER    │            │   PLACEHOLDER    │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #8    LOADING    │            │ #8    LOADING    │            │ #8    LOADING    │
+ │   PLACEHOLDER    │            │   PLACEHOLDER    │            │   PLACEHOLDER    │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #9    LOADING    │            │ #9    LOADING    │            │ #9    LOADING    │
+ │   PLACEHOLDER    │            │   PLACEHOLDER    │            │   PLACEHOLDER    │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #10   LOADING    │            │ #10   LOADING    │            │ #10   LOADING    │
+ │   PLACEHOLDER    │            │   PLACEHOLDER    │            │   PLACEHOLDER    │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #11   LOADING    │            │ #11   LOADING    │            │ #11   LOADING    │
+ │   PLACEHOLDER    │            │   PLACEHOLDER    │            │   PLACEHOLDER    │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #12   LOADING    │            │ #12   LOADING    │            │ #12   LOADING    │
+ │   PLACEHOLDER    │            │   PLACEHOLDER    │            │   PLACEHOLDER    │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #13   LOADING    │            │ #13   LOADING    │            │ #13   LOADING    │
+ │   PLACEHOLDER    │            │   PLACEHOLDER    │            │   PLACEHOLDER    │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #14   LOADING    │            │ #14   LOADING    │            │ #14   LOADING    │
+ │   PLACEHOLDER    │            │   PLACEHOLDER    │            │   PLACEHOLDER    │
+ └──────────────────┘            └──────────────────┘            └──────────────────┘
+
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌  load second page ▼
+
+ ┌──────────────────┐            ┌──────────────────┐            ┌──────────────────┐
+ │ #0               │            │ #0               │            │ #0               │
+ │                  │            │                  │            │                  │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #1               │            │ #1               │            │ #1               │
+ │                  │            │                  │           ┏┿━━━━━━━━━━━━━━━━━━┿┓
+ ├──────────────────┤            ├──────────────────┤           ┃├──────────────────┤┃
+ │ #2               │            │ #2               │           ┃│ #2               │┃
+ │                  │            │                  │           ┃│                  │┃
+ ├──────────────────┤            ├──────────────────┤           ┃├──────────────────┤┃
+ │ #3               │            │ #3               │           ┃│ #3               │┃
+ │                  │            │                  │           ┃│                  │┃
+ ├──────────────────┤            ├──────────────────┤           ┃├──────────────────┤┃
+ │ #4               │            │ #4               │           ┗┿━━━━━━━━━━━━━━━━━━┿┛
+ │                  │            │                  │            │                  │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #5               │            │ #5               │            │ #5               │
+ │                  │            │                  │            │                  │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #6               │            │ #6    LOADING    │   scroll   │ #6    LOADING    │
+ │                  │     load   │   PLACEHOLDER    │      two   │   PLACEHOLDER    │
+ ├──────────────────┤    third   ├──────────────────┤    pages   ├──────────────────┤
+ │ #7               │     page   │ #7    LOADING    │     down   │ #7    LOADING    │
+ │                  │            │   PLACEHOLDER    │            │   PLACEHOLDER    │
+ ├──────────────────┤      ◀     ├──────────────────┤      ◀     ├──────────────────┤
+ │ #8               │            │ #8    LOADING    │            │ #8    LOADING    │
+ │                  │            │   PLACEHOLDER    │            │   PLACEHOLDER    │
+┏┿━━━━━━━━━━━━━━━━━━┿┓          ┏┿━━━━━━━━━━━━━━━━━━┿┓           ├──────────────────┤
+┃│ #9    LOADING    │┃          ┃│ #9    LOADING    │┃           │ #9    LOADING    │
+┃│   PLACEHOLDER    │┃          ┃│   PLACEHOLDER    │┃           │   PLACEHOLDER    │
+┃├──────────────────┤┃          ┃├──────────────────┤┃           ├──────────────────┤
+┃│ #10   LOADING    │┃          ┃│ #10   LOADING    │┃           │ #10   LOADING    │
+┃│   PLACEHOLDER    │┃          ┃│   PLACEHOLDER    │┃           │   PLACEHOLDER    │
+┃├──────────────────┤┃          ┃├──────────────────┤┃           ├──────────────────┤
+┃│ #11   LOADING    │┃          ┃│ #11   LOADING    │┃           │ #11   LOADING    │
+┗┿━━━━━━━━━━━━━━━━━━┿┛          ┗┿━━━━━━━━━━━━━━━━━━┿┛           │   PLACEHOLDER    │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #12   LOADING    │            │ #12   LOADING    │            │ #12   LOADING    │
+ │   PLACEHOLDER    │            │   PLACEHOLDER    │            │   PLACEHOLDER    │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #13   LOADING    │            │ #13   LOADING    │            │ #13   LOADING    │
+ │   PLACEHOLDER    │            │   PLACEHOLDER    │            │   PLACEHOLDER    │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #14   LOADING    │            │ #14   LOADING    │            │ #14   LOADING    │
+ │   PLACEHOLDER    │            │   PLACEHOLDER    │            │   PLACEHOLDER    │
+ └──────────────────┘            └──────────────────┘            └──────────────────┘
+
+  load fourth page ▼ ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+
+ ┌──────────────────┐            ┌──────────────────┐            ┌──────────────────┐
+ │ #0               │            │ #0               │            │ #0               │
+ │                  │            │                  │            │                  │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #1               │            │ #1               │            │ #1               │
+ │                  │            │                  │            │                  │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #2               │            │ #2               │            │ #2               │
+ │                  │            │                  │            │                  │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #3               │            │ #3               │            │ #3               │
+ │                  │            │                  │            │                  │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #4               │            │ #4               │            │ #4               │
+ │                  │            │                  │            │                  │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #5               │            │ #5               │            │ #5               │
+ │                  │            │                  │            │                  │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #6               │            │ #6               │            │ #6               │
+ │                  │            │                  │            │                  │
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #7               │            │ #7               │            │ #7               │
+ │                  │    scroll  │                  │            │                  │
+ ├──────────────────┤    one     ├──────────────────┤    load    ├──────────────────┤
+ │ #8               │    page    │ #8               │    fifth   │ #8               │
+ │                  │    down    │                  │    page    │                  │
+┏┿━━━━━━━━━━━━━━━━━━┿┓           ├──────────────────┤            ├──────────────────┤
+┃│ #9               │┃     ▶     │ #9               │      ▶     │ #9               │
+┃│                  │┃           │                  │            │                  │
+┃├──────────────────┤┃           ├──────────────────┤            ├──────────────────┤
+┃│ #10              │┃           │ #10              │            │ #10              │
+┃│                  │┃           │                  │            │                  │
+┃├──────────────────┤┃          ┏┿━━━━━━━━━━━━━━━━━━┿┓          ┏┿━━━━━━━━━━━━━━━━━━┿┓
+┃│ #11              │┃          ┃│ #11              │┃          ┃│ #11              │┃
+┗┿━━━━━━━━━━━━━━━━━━┿┛          ┃│                  │┃          ┃│                  │┃
+ ├──────────────────┤           ┃├──────────────────┤┃          ┃├──────────────────┤┃
+ │ #12   LOADING    │           ┃│ #12   LOADING    │┃          ┃│ #12              │┃
+ │   PLACEHOLDER    │           ┃│   PLACEHOLDER    │┃          ┃│                  │┃
+ ├──────────────────┤           ┃├──────────────────┤┃          ┃├──────────────────┤┃
+ │ #13   LOADING    │           ┃│ #13   LOADING    │┃          ┃│ #13              │┃
+ │   PLACEHOLDER    │           ┗┿━━━━━━━━━━━━━━━━━━┿┛          ┗┿━━━━━━━━━━━━━━━━━━┿┛
+ ├──────────────────┤            ├──────────────────┤            ├──────────────────┤
+ │ #14   LOADING    │            │ #14   LOADING    │            │ #14              │
+ │   PLACEHOLDER    │            │   PLACEHOLDER    │            │                  │
+ └──────────────────┘            └──────────────────┘            └──────────────────┘
+```
+
+  </blockquote>
+</details>
+
+Let's implement the `SearchingResult` windowed component with finite items loading. Here is a [live demo][todo] with [source code][todo].
 
 <!-- L I N K S -->
 
