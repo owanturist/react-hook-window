@@ -1,6 +1,6 @@
 # `use-items-loader`
 
-React hook to manage pagination or infinite loading of a windowed list items.
+React hook to manage pagination or infinite loading of a windowed list items.
 
 ## Getting started
 
@@ -18,16 +18,16 @@ npm install @react-hook-window/use-items-loader --save
 
 ## Infinite loading usage
 
-Consider a social network feed like one on Instagram, Facebook, YouTube, etc. That case is an infinite loading list, where an application can always render a loading placeholder while the next page is loading. As soon as the loading placeholder becomes visible, the app starts the next page loading.
+Consider a social network feed like one on Instagram, Facebook, YouTube, etc. That case is an infinite loading list, where an application can always render a loading placeholder while the next page is loading. As soon as the loading placeholder becomes visible, the app starts the next page loading.
 
 <details>
   <summary>
-    Show an infinite loading illustration.
+    Show an infinite loading illustration.
   </summary>
 
   <blockquote>
 
-Consider page size equals to 3 items.
+Consider page size equals to 3 items.
 
 ```
                     load first page       ▶         scroll down         ▶       load next page        ▶         scroll down         ▶       load next page
@@ -67,18 +67,18 @@ Consider page size equals to 3 items.
   </blockquote>
 </details>
 
-Let's implement the `InfiniteFeed` windowed component with infinite items loading. Here is a [live demo][todo] with [source code][todo].
+Let’s implement the `InfiniteFeed` windowed component with infinite items loading. Here is a [live demo][todo] with [source code][todo].
 
 <details>
   <summary>
-    Show a windowed infinite loading illustration.
+    Show a windowed infinite loading illustration.
   </summary>
 
   <blockquote>
 
-Consider page size equals to 3 items and [`UseWindowedListOptions.overscanCount`][use-windowed-list-options.overscan-count] equals 0.
+Consider page size equals to 3 items and [`UseWindowedListOptions.overscanCount`][use-windowed-list-options.overscan-count] equals 0.
 
-Compare it with the "infinite loading illustration" above to get more insights.
+Compare it with the “infinite loading illustration” above to get more insights.
 
 ```
                     load first page       ▶         scroll down         ▶       load next page        ▶         scroll down         ▶       load next page
@@ -212,18 +212,18 @@ export const InfiniteFeed: React.VFC<{
 }
 ```
 
-## Finite loading (aka pagination) usage
+## Finite loading (pagination) usage
 
-Consider an Internet shop's searching page where resulting items split into pages. That case is a finite loading list, where an application knows a total count of items but loads them page by page when a user scrolls to an unloaded area. The app might render loading placeholders instead of all unloaded items since the total count is known ahead.
+Consider an Internet shop’s searching page where resulting items split into pages. That case is a finite loading list, where an application knows a total count of items but loads them page by page when a user scrolls to an unloaded area. The app might render loading placeholders instead of all unloaded items since the total count is known ahead.
 
 <details>
   <summary>
-    Show a finite loading illustration.
+    Show a finite loading illustration.
   </summary>
 
   <blockquote>
 
-Consider page size equals to 3 items with total count of 15 items.
+Consider page size equals to 3 items with total count of 15 items.
 
 ```
                     load first page       ▶         scroll down         ▶      load second page       ▶       scroll down far       ▶       load third page       ▶       load fourth page      ▶         scroll down         ▶       load fifth page
@@ -278,18 +278,18 @@ Consider page size equals to 3 items with total count of 15 items.
   </blockquote>
 </details>
 
-Let's implement the `SearchResult` windowed component with finite items loading. Here is a [live demo][todo] with [source code][todo].
+Let’s implement the `SearchResult` windowed component with finite items loading. Here is a [live demo][todo] with [source code][todo].
 
 <details>
   <summary>
-    Show a windowed finite loading illustration.
+    Show a windowed finite loading illustration.
   </summary>
 
   <blockquote>
 
-Consider page size equals to 3 items with total count of 15 items and [`UseWindowedListOptions.overscanCount`][use-windowed-list-options.overscan-count] equals 0.
+Consider page size equals to 3 items with total count of 15 items and [`UseWindowedListOptions.overscanCount`][use-windowed-list-options.overscan-count] equals 0.
 
-Compare it with the "finite loading illustration" above to get more insights.
+Compare it with the “finite loading illustration” above to get more insights.
 
 ```
                     load first page       ▶         scroll down         ▶      load second page       ▶       scroll down far       ▶       load third page       ▶       load fourth page      ▶         scroll down         ▶       load fifth page
@@ -439,21 +439,21 @@ export const SearchResult: React.VFC<{
 
 ## Range loading usage
 
-The finite loading use case above might be a bit underwhelming for some use cases.
+The finite loading use case above might be a bit underwhelming for some use cases.
 
-1. The app might not need to load an entire page but only a few items.
-2. The app might need to load a far away page.
+1. The app might not need to load an entire page but only a few items.
+2. The app might need to load a far away page.
 
-For both cases, it might be helpful to load a range of items instead of a page. That case is a range loading list, where an application knows a total count of items and can fetch a range of them when a user scrolls to unloaded items. The app might render loading placeholders since the total count is known ahead.
+For both cases, it might be helpful to load a range of items instead of a page. That case is a range loading list, where an application knows a total count of items and can fetch a range of them when a user scrolls to unloaded items. The app might render loading placeholders since the total count is known ahead.
 
 <details>
   <summary>
-    Show a range loading illustration.
+    Show a range loading illustration.
   </summary>
 
   <blockquote>
 
-Consider total count of 15 items.
+Consider total count of 15 items.
 
 ```
                   load items 0, 1, 2      ▶         scroll down         ▶       load items 3, 4       ▶         scroll down         ▶    load items 9, 10, 11     ▶         scroll down         ▶      load items 12, 13      ▶          scroll up          ▶     load items 5, 6, 7      ▶         scroll down         ▶         load item 8         ▶         scroll down         ▶         load item 14
@@ -508,16 +508,16 @@ Consider total count of 15 items.
   </blockquote>
 </details>
 
-Let's implement the `RangedSearchResult` windowed component with finite items loading. Here is a [live demo][todo] with [source code][todo].
+Let’s implement the `RangedSearchResult` windowed component with finite items loading. Here is a [live demo][todo] with [source code][todo].
 
 <details>
   <summary>
-    Show a windowed range loading illustration.
+    Show a windowed range loading illustration.
   </summary>
 
   <blockquote>
 
-Consider total count of 15 items and [`UseWindowedListOptions.overscanCount`][use-windowed-list-options.overscan-count] equals 0.
+Consider total count of 15 items and [`UseWindowedListOptions.overscanCount`][use-windowed-list-options.overscan-count] equals 0.
 
 Compare it with the “range loading illustration” above to get more insights.
 
