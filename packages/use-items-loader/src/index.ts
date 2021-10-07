@@ -7,23 +7,23 @@ export interface LoadingItemsRange {
   loadCount: number
 }
 
-export interface UseInfiniteLoaderOptions {
-  isScrolling: boolean
+export interface UseItemsLoaderOptions {
+  skip?: boolean
   overscanFromIndex: number
   overscanBeforeIndex: number
   shouldLoadItem(index: number): boolean
   loadItemsRange(range: LoadingItemsRange): void
 }
 
-export const useInfiniteLoader = ({
-  isScrolling,
+export const useItemsLoader = ({
+  skip = false,
   overscanFromIndex,
   overscanBeforeIndex,
   shouldLoadItem,
   loadItemsRange
-}: UseInfiniteLoaderOptions): void => {
+}: UseItemsLoaderOptions): void => {
   useEffect(() => {
-    if (isScrolling) {
+    if (skip) {
       return
     }
 
@@ -41,7 +41,7 @@ export const useInfiniteLoader = ({
       })
     }
   }, [
-    isScrolling,
+    skip,
     overscanFromIndex,
     overscanBeforeIndex,
     shouldLoadItem,
