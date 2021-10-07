@@ -658,11 +658,11 @@ export const SearchResult: React.VFC<{
 
         return (
           <div
-            key={loadableItem.id}
+            key={loadableItem.data.id}
             className="box"
             style={{ height: FEED_ITEM_HEIGHT }}
           >
-            {loadableItem.content}
+            {loadableItem.data.content}
           </div>
         )
       })}
