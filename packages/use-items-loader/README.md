@@ -372,7 +372,7 @@ export const SearchResult: React.VFC<{
   } = useWindowedList({
     containerSize: SEARCH_CONTAINER_HEIGHT,
     itemSize: SEARCH_ITEM_HEIGHT,
-    // 1. Pass total count but not searchItems.length
+    // 1. Pass total count but not searchItems.length.
     itemCount: searchItemsTotalCount
   })
 
@@ -573,6 +573,105 @@ Compare it with the “range loading illustration” above to get more insigh
 
   </blockquote>
 </details>
+
+```tsx
+import { useWindowedList } from '@react-hook-window/use-windowed-list'
+import {
+  LoadingItemsRange,
+  useItemsLoader
+} from '@react-hook-window/use-items-loader'
+
+type Loadable<T> =
+  | { type: 'NOT_LOADED' }
+  | { type: 'LOADING' }
+  | { type: 'LOADED'; data: T }
+
+interface SearchItem {
+  id: string
+  content: string
+}
+
+export const SearchResult: React.VFC<{
+  loadableItems: Array<Loadable<SearchItem>>
+  loadItemsRange(fromIndex: number, count: number): void
+}> = ({ loadableItems, loadItemsRange }) => {
+  const {
+    setContainerRef,
+    startSpace,
+    endSpace,
+    indexes,
+    isScrolling,
+    overscanFromIndex,
+    overscanBeforeIndex
+  } = useWindowedList({
+    containerSize: SEARCH_CONTAINER_HEIGHT,
+    itemSize: SEARCH_ITEM_HEIGHT,
+    // 1. Pass total loadableItems.length as it represents the search items' total count.
+    itemCount: loadableItems.length
+  })
+
+  useItemsLoader({
+    // 2. Skip the loading while isScrolling
+    skip: isScrolling,
+    overscanFromIndex,
+    overscanBeforeIndex,
+    shouldLoadItem: React.useCallback(
+      // 3. Loadable items with NOT_LOADED type should be loaded.
+      (index: number) => index >= loadableItems[index].type === 'NOT_LOADED',
+      [loadableItems]
+    ),
+    loadItemsRange: React.useCallback(
+      // 4. Load the visible range.
+      ({ loadFromIndex, loadCount }: LoadingItemsRange) => {
+        loadItemsRange(loadFromIndex, loadCount)
+      },
+      [loadItemsRange]
+    )
+  })
+
+  return (
+    <div
+      ref={setContainerRef}
+      className="container"
+      style={{
+        overflow: 'auto',
+        height: SEARCH_CONTAINER_HEIGHT
+      }}
+    >
+      <div style={{ height: startSpace }} />
+
+      {indexes.map(index => {
+        const loadableItem = loadableItems[index]
+
+        // 5. Render loading placeholders for both NOT_LOADED and LOADING.
+        if (loadableItem.type !== 'LOADED') {
+          return (
+            <div
+              key={`placeholder-${index}`}
+              className="box"
+              style={{ height: SEARCH_ITEM_HEIGHT }}
+            >
+              LOADING PLACEHOLDER
+            </div>
+          )
+        }
+
+        return (
+          <div
+            key={loadableItem.id}
+            className="box"
+            style={{ height: FEED_ITEM_HEIGHT }}
+          >
+            {loadableItem.content}
+          </div>
+        )
+      })}
+
+      <div style={{ height: endSpace }} />
+    </div>
+  )
+}
+```
 
 <!-- L I N K S -->
 
